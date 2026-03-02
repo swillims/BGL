@@ -1,0 +1,53 @@
+================================================================================
+BGL – License Overview
+================================================================================
+This LICENSE file applies to the entirety of this repository. It is divided into three sections: your engine code, your assets, and third-party libraries.
+
+--------------------------------------------------------------------------------
+1. Your Engine Code
+--------------------------------------------------------------------------------
+All original code written by the author(s) of this repository is released
+into the public domain under the Unlicense:
+
+    This is free and unencumbered software released into the public domain.
+
+	Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a compiled binary, for any purpose, commercial or non-commercial, and by any means.
+
+	In jurisdictions that recognize copyright laws, the author or authors of this software dedicate any and all copyright interest in the software to the public domain. We make this dedication for the benefit of the public at large and to the detriment of our heirs and successors. We intend this dedication to be an overt act of relinquishment in perpetuity of all present and future rights to this software under copyright law.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+	For more information, please refer to <https://unlicense.org/>
+
+--------------------------------------------------------------------------------
+2. Assets (Art, Audio, etc.)
+--------------------------------------------------------------------------------
+All assets (sprites, sounds, music, etc.) created by the author(s) are
+released under Creative Commons Zero (CC0 1.0 Universal):
+
+    You may copy, modify, distribute, and perform the work, even for commercial purposes, all without asking permission.
+
+    See <https://creativecommons.org/publicdomain/zero/1.0/> for the full text.
+
+--------------------------------------------------------------------------------
+3. Third-Party Libraries
+--------------------------------------------------------------------------------
+The following third-party libraries are included in this repository. You must comply with their respective licenses when using them:
+
+1. FreeType (Font Engine)
+   - License options: FreeType License (FTL.TXT) OR GNU GPL v2 (GPLv2.TXT)
+   - You may pick one license to comply with.
+
+2. MiniAudio
+   - License: Public Domain (or MIT-style)
+
+3. GLM (OpenGL Mathematics)
+   - License: MIT License or The Happy Bunny License
+
+4. GLFW
+   - License: zlib/libpng license
+
+5. glad
+   - License: MIT License
+
+6. Any other included third-party libraries
+   - Please see their respective LICENSE files in the repository.
