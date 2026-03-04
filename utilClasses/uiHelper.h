@@ -1,5 +1,5 @@
 #pragma once
-//#include "singleton/staticDraw.h"
+#include "singleton/staticDraw.h" // used for ratio
 #include "singleton/staticWrite.h" // used for appending text to a channel
 
 // main purpose of UIElement is to return a vector<float> list for batching
@@ -15,7 +15,7 @@ struct UIElement
         it is mem enefficient but it chains which is a big trade off
         parent[0][0][1] is doable
         the alternative is a series of castings which is hell
-        if using something that doesn't use have subnodes just pretend nodes doesn't exist
+        if using something that doesn't have subnodes just pretend nodes doesn't exist
     */
     std::vector<std::unique_ptr<UIElement>> nodes; 
 
@@ -27,6 +27,7 @@ struct UIElement
     int key; // key is referenced
 
     UIElement(){}
+    UIElement(int key = -1): key(key) {}
     UIElement(float xMin, float yMin, float xSize, float ySize, int key=-1) 
         : xMin(xMin), yMin(yMin), xSize(xSize), ySize(ySize), key(key){}
 
@@ -47,10 +48,10 @@ struct UIElement
     {}
     virtual void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
     {
-        xMin = xMin;
-        yMin = yMin;
-        xSize = xSize;
-        ySize = ySize;
+        xMin = xMin2;
+        yMin = yMin2;
+        xSize = xSize2;
+        ySize = ySize2;
     }
 
     UIElement& operator[](const int i)
@@ -69,6 +70,7 @@ struct UIContainer : UIElement
     //std::vector<std::unique_ptr<UIElement>> nodes; // moved to parent class to enable chaining
     UIContainer(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
         : UIElement(xMin, yMin, xSize, ySize, key) {}
+    UIContainer(int key = -1): UIElement(key) {}
 
     void renderVerts(std::vector<float>& vertices)
     {
@@ -83,28 +85,30 @@ struct UIContainer : UIElement
 struct UIXRatio : UIContainer
 {
     float ratio;
+    bool relativeToScreenSize;
 
-    void adjustNode(float xMin, float yMin, float xSize, float ySize)
+    //UIXRatio() {}
+    //UIXRatio(float xMin, float yMin, float xSize, float ySize, float ratio, bool relativeToScreenSize = true, int key = -1)
+    //    : UIContainer(xMin, yMin, xSize, ySize, key), ratio(ratio), relativeToScreenSize(relativeToScreenSize) {}
+    UIXRatio(float ratio, bool relativeToScreenSize = true, int key = -1)
+        : ratio(ratio), relativeToScreenSize(relativeToScreenSize), UIContainer(key) {}
+
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
     {
-        UIElement::adjustNode(xMin, yMin, xSize, ySize);
+        UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         float xxSize;
         float yySize;
         float xxMin;
         float yyMin;
+        float r = ratio;
         float sizeRatio = xSize / ySize;
-
-        // goal is to maximize space consumed by internal node...
-        // - while staying in parent node(this)...
-        // - while maintaining xRatio
-        // ratio is larger than sizeRatio Shrink x, else shrink y 
-        if (sizeRatio > ratio)
+        if (relativeToScreenSize)
         {
-            //xxSize = xSize * ratio / sizeRatio;
-            // sizeRatio = sSize / ySize 
-            // xSize * ratio / sizeRatio = xSize * ratio / (sSize / ySize)
-            // xSize * ratio / sizeRatio = ratio * xSize * (ySize / sSize)
-            // xSize * ratio / sizeRatio = ratio * ySize
-            xxSize = ratio * ySize;
+            r /= StaticDraw::aspectRatio;
+        }
+        if (sizeRatio > r)
+        {
+            xxSize = r * ySize;
             xxMin = xMin + (xSize * .5) - (xxSize * .5);
             yyMin = yMin;
             yySize = ySize;
@@ -113,8 +117,13 @@ struct UIXRatio : UIContainer
         {
             xxMin = xMin;
             xxSize = xSize;
-            yySize = xSize / ratio;
+            yySize = xSize / r;
             yyMin = yMin + (ySize * .5) - (yySize * .5);
+        }
+        for (std::unique_ptr<UIElement>& nodePtr : nodes)
+        {
+            UIElement& node = *nodePtr;
+            node.adjustNode(xxMin, yyMin, xxSize, yySize);
         }
     }
 };
@@ -127,20 +136,17 @@ struct UIStack : UIContainer
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
         {
             UIElement& node = *nodePtr;
-            node.xMin = xMin;
-            node.xSize = xSize;
-            node.yMin = yMin;
-            node.ySize = ySize;
             node.adjustNode(xMin, yMin, xSize, ySize);
         }
     }
 };
 
+// this is broken and wrong. I haven't gotten around to fixing it
 struct UIXHolder : UIContainer
 {
-    void adjustNode(float xMin, float yMin, float xSize, float ySize)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
     {
-        UIElement::adjustNode(xMin, yMin, xSize, ySize);
+        UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         int n = nodes.size();
         if (n == 0) { return; }
         float yyMin = yMin;
@@ -153,7 +159,7 @@ struct UIXHolder : UIContainer
             node.yMin = yyMin;
             yyMin += yySize;
             node.ySize = yySize;
-            node.adjustNode(xMin, yMin, xSize, ySize);
+            node.adjustNode(xMin2, yMin2, xSize2, ySize2);
         }
     }
 };
@@ -163,24 +169,18 @@ struct UIYHolder : UIContainer
     UIYHolder(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
         : UIContainer(xMin, yMin, xSize, ySize, key) {}
 
-    void adjustNode(float xMin, float yMin, float xSize, float ySize)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
     {
-        UIElement::adjustNode(xMin, yMin, xSize, ySize);
+        UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         int n = nodes.size();
         if (n == 0) { return; }
         float yyMin = yMin;
         float yySize = ySize / n;
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
         {
-            
             UIElement& node = *nodePtr;
-            node.yMin = yyMin;
+            node.adjustNode(xMin, yyMin, xSize, yySize);
             yyMin += yySize;
-            node.ySize = yySize;
-            node.xMin = xMin;
-            node.xSize = xSize;
-            std::cout <<"ymin: "<< node.yMin << " ysize: " << node.ySize << " xmin: " << node.xMin << " xsize " << node.xSize << "\n";
-            node.adjustNode(xMin, yMin, xSize, ySize);
         }
     }
 };
@@ -196,8 +196,8 @@ struct TexUVNode : UIElement
     float xMaxUv=1;
     float yMinUv=0;
     float yMaxUv=1;
-    TexUVNode(float xMinUV=0, float xMaxUv = 1, float yMinUv = 0, float yMaxUv = 1)
-    : xMinUV(xMinUV), xMaxUv(xMaxUv), yMinUv(yMinUv), yMaxUv(yMaxUv){}
+    TexUVNode(float xMinUV=0, float xMaxUv = 1, float yMinUv = 0, float yMaxUv = 1, int key = -1)
+    : xMinUV(xMinUV), xMaxUv(xMaxUv), yMinUv(yMinUv), yMaxUv(yMaxUv), UIElement(key){}
 
     void renderVerts(std::vector<float>& vertices)
     {

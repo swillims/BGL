@@ -37,7 +37,10 @@ endif()
 find_package(OpenGL REQUIRED)
 
 if(WIN32)
-    target_include_directories(BGL PRIVATE ${CMAKE_SOURCE_DIR}/lib/include)
+    target_include_directories(BGL PRIVATE
+    ${CMAKE_SOURCE_DIR}/lib/include
+    ${CMAKE_SOURCE_DIR}/lib
+    )
     target_link_libraries(
         BGL
         ${CMAKE_SOURCE_DIR}/lib/lib-vc2022/glfw3.lib
@@ -67,7 +70,7 @@ add_custom_command(
 
 
 target_include_directories(BGL PRIVATE 
-    ${CMAKE_SOURCE_DIR}/lib
+    #${CMAKE_SOURCE_DIR}/lib
     ${CMAKE_SOURCE_DIR}/classes
     ${CMAKE_SOURCE_DIR}/utilClasses
 )

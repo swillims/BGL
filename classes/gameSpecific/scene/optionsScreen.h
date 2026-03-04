@@ -89,10 +89,10 @@ struct OptionsScreen : Scene
 
         StaticAudio::updateSounds();
 
-        if (!StaticDraw::hasShader("blackfadenoimage"))
-        {
-            StaticDraw::compileShader("assets/shaders/simple.vs", "assets/gameSpecific/shaders/blackfadenoimage.fs", "blackfadenoimage");
-        }
+        //if (!StaticDraw::hasShader("blackfadenoimage"))
+        //{
+        //    StaticDraw::compileShader("assets/shaders/simple.vs", "assets/gameSpecific/shaders/blackfadenoimage.fs", "blackfadenoimage");
+        //}
 
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
@@ -102,9 +102,11 @@ struct OptionsScreen : Scene
         //uiY.xSize = 1;
         //uiY.ySize = 1;
 
+        uiY.appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
         uiY.appendNode(std::make_unique<TexUVNode>(0,.25,0,.5));
         uiY.appendNode(std::make_unique<TexUVNode>(0, 1, .5, 1));
         uiY.appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        uiY.appendNode(std::make_unique<UIXRatio>(1.0,true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
         aspectChange();
     }
     void render(float time = 0, bool updateDisplay = true) override
