@@ -276,13 +276,45 @@ public:
     static void DestroyChannels() { singleton->destroyChannels(); }
     void setUpChannel(unsigned int channel);
     static void SetUpChannel(unsigned int channel) { singleton->setUpChannel(channel); }
+    std::vector<float>generateVertices(const std::string& text, float x, float y, float xScale, float yScale)
+    {
+        xScale /= size;
+        yScale /= size;
+        std::string::const_iterator c;
+        std::vector<float> vertices;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            Character ch = characters[*c];
+
+            float xpos = x + ch.bearing.x * xScale;
+            float ypos = y - (ch.size.y - ch.bearing.y) * yScale;
+
+            float w = ch.size.x * xScale;
+            float h = ch.size.y * yScale;
+            vertices.insert(
+                vertices.end(),
+                {
+                    xpos,     ypos + h, ch.uv0.x, ch.uv0.y, // v0
+                    xpos,     ypos,     ch.uv0.x, ch.uv1.y, // v1
+                    xpos + w, ypos,     ch.uv1.x, ch.uv1.y, // v2
+
+                    xpos,     ypos + h, ch.uv0.x, ch.uv0.y, // v0
+                    xpos + w, ypos,     ch.uv1.x, ch.uv1.y, // v2
+                    xpos + w, ypos + h, ch.uv1.x, ch.uv0.y  // v3
+                }
+            );
+            x += (ch.advance >> 6) * xScale;
+        }
+        std::cout << "no error instance level\n";
+        return vertices;
+    }
+    static std::vector<float> GenerateVertices(const std::string& text, float x, float y, float xScale, float yScale)
+    {
+        std::cout << "call works\n";
+        return singleton->generateVertices(text,x,y,xScale,yScale);
+    }
     void appendChannel(unsigned int channel, const std::vector<float>& vertices); // this is untested but works in theory.
-    //static void AppendTextTs(unsigned int channel, TextShell ts) { channel, singleton->appendTextTs(channel, ts); } // bad code but rework later if TextShell is kept post rework
-    //void appendTextTs(unsigned int channel, TextShell ts)
-    //{
-    //    appendText(channel, ts.text, ts.x, ts.y, ts.scale, ts.scale);
-    //}
-    static void AppendText(unsigned int channel, const std::string& text, float x, float y, float xScale, float yScale){ singleton->appendText(channel, text, x, y, xScale, yScale); }
+    static void AppendChannel(unsigned int channel, const std::vector<float>& vertices) { singleton->appendChannel(channel, vertices); }
     void appendText(unsigned int channel, const std::string& text, float x, float y, float xScale, float yScale)
     {
         xScale /= size;
@@ -312,5 +344,5 @@ public:
             x += (ch.advance >> 6) * xScale;
         }
     }
-    
+    static void AppendText(unsigned int channel, const std::string& text, float x, float y, float xScale, float yScale) { singleton->appendText(channel, text, x, y, xScale, yScale); }
 };

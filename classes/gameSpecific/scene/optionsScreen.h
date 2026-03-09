@@ -33,14 +33,27 @@ struct OptionsScreen : Scene
     //std::vector<std::unique_ptr<uiElement>> elements;
 
     // uiElement
-    UIYHolder uiY;//(0.f, 0.f, 1.f, 1.f);
+    UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
+
+    // uiTextSources
+    std::string soundTitle;
+    std::string masterTitle;
+    std::string masterValue;
+    std::string musicTitle;
+    std::string musicValue;
+    std::string soundEffectTitle;
+    std::string soundEffectValue;
+
+    // uiVariables
+    float masterVollumeLeft;
+    float masterVollumeWidth;
 
     // scene for backtracking and render
     Scene* previous;
 
     // constructor only used to instantiate a ui
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    OptionsScreen() : uiY(-1,-1,2,2) {}
+    OptionsScreen() : ui(-1, -1, 2, 2, 1.0, true) {}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
@@ -101,12 +114,72 @@ struct OptionsScreen : Scene
         //uiY.yMin = 0;
         //uiY.xSize = 1;
         //uiY.ySize = 1;
+        soundTitle = "Sound Settings";
+        masterTitle = "Master Vollume";
+        masterValue = "100"; // change later
+        masterVollumeLeft = .9;
+        masterVollumeWidth = .1;
+        musicTitle = "Music Vollume";
+        musicValue = "100"; // change later
+        soundEffectTitle = "Sound Effects Vollume";
+        soundEffectValue = "100"; // change later
 
-        uiY.appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        uiY.appendNode(std::make_unique<TexUVNode>(0,.25,0,.5));
-        uiY.appendNode(std::make_unique<TexUVNode>(0, 1, .5, 1));
-        uiY.appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        uiY.appendNode(std::make_unique<UIXRatio>(1.0,true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        // exists to not have a ref not initialized
+        // minimum decalration too large to keep code clean so ref needs to be declared up here
+        // - but it had nothing to point to, so currentTarget was added
+        //std::vector<std::unique_ptr<UIElement>> currentTarget;  
+        //std::vector<std::unique_ptr<UIElement>>& ct = currentTarget;
+
+        ui.appendType<UIYHolder>();
+        ui[0].appendType<UIBuffer>(.1) // 0 0
+            .appendType<UITextOneLine>(-111, soundTitle,.5);
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) //0 1
+            .appendType<UIBuffer>(.1) // 0 1 0
+            .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
+        // bar
+        std::vector<std::unique_ptr<UIElement>>& ct =
+        ui[0][1].appendType<UIStack>() // 0 1 1
+            .appendType<UIXHolder>() // 0 1 1 0
+            //.appendSameType<TexUVNode>(10, 0, .25, 0, .5);
+            .appendSameType<UIXRatio>(10, 1.0, true);
+        for (auto& nodePtr : ct) 
+        {
+            UIElement& node = *nodePtr;
+            node.appendType<TexUVNode>(.25, .75, 0, .5);
+        }
+        ui[0][1].appendType<UIBuffer>(.1) // 0 1 2
+            .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT);
+        ui[0][1][1].appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
+            .appendType<UIXRatio> (1.0)
+            .appendType<TexUVNode>(0, .25, 0, .5);
+
+        //ui[0][1][1].debugTreePrint(); // selector/drag here
+        
+            //.appendSameType<UIXRatio>(10, -1, -1, 2, 2, 1.0, true);
+        //ui[0][1][1][0].debugTreePrint();
+        //std::cout << "math " << ui[0][1][0][0].size() << "\n";
+            //.appendNode(std::make_unique<UIXRatio>(-1, -1, 2, 2, 1.0, true));
+            //.appendMultipleNodes(std::make_unique<TexUVNode>(0, .25, 0, .5), 5);
+            //.appendMultipleNodes(std::make_unique<UIXRatio>(-1, -1, 2, 2, 1.0, true),10);
+        /*    .appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][1][1].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][1][1].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][1].appendNode(std::make_unique<UIBuffer>(.1))
+            .appendNode(std::make_unique<UITextOneLine>(-111, masterValue, .2));
+        */
+
+        ui[0].appendNode(std::make_unique<UIXHolder>());
+        ui[0][2].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][2].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        /*
+        ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0].appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0].appendNode(std::make_unique<TexUVNode>(0, 1, .5, 1));
+        ui[0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0].appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        */
         aspectChange();
     }
     void render(float time = 0, bool updateDisplay = true) override
@@ -148,8 +221,9 @@ struct OptionsScreen : Scene
         // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
         StaticWrite::SetUpChannel(-111);
         //std::cout << "AAAA\n";
-        uiY.adjustNode(uiY.xMin, uiY.yMin, uiY.xSize, uiY.ySize);
-        uiY.renderVerts(batch);
+        //ui.adjustNode(ui.xMin, ui.yMin, ui.xSize, ui.ySize);
+        ui.adjustNodeDefault();
+        ui.renderVerts(batch);
         // non-positive number used for channel to avoid conflict with game allocated channels
         // also underflow logic error is fine
         //StaticWrite::SetUpChannel(-1);

@@ -1,6 +1,6 @@
+#pragma once
 
-
-struct vectorFUtil
+struct VectorFUtil
 {
 	// Intended Usage: This function write creates a quad(for batching) and then draws it from bottom left cornor
 	// getVectorFromCornor can be used with rightAlign and centerAlign to shift X or Y axis. The naming is unintuitive but these function work on y axis as well.

@@ -403,9 +403,9 @@ void FrogHop::render(float time, bool updateDisplay)
 		// The 4 vertices are read as 6 points(3 per triangle).
 		// The left two numbers are x,y cordinates.
 		// The right two numbers are UV cordinates. UV are texture locations.
-		v = vectorFUtil::getVectorFromCornor(xLMin, yMin, twoX, twoY);
+		v = VectorFUtil::getVectorFromCornor(xLMin, yMin, twoX, twoY);
 		batch.insert(batch.end(), v.begin(), v.end());
-		v = vectorFUtil::getVectorFromCornor(xRMin, yMin, -twoX, twoY);
+		v = VectorFUtil::getVectorFromCornor(xRMin, yMin, -twoX, twoY);
 		batch.insert(batch.end(), v.begin(), v.end());
 		//StaticDraw::halfDimImage(spike, xL, yf, xScale, yScale); // this works and is easier than batching but is suboptimal performance due to not batching
 		//StaticDraw::halfDimImage(spike, xR, yf, -xScale, yScale); // this works and is easier than batching but is suboptimal performance due to not batching
