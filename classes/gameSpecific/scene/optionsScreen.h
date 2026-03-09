@@ -47,6 +47,11 @@ struct OptionsScreen : Scene
     // uiVariables
     float masterVollumeLeft;
     float masterVollumeWidth;
+    float musicVollumeLeft;
+    float musicVollumeWidth;
+    float effectVollumeLeft;
+    float effectVollumeWidth;
+
 
     // scene for backtracking and render
     Scene* previous;
@@ -90,7 +95,8 @@ struct OptionsScreen : Scene
         // engine does not directly handle shader code, so learn how to do your own shaders
         StaticDraw::useShader(colorShaderRef); // selecting shader is needed to modify shader for smoe reason
         GLint colorLoc = glGetUniformLocation(colorShaderRef, "color"); // get uniform location. Uniforms are shader vars
-        glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
+        //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
+        glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
 
 
         if (!StaticAudio::soundStringRefs.contains("menuBloo.wav"))
@@ -121,8 +127,12 @@ struct OptionsScreen : Scene
         masterVollumeWidth = .1;
         musicTitle = "Music Vollume";
         musicValue = "100"; // change later
+        musicVollumeLeft = .7;
+        musicVollumeWidth = .1;
         soundEffectTitle = "Sound Effects Vollume";
         soundEffectValue = "100"; // change later
+        effectVollumeLeft = .5;
+        effectVollumeWidth = .1;
 
         // exists to not have a ref not initialized
         // minimum decalration too large to keep code clean so ref needs to be declared up here
@@ -130,15 +140,15 @@ struct OptionsScreen : Scene
         //std::vector<std::unique_ptr<UIElement>> currentTarget;  
         //std::vector<std::unique_ptr<UIElement>>& ct = currentTarget;
 
-        ui.appendType<UIYHolder>();
+        ui.appendType<UIYHolder>(); // 0
         ui[0].appendType<UIBuffer>(.1) // 0 0
-            .appendType<UITextOneLine>(-111, soundTitle,.5);
+            .appendType<UITextOneLine>(-111, soundTitle,.5); // 0 0 0 title
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) //0 1
             .appendType<UIBuffer>(.1) // 0 1 0
             .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
-        ui[0][1].appendType<UIStack>() // 0 1 1
+        ui[0][1].appendType<UIStack>(1) // 0 1 1 // 1 key - skipping 0 for exit
             .appendType<UIXHolder>() // 0 1 1 0
             //.appendSameType<TexUVNode>(10, 0, .25, 0, .5);
             .appendSameType<UIXRatio>(10, 1.0, true);
@@ -151,7 +161,43 @@ struct OptionsScreen : Scene
             .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT);
         ui[0][1][1].appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
             .appendType<UIXRatio> (1.0)
-            .appendType<TexUVNode>(0, .25, 0, .5);
+            .appendType<TexUVNode>(.75, 1, 0, .5);
+
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 2
+            .appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
+        std::vector<std::unique_ptr<UIElement>>& ct2 =
+            ui[0][2].appendType<UIStack>(1)
+            .appendType<UIXHolder>()
+            .appendSameType<UIXRatio>(10, 1.0, true);
+        for (auto& nodePtr : ct2)
+        {
+            UIElement& node = *nodePtr;
+            node.appendType<TexUVNode>(.25, .75, 0, .5);
+        }
+        ui[0][2].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, musicValue, .2, XLEFT);
+        ui[0][2][1].appendType<UIXShifter>(musicVollumeLeft, musicVollumeWidth)
+            .appendType<UIXRatio>(1.0)
+            .appendType<TexUVNode>(.75, 1, 0, .5);
+
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 3
+            .appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, soundEffectTitle, .2, XRIGHT);
+        std::vector<std::unique_ptr<UIElement>>& ct3 =
+            ui[0][3].appendType<UIStack>(1)
+            .appendType<UIXHolder>()
+            .appendSameType<UIXRatio>(10, 1.0, true);
+        for (auto& nodePtr : ct3)
+        {
+            UIElement& node = *nodePtr;
+            node.appendType<TexUVNode>(.25, .75, 0, .5);
+        }
+        ui[0][3].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, soundEffectValue, .2, XLEFT);
+        ui[0][3][1].appendType<UIXShifter>(effectVollumeLeft, effectVollumeWidth)
+            .appendType<UIXRatio>(1.0)
+            .appendType<TexUVNode>(.75, 1, 0, .5);
 
         //ui[0][1][1].debugTreePrint(); // selector/drag here
         
@@ -169,8 +215,8 @@ struct OptionsScreen : Scene
         */
 
         ui[0].appendNode(std::make_unique<UIXHolder>());
-        ui[0][2].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][2].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][4].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0][4].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
         /*
         ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
         ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
