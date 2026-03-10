@@ -19,6 +19,7 @@
 #include "singleton/staticWrite.h"
 #include "singleton/staticDraw.h"
 #include "singleton/staticSound.h"
+#include "singleton/staticInput.h"
 
 #include "scene/scene.h"
 
@@ -157,13 +158,15 @@ static int mainmainmain()
     StaticDraw::init();
     StaticDraw::windowSpecify(window);
     StaticAudio::init();
+    StaticInput::Init();
+    //StaticInput::singleton;//.init();
 
     // replace MainMenu if you write your own.
     // cleanest way to implement a new game is to modify Main menu instead of replacing it.
     // main menu is located at assets/gameSpecific/scene/mainMenu.h because it should be modified and should be different for most builds.
     DataHolder::SceneQueue(new MainMenu, false);
 
-    StaticDraw::init();
+    //StaticDraw::init();
     std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
 
     // render loop

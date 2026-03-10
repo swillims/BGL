@@ -2,6 +2,7 @@
 #include <array>
 #include "scene/scene.h"
 #include "uiHelper.h"
+#include "singleton/staticInput.h"
 //#include "mainMenu.h"
 
 struct OptionsScreen : Scene
@@ -98,7 +99,6 @@ struct OptionsScreen : Scene
         //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
         glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
 
-
         if (!StaticAudio::soundStringRefs.contains("menuBloo.wav"))
         {
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
@@ -167,7 +167,7 @@ struct OptionsScreen : Scene
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct2 =
-            ui[0][2].appendType<UIStack>(1)
+            ui[0][2].appendType<UIStack>(2) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct2)
@@ -185,7 +185,7 @@ struct OptionsScreen : Scene
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, soundEffectTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct3 =
-            ui[0][3].appendType<UIStack>(1)
+            ui[0][3].appendType<UIStack>(3) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct3)
@@ -288,9 +288,14 @@ struct OptionsScreen : Scene
     {
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
-            if (!click) { buttonPress(buttonHover); }
+            if (!click)
+            {
+                buttonPress(buttonHover);
+                std::cout << "click\n";
+                //std::cout << ui.findOneHover();
+                std::cout << "\n";
+            }
             click = true;
-            //std::cout << "click\n";
         }
         else { click = false; }
         //if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
