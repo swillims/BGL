@@ -4,6 +4,7 @@
 #include "singleton/staticDraw.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticWrite.h"
+#include "singleton/staticInput.h"
 
 // scenes
 #include "frogHop.h"
@@ -135,12 +136,18 @@ struct MainMenu : Scene {
 
         // play background music
         StaticAudio::playSoundLoop(backgroundMusic);
+
+        //StaticInput::Track(GLFW_MOUSE_BUTTON_LEFT);
+        StaticInput::MouseTrack(GLFW_MOUSE_BUTTON_LEFT);
     }
     void render(float time = 0, bool updateDisplay = true)
     {
+        //std::cout << "keyBoard" << glfwGetKey(window, GLFW_MOUSE_BUTTON_LEFT) << "\n";
+        //std::cout << "mouseMethod" << glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) << "\n";
+        
         // clear previous render
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        //glClear(GL_COLOR_BUFFER_BIT);
 
         // set shader to simple <- this is big
         StaticDraw::useShader(shaderSimpleRef);
@@ -222,32 +229,22 @@ struct MainMenu : Scene {
         // done as a demo because the posted version of this is a demo of game with the engine
         Scene::processInput();
 
+        // Tick is required to check for inputs
+        StaticInput::Tick();
+
         updateMouseHover();
 
-        if (!loadAntiClick)
+        if (StaticInput::MouseClick(GLFW_MOUSE_BUTTON_LEFT))
         {
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) // check mouse button
-            {
-                click = true;
-                if (buttonStart == -1)
-                {
-                    buttonStart = buttonHover;
-                }
-            }
-            else if (click) // mouse button not pressed + click bool==true means release
-            {
-                if (buttonStart == buttonHover)
-                {
-                    buttonPress(buttonHover);
-                }
-                click = false;
-                buttonStart = -1;
-            }
+            buttonStart = buttonHover;
         }
-        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
+        else if (StaticInput::MouseRelease(GLFW_MOUSE_BUTTON_LEFT))
         {
-            loadAntiClick = false;
-            click = false;
+            if (buttonHover == buttonStart)
+            {
+                buttonPress(buttonStart);
+            }
+            buttonStart = -1;
         }
     }
 
@@ -256,11 +253,11 @@ struct MainMenu : Scene {
     {
         //mouse vars
         double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        
+        //glfwGetCursorPos(window, &mouseX, &mouseY);
+        StaticInput::GetMouse(mouseX, mouseY);
         // convert mouse vars from window size to -1.0 to 1.0 engine and openGl readable cords
-        mouseX = (mouseX / winWidth) * 2.0 - 1.0;
-        mouseY = -((mouseY / winHeight) * 2.0 - 1.0);
+        //mouseX = (mouseX / winWidth) * 2.0 - 1.0;
+        //mouseY = -((mouseY / winHeight) * 2.0 - 1.0);
 
         // All buttons have same width. Check if mouse is in that range.
         if (mouseX < -0.8 || mouseX > 0.8)

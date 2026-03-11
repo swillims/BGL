@@ -125,11 +125,17 @@ struct StaticInput
 	static StaticInput singleton;
 	GLFWwindow* window;
 
-	//std::map<int, bool> held;
+	// keys
 	std::bitset<GLFW_KEY_LAST + 1> tracked;
 	std::bitset<GLFW_KEY_LAST + 1> isHeld;
 	std::bitset<GLFW_KEY_LAST + 1> isClick;
 	std::bitset<GLFW_KEY_LAST + 1> isRelease;
+
+	// buttons
+	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseTracked;
+	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseHeld;
+	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseClick;
+	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseRelease;
 
 	static void Init() 
 	{
@@ -139,46 +145,120 @@ struct StaticInput
 	{
 		window = glfwGetCurrentContext();
 	}
+	
+	static void GetMouse(double& x, double& y, bool normalize = true) { singleton.getMouse(x, y, normalize); }
+	void getMouse(double& x, double& y, bool normalize=true)
+	{
+		glfwGetCursorPos(window, &x, &y);
+		if (normalize)
+		{
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+			x = (x / width) * 2.0 - 1;
+			y = -((y / height) * 2.0 - 1);
+		}
+	}
 
 	static void Tick() { singleton.tick(); }
-	void tick()
+	void tick(bool keyboard=true, bool mouse=true)
 	{
-		for (int key = 0; key <= GLFW_KEY_LAST; key++)
+		if (keyboard)
 		{
-			if (!tracked[key]) { continue; }
+			for (int key = 0; key <= GLFW_KEY_LAST; key++)
+			{
+				if (!tracked[key]) { continue; }
 
-			bool pressed = glfwGetKey(window, key) == GLFW_PRESS;
-			isClick[key] = pressed && !isHeld[key];
-			isRelease[key] = !pressed && isHeld[key];
-			isHeld[key] = pressed;
+				bool pressed = glfwGetKey(window, key) == GLFW_PRESS;
+				isClick[key] = pressed && !isHeld[key];
+				isRelease[key] = !pressed && isHeld[key];
+				isHeld[key] = pressed;
+			}
+		}
+		if (mouse)
+		{
+			for (int button = 0; button <= GLFW_MOUSE_BUTTON_LAST; button++)
+			{
+				if (!mouseTracked[button]) { continue; }
+
+				bool pressed = glfwGetMouseButton(window, button) == GLFW_PRESS;
+				mouseClick[button] = pressed && !mouseHeld[button];
+				mouseRelease[button] = !pressed && mouseHeld[button];
+				mouseHeld[button] = pressed;
+			}
 		}
 	}
 
 	template<typename T>
-	static void Track(T key, bool positive = true) { singleton.track(key, positive); }
-	void track(int key, bool positive = true)
+	static void KeyTrack(T key, bool positive = true) { singleton.keyTrack(key, positive); }
+	void keyTrack(int key, bool positive = true)
 	{
 		if (key > GLFW_KEY_LAST) { return; }
 		tracked[key] = positive;
 	}
-	void track(const std::string& key, bool positive = true)
+	void keyTrack(const std::string& key, bool positive = true)
 	{
-		if(key.size()==1) // string size 1 key is char
-		{
-			track(key.at(0)); // implicit char to int
-		}
-		//keyMap["UP"];
-		if (keyMap.contains(key))
-		{
-			track(keyMap.find(key)->second);
-		}
+		keyTrack(StringToInt(key), positive);
 	}
 
 	template<typename T>
-	static void Untrack(T key) { singleton.untrack(key); }
-	void untrack(int key) { track(key, false); }
-	void untrack(const std::string& key){ track(key, false); }
+	static void KeyUntrack(T key) { singleton.keyUntrack(key); }
+	void keyUntrack(int key) { keyTrack(key, false); }
+	void keyUntrack(const std::string& key) { keyTrack(key, false); }
 
-	//*/
+	// templates used because will probably add string later
+	template<typename T>
+	bool KeyClick(T i) { return singleton.keyClick(i); }
+	bool keyClick(int i) { return isClick[i]; }
+
+	template<typename T>
+	bool KeyHeld(T i) { return singleton.keyHeld(i); }
+	bool keyHeld(int i) { return isHeld[i]; }
+
+	template<typename T>
+	bool KeyRelease(T i) { return singleton.keyRelease(i); }
+	bool keyRelease(int i) { return isRelease[i]; }
+
+	template<typename T>
+	static void MouseTrack(T button, bool positive = true){singleton.mouseTrack(button, positive);}
+	void mouseTrack(int button, bool positive = true)
+	{
+		if (button > GLFW_MOUSE_BUTTON_LAST) { return; }
+		mouseTracked[button] = positive;
+	}
+	void mouseTrack(const std::string& button, bool positive = true)
+	{
+		mouseTrack(StringToInt(button), positive);
+	}
+
+	template<typename T>
+	static void MouseUntrack(T button){singleton.mouseUntrack(button);}
+	void mouseUntrack(int button){mouseTrack(button, false);}
+	void mouseUntrack(const std::string& button){mouseTrack(button, false);}
+
+	template<typename T>
+	static bool MouseClick(T i){return singleton.mouseClickState(i);}
+	bool mouseClickState(int i){return mouseClick[i];}
+
+	template<typename T>
+	static bool MouseHeld(T i){return singleton.mouseHeldState(i);}
+	bool mouseHeldState(int i){return mouseHeld[i];}
+
+	template<typename T>
+	static bool MouseRelease(T i){return singleton.mouseReleaseState(i);}
+	bool mouseReleaseState(int i){return mouseRelease[i];}
+
+	static int StringToInt(const std::string& input)
+	{
+		if (input.size() == 1) // string size 1 key is char
+		{
+			return input.at(0); // implicit char to int
+		}
+		auto it = keyMap.find(input);
+		if (it != keyMap.end())
+		{
+			return it->second;
+		}
+		return -1;
+	}
 };
 

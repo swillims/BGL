@@ -305,12 +305,10 @@ public:
             );
             x += (ch.advance >> 6) * xScale;
         }
-        std::cout << "no error instance level\n";
         return vertices;
     }
     static std::vector<float> GenerateVertices(const std::string& text, float x, float y, float xScale, float yScale)
     {
-        std::cout << "call works\n";
         return singleton->generateVertices(text,x,y,xScale,yScale);
     }
     void appendChannel(unsigned int channel, const std::vector<float>& vertices); // this is untested but works in theory.

@@ -150,6 +150,13 @@ public:
         ma_engine_set_volume(&engine, v);
     }
 
+    static void updateTagVollume(int tag, float v, bool power = true)
+    {
+        v = std::clamp(v, 0.0f, 1.0f);
+        tagSettings[tag] = v;
+    }
+    static void updateTagVollume(const std::string& tag, float v, bool power = true) { updateTagVollume(tagStringRefs[tag], v, power); }
+
     static void updateSoundVollume(int soundRef, bool power = true)
     {
         float v = 1.0f;

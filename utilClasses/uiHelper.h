@@ -41,15 +41,40 @@ struct UIElement
             if (x <= xMin + xSize && y <= yMin + ySize)
             {
                 if (key != -1)
+                {
                     return key;
+                }
                 for (int i = 0; i < nodes.size(); i++)
                 {
                     if (nodes[i]->findOneHover(x, y) != -1)
+                    {
                         return nodes[i]->findOneHover(x, y);
+                    }
                 }
             }
         }
         return -1;
+    }
+
+    // returns a subNode matchig the key if it exists, otherwise returns self. After running method, check key to see if it matches.
+    virtual UIElement& findByKey(int findKey)
+    {
+        if (findKey == key)
+        {
+            return *this;
+        }
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            int k = nodes[i]->findByKey(findKey).key;
+            if (k == findKey)
+            {
+                return nodes[i]->findByKey(findKey);
+            }
+        }
+        // different(logically) from above value.
+        // above value return because found key. This return returns a non-match for a default + for loop
+        // can not nullptr a reference return and see no difference between a default
+        return *this;
     }
 
     virtual bool isPointIn(float x, float y)
@@ -63,6 +88,13 @@ struct UIElement
         }
         return false;
     }
+
+    virtual UIElement& setKey(int newKey)
+    {
+        key = newKey;
+        return *this;
+    }
+
     virtual void renderVerts(std::vector<float>& vertices)
     {}
     virtual void adjustNodeDefault() { adjustNode(xMin,yMin,xSize,ySize); }
@@ -134,6 +166,19 @@ struct UIElement
             nodes[i]->debugTreePrint();
         }
         std::cout << "node end here\n";
+    }
+
+    std::vector<float> getVerts()
+    {
+        return {
+            xMin + xSize, yMin + ySize, 1, 1, // v0
+            xMin + xSize, yMin,         1, 0, // v1
+            xMin,         yMin,         0, 0, // v2
+
+            xMin + xSize, yMin + ySize, 1, 1, // v0
+            xMin,         yMin,         0, 0, // v2
+            xMin,         yMin + ySize, 0, 1, // v3
+        };
     }
 };
 
@@ -332,17 +377,13 @@ struct UIBuffer : UIContainer
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
-        std::cout << "pre math: xmin: " << xMin2 << " ysize: " << ySize2 << " ymin: " << yMin2 << " ysize: " << ySize2 << "\n";
         xMin2 += xSize2 * xLeftBuffer;
         xSize2 -= xSize2 * (xLeftBuffer + xRightBuffer);
         yMin2 += ySize2 * yBottomBuffer;
         ySize2 -= ySize2 * (yBottomBuffer + yTopBuffer);
 
-        std::cout << "post math: xmin: " << xMin2 << " ysize: " << ySize2 << " ymin: " << yMin2 << " ysize: " << ySize2 << "\n";
-
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
         {
-            std::cout << "node exists\n";
             UIElement& node = *nodePtr;
             node.adjustNode(xMin2, yMin2, xSize2, ySize2);
         }
@@ -477,5 +518,19 @@ struct TexUVNode : UIElement
             xMin,         yMin,         xMinUV, yMinUv, // v2
             xMin,         yMin + ySize, xMinUV, yMaxUv, // v3
             });
+    }
+
+    std::vector<float> getVerts()
+    {
+        return
+        {
+        xMin + xSize, yMin + ySize, xMaxUv, yMaxUv, // v0
+        xMin + xSize, yMin,         xMaxUv, yMinUv, // v1
+        xMin,         yMin,         xMinUV, yMinUv, // v2
+
+        xMin + xSize, yMin + ySize, xMaxUv, yMaxUv, // v0
+        xMin,         yMin,         xMinUV, yMinUv, // v2
+        xMin,         yMin + ySize, xMinUV, yMaxUv, // v3
+        };
     }
 };

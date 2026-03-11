@@ -19,11 +19,9 @@ struct OptionsScreen : Scene
     // sound;
     unsigned int bwoo;
 
-    unsigned int buttonHover;//  = true;
-
-    // click handling bools
-    bool click;
-    bool loadAntiClick;
+    // ui vars
+    unsigned int buttonHover; // button being hovered
+    double mouseCordX, mouseCordY; // mouse cords that need to be normalized
 
     // there are only two button so I'm not using a for loop and I can get away with two hoverBatchs
     std::vector<float> batch;
@@ -53,6 +51,10 @@ struct OptionsScreen : Scene
     float effectVollumeLeft;
     float effectVollumeWidth;
 
+    // settingsVariables
+    float masterVollume;
+    float musicVollume;
+    float effectVollume;
 
     // scene for backtracking and render
     Scene* previous;
@@ -68,24 +70,22 @@ struct OptionsScreen : Scene
         //window = glfwGetCurrentContext();
         Scene::onLoad();
 
+        // textures
         if (!StaticDraw::imageFileRefs.contains("button.png"))
         {
             StaticDraw::loadImage("assets/core/button.png");
         }
         buttonImageRef = StaticDraw::imageFileRefs["button.png"];
 
-        std::cout << StaticDraw::imageFileRefs.contains("optionsUi.png") << " debug\n";
         if (!StaticDraw::imageFileRefs.contains("optionsUi.png"))
         {
             StaticDraw::loadImage("assets/core/optionsUi.png");
         }
         uITex = StaticDraw::imageFileRefs["optionsUi.png"];
-        /*if (!StaticDraw::hasShader("simpleWhiteShade"))
-        {
-            StaticDraw::compileShader("simpleWhiteShade", "assets/shaders/simple.vs", "assets/shaders/simplemixwhite.fs");
-        }
-        shaderWhiteShadeRef = StaticDraw::getShader("simpleWhiteShade").ID;
-        */
+
+
+
+        // shaders
         if (!StaticDraw::hasShader("colorShader"))
         {
             StaticDraw::compileShader("assets/shaders/simple.vs", "assets/shaders/color.fs", "colorRef");
@@ -99,6 +99,7 @@ struct OptionsScreen : Scene
         //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
         glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
 
+        // sounds
         if (!StaticAudio::soundStringRefs.contains("menuBloo.wav"))
         {
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
@@ -140,7 +141,7 @@ struct OptionsScreen : Scene
         //std::vector<std::unique_ptr<UIElement>> currentTarget;  
         //std::vector<std::unique_ptr<UIElement>>& ct = currentTarget;
 
-        ui.appendType<UIYHolder>(); // 0
+        ui.appendType<UIYHolder>(5); // 0
         ui[0].appendType<UIBuffer>(.1) // 0 0
             .appendType<UITextOneLine>(-111, soundTitle,.5); // 0 0 0 title
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) //0 1
@@ -148,7 +149,7 @@ struct OptionsScreen : Scene
             .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
-        ui[0][1].appendType<UIStack>(1) // 0 1 1 // 1 key - skipping 0 for exit
+        ui[0][1].appendType<UIStack>().setKey(1) // 0 1 1
             .appendType<UIXHolder>() // 0 1 1 0
             //.appendSameType<TexUVNode>(10, 0, .25, 0, .5);
             .appendSameType<UIXRatio>(10, 1.0, true);
@@ -161,13 +162,13 @@ struct OptionsScreen : Scene
             .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT);
         ui[0][1][1].appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
             .appendType<UIXRatio> (1.0)
-            .appendType<TexUVNode>(.75, 1, 0, .5);
+            .appendType<TexUVNode>(.75, 1, 0, .5).setKey(11);
 
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 2
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct2 =
-            ui[0][2].appendType<UIStack>(2) // key
+            ui[0][2].appendType<UIStack>().setKey(2) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct2)
@@ -179,13 +180,13 @@ struct OptionsScreen : Scene
             .appendType<UITextOneLine>(-111, musicValue, .2, XLEFT);
         ui[0][2][1].appendType<UIXShifter>(musicVollumeLeft, musicVollumeWidth)
             .appendType<UIXRatio>(1.0)
-            .appendType<TexUVNode>(.75, 1, 0, .5);
+            .appendType<TexUVNode>(.75, 1, 0, .5).setKey(12);
 
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 3
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, soundEffectTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct3 =
-            ui[0][3].appendType<UIStack>(3) // key
+            ui[0][3].appendType<UIStack>().setKey(3) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct3)
@@ -197,7 +198,7 @@ struct OptionsScreen : Scene
             .appendType<UITextOneLine>(-111, soundEffectValue, .2, XLEFT);
         ui[0][3][1].appendType<UIXShifter>(effectVollumeLeft, effectVollumeWidth)
             .appendType<UIXRatio>(1.0)
-            .appendType<TexUVNode>(.75, 1, 0, .5);
+            .appendType<TexUVNode>(.75, 1, 0, .5).setKey(13);
 
         //ui[0][1][1].debugTreePrint(); // selector/drag here
         
@@ -254,6 +255,9 @@ struct OptionsScreen : Scene
 
     void handle(float time = 0) override
     {
+        StaticInput::GetMouse(mouseCordX,mouseCordY);
+        //std::cout << "start search\n";
+        
         processInput(window);
     }
 
@@ -286,31 +290,127 @@ struct OptionsScreen : Scene
 
     void processInput(GLFWwindow* window)
     {
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        StaticInput::Tick();
+        if (StaticInput::MouseClick(GLFW_MOUSE_BUTTON_LEFT))
         {
-            if (!click)
-            {
-                buttonPress(buttonHover);
-                std::cout << "click\n";
-                //std::cout << ui.findOneHover();
-                std::cout << "\n";
-            }
-            click = true;
+            buttonHover = ui.findOneHover(mouseCordX, mouseCordY);
+
+            buttonPress(buttonHover);
+            //std::cout << "click\n";
+            //std::cout << "Mouse Cords: " << mouseCordX << " " << mouseCordY << "\n";
+            //std::cout << "hover: " << buttonHover << "\n";
+            
+            //std::cout << "test find by key\n" << ui.findByKey(buttonHover).key << "\n";
         }
-        else { click = false; }
-        //if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        //    glfwSetWindowShouldClose(window, true);
+        else if (StaticInput::MouseHeld(GLFW_MOUSE_BUTTON_LEFT))
+        {
+            // magic numbers are keys for sliders
+            // this assumes buttonHover from click
+            if (buttonHover == 1 || buttonHover == 2 || buttonHover == 3)
+            {
+                int newHover = ui.findOneHover(mouseCordX, mouseCordY);
+                if (newHover != buttonHover){ buttonHover = -1;}
+                else{buttonPress(buttonHover);}
+            }
+        }
     }
 
     void buttonPress(int x)
     {
         if (x == 0)
         {
+            DataHolder::SceneQueue(previous, true);
             // correct way to delete things
             //DataHolder::DelayDelete(previous); // delayed deletion is better than instant deletion in situations where multiple scenes are rendered(like this one)
             //previous->clean(); // clean needs to be ran before canging scenes
             //DataHolder::SceneQueue(new (), true);
         }
-        else if (x == 1) { DataHolder::SceneQueue(previous, true); }
+        else if (x == 1)
+        {
+            UIElement& barHolder = ui.findByKey(1);
+            if (barHolder.key == 1)
+            {
+                //float l = barHolder.xSize;
+                //float halfB = masterVollumeWidth / 2;
+                //float mouseAdjust = mouseCordX - barHolder.xMin;
+                //std::cout << "bar holder xmin" << barHolder.xMin << "\n";
+                //float lb = barHolder.xSize - masterVollumeWidth;
+                //float mouseAndB = mouseAdjust - halfB;
+                // probably what I want
+                //std::cout << "attempted solution: " << mouseAndB / lb << "\n";
+                //masterVollume = mouseAndB / lb;
+                //masterVollume = ((mouseCordX - barHolder.xMin) - (masterVollumeWidth / 2)) / (barHolder.xSize - masterVollumeWidth);
+                masterVollume = ((mouseCordX - barHolder.xMin) - (masterVollumeWidth * 0.5f)) / (barHolder.xSize - masterVollumeWidth);
+                if (masterVollume < 0) { masterVollume = 0; }
+                else if (masterVollume > 1) { masterVollume =1; }
+                //masterValue = std::to_string((int)std::round(masterVollume*100));
+                masterValue = std::to_string((int)(masterVollume * 100.0f + 0.5f));
+
+                masterVollumeLeft = masterVollume / (1.0 + masterVollumeWidth);
+
+                StaticAudio::setMasterVollume(masterVollume);
+
+                ui.adjustNodeDefault();
+                StaticWrite::SetUpChannel(-111);
+                batch.clear();
+                ui.renderVerts(batch);
+
+                saveSetting();
+            }
+        }
+        else if (x == 2)
+        {
+            UIElement& barHolder = ui.findByKey(2);
+            if (barHolder.key == 2)
+            {
+                musicVollume = ((mouseCordX - barHolder.xMin) - (musicVollumeWidth * 0.5f)) / (barHolder.xSize - musicVollumeWidth);
+                if (musicVollume < 0) { musicVollume = 0; }
+                else if (musicVollume > 1) { musicVollume = 1; }
+                musicValue = std::to_string((int)(musicVollume * 100.0f + 0.5f));
+
+                musicVollumeLeft = musicVollume / (1.0 + musicVollumeWidth);
+
+                //StaticAudio::setMasterVollume(musicVollume);
+                StaticAudio::updateTagVollume("music", musicVollume);
+                StaticAudio::updateSounds();
+
+                ui.adjustNodeDefault();
+                StaticWrite::SetUpChannel(-111);
+                batch.clear();
+                ui.renderVerts(batch);
+
+                saveSetting();
+            }
+        }
+        else if (x == 3)
+        {
+            UIElement& barHolder = ui.findByKey(3);
+            if (barHolder.key == 3)
+            {
+                effectVollume = ((mouseCordX - barHolder.xMin) - (effectVollumeWidth * 0.5f)) / (barHolder.xSize - effectVollumeWidth);
+                if (effectVollume < 0) { effectVollume = 0; }
+                else if (effectVollume > 1) { effectVollume = 1; }
+                soundEffectValue = std::to_string((int)(effectVollume * 100.0f + 0.5f));
+
+                effectVollumeLeft = effectVollume / (1.0 + effectVollumeWidth);
+
+                StaticAudio::updateTagVollume("soundEffect", effectVollume);
+                StaticAudio::updateSounds();
+
+                StaticAudio::playSoundEffect(bwoo);
+
+                ui.adjustNodeDefault();
+                StaticWrite::SetUpChannel(-111);
+                batch.clear();
+                ui.renderVerts(batch);
+
+                saveSetting();
+            }
+        }
+    }
+
+    void saveSetting()
+    {
+
     }
 };
