@@ -47,12 +47,6 @@ if(WIN32)
         ${CMAKE_SOURCE_DIR}/lib/freetype.lib
         opengl32.lib
     )
-    #add_custom_command(
-    #    TARGET BGL POST_BUILD
-    #    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    #            "${CMAKE_SOURCE_DIR}/assets"
-    #            "$<TARGET_FILE_DIR:BGL>/assets"
-    #)
 endif()
 
 add_custom_command(
