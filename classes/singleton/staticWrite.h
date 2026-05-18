@@ -1,8 +1,8 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <glad/glad.h>
+
+//#include <GL/gl.h>
+#include "singleton/gl_core.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <string>
@@ -16,6 +16,7 @@
 //#include "shader.h"
 //#include "staticDraw.h" // used for shaders
 //#include "glue/textShell.h"
+#include <vector>
 
 
 //*

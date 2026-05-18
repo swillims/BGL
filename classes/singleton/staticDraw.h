@@ -1,8 +1,8 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <glad/glad.h>
+#include "singleton/gl_core.h"
+
+//#include <GL/gl.h>
 
 #include <string>
 #include <iostream>
@@ -107,7 +107,7 @@ public:
             vShaderFile.open(vertexSource);
             fShaderFile.open(fragmentSource);
             std::stringstream vShaderStream, fShaderStream;
-            //readfile’sbuffercontentsintostreams
+            //readfileï¿½sbuffercontentsintostreams
             vShaderStream << vShaderFile.rdbuf();
             fShaderStream << fShaderFile.rdbuf();
             //closefilehandlers
@@ -174,7 +174,7 @@ public:
             glDeleteProgram(iD);
             return 0;
         }
-        //deleteshaders;they’re linked into our program and no longer necessary
+        //deleteshaders;theyï¿½re linked into our program and no longer necessary
         glDeleteShader(vertex);
         glDeleteShader(fragment);
         

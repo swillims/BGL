@@ -41,17 +41,17 @@ void FrogHop::onLoad()
 	// load iamges
 	if (!StaticDraw::imageFileRefs.contains("frog"))
 	{
-		StaticDraw::loadImage("assets/gamespecific/png/froghop/frogsprite1x2.png", "frog");
+		StaticDraw::loadImage("assets/gameSpecific/png/frogHop/frogsprite1x2.png", "frog");
 	}
 	frogImage = StaticDraw::imageFileRefs["frog"];
 	if (!StaticDraw::imageFileRefs.contains("frogBlock"))
 	{
-		StaticDraw::loadImage("assets/gamespecific/png/froghop/block.png", "frogBlock");
+		StaticDraw::loadImage("assets/gameSpecific/png/frogHop/block.png", "frogBlock");
 	}
 	block = StaticDraw::imageFileRefs["frogBlock"];
 	if (!StaticDraw::imageFileRefs.contains("spike"))
 	{
-		StaticDraw::loadImage("assets/gamespecific/png/froghop/spike.png", "spike");
+		StaticDraw::loadImage("assets/gameSpecific/png/frogHop/spike.png", "spike");
 	}
 	spike = StaticDraw::imageFileRefs["spike"];
 

@@ -1,10 +1,13 @@
 #include "staticDraw.h"
 
-#ifndef STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#endif
+#include "singleton/gl_core.h"
 
-#include <stb_image.h>
+#ifdef _WIN32
+    #include <stb_image.h>
+#elif __linux__
+    #define STB_IMAGE_IMPLEMENTATION
+    #include <stb_image.h>
+#endif
 
 void StaticDraw::updateView()
 {

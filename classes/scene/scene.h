@@ -1,6 +1,10 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+#ifdef _WIN32
+	#include <GLFW/glfw3.h> // windows // comment added to make ignoring in grep easier
+#elif __linux__
+	#include "singleton/gl_core.h"
+#endif
 #include <vector>
 
 //#include <string>

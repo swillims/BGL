@@ -2,8 +2,8 @@
 
 #include "scene/scene.h"
 #include<string>
-#include<unordered_map>;
-#include<any>;
+#include<unordered_map>
+#include<any>
 //#include <map>
 
 struct DataHolder
@@ -54,8 +54,9 @@ public:
 	void setUnCatData(std::string key, std::any data);
 	static bool CheckKeyUnCatData(std::string key) { return god.checkKeyUnCatData(key); };
 	bool checkKeyUnCatData(std::string key);
-	template<typename T>
-	static T GetUnCatData(std::string key) { return god.getUnCatData(key); };
+	// function removed because it breaks in CMake
+	//template<typename T>
+	//static T GetUnCatData(std::string key) { return god.getUnCatData(key); };
 	template<typename T>
 	T getUnCatData(std::string key) { return std::any_cast<T>(uncategorizedData[key]); }
 	static void DeleteUnCatData(std::string key) { god.deleteUnCatData(key); };

@@ -1,6 +1,6 @@
 #pragma once
 // libs/tools
-#include <GLFW/glfw3.h>
+
 #include "singleton/staticDraw.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticWrite.h"

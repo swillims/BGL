@@ -10,6 +10,8 @@
 #include "util.h"
 #include "singleton/dataHolder.h"
 
+#include <cmath>
+
 struct StaticAudio
 {
 public:
@@ -32,13 +34,23 @@ public:
 
     static void init()
     {
-        ma_result result = ma_engine_init(NULL, &engine);
+        // force mono because linux not working
+        ma_engine_config config = ma_engine_config_init();
+        //config.channels = 1;          // force mono output
+
+        ma_result result = ma_engine_init(&config, &engine);
         if (result != MA_SUCCESS)
         {
             std::cerr << "Failed to initialize audio engine.\n";
             return;
         }
-        std::cout << "Audio engine initialized.\n";
+        std::cout << "Audio engine initialized.\n";\
+        ma_device* mm = ma_engine_get_device(&engine);
+        std::cout << "type: " << mm->type << " sample rate: " << mm->sampleRate << " playback channels: " << mm->playback.channels << "\n";
+        std::cout << "Engine " << ma_engine_get_device(&engine) << "\n";
+
+        // latest debug
+        std::cout << "Backend: " << ma_get_backend_name(mm->pContext->backend) << "\n";
     }
     static void playSoundFromFile(const char* path)
     {

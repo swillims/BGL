@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "scene/scene.h"
 
 DataHolder DataHolder::god;
 

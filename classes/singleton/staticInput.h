@@ -1,8 +1,9 @@
 #pragma once
-#include <bitset>
-#include <GLFW/glfw3.h>
 
-#include "unordered_map";
+#include "singleton/gl_core.h"
+
+#include <bitset>
+#include "unordered_map"
 
 // hard coded values are GLFW constants
 // have to use a normal map instead of bimap because of duplicate int values

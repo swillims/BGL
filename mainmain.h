@@ -1,11 +1,28 @@
 #include <iostream>
 
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
+#ifdef _WIN32
+    #include <GLFW/glfw3.h> // windows // comment added to make ignoring in grep easier
+    #include <GL/gl.h>
+    #include <glad/glad.h>
+    #include <glm/glm.hpp>
+    #include <glm/gtc/matrix_transform.hpp>
+    #include <glm/gtc/type_ptr.hpp>
+#elif __linux__
+    #include "singleton/gl_core.h"
+    //#define GLFW_INCLUDE_NONE
+    //#include <glad/glad.h>
+    //#include <GLFW/glfw3.h>
+    //#include "lib/shared/include/GLFW/glfw3.h"
+
+    #include <glm/glm.hpp>
+    #include <glm/gtc/matrix_transform.hpp>
+    #include <glm/gtc/type_ptr.hpp>
+    //#include "lib/shared/include/glad/glad.h"
+    //#include "lib/shared/glm/glm.hpp"
+    //#include "lib/shared/glm/gtc/matrix_transform.hpp"
+    //#include "lib/shared/glm/gtc/type_ptr.hpp"
+#endif
 
 #include <map>
 #include <string>
@@ -26,8 +43,8 @@
 // replace mainMenu import if you write your own intro scene. 
 #include "gameSpecific/scene/mainMenu.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+static void processInput(GLFWwindow* window);
 
 //const unsigned int SCR_WIDTH = 800;
 //const unsigned int SCR_HEIGHT = 600;
