@@ -57,6 +57,15 @@ static int mainmainmain()
     std::cout << "mainmain here\n";
     // glfw: initialize and configure
     // ------------------------------
+
+    // set root for relative links to executable because it is needed for loading files
+#ifdef _win32
+    //I Haven't had a need to set current_path to project root in windows yet so this unimplemented
+    std::filesystem::path rootPath = std::filesystem::current_path();
+#elif __linux__
+    std::filesystem::path rootPath = std::filesystem::read_symlink("/proc/self/exe").parent_path();
+    std::filesystem::current_path(rootPath);
+#endif
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

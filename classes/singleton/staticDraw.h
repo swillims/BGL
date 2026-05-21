@@ -59,7 +59,7 @@ public:
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         windowImply();
-        
+
         const char* vertexShaderSource = R"(assets/shaders/simple.vs)";
         const char* fragmentShaderSource = R"(assets/shaders/simple.fs)";
         compileShader(vertexShaderSource, fragmentShaderSource, "simple");
