@@ -3,6 +3,7 @@
 #include "singleton/gl_core.h"
 
 #ifdef _WIN32
+    #define STB_IMAGE_IMPLEMENTATION
     #include <stb_image.h>
 #elif __linux__
     #define STB_IMAGE_IMPLEMENTATION
