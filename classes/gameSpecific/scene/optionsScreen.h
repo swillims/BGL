@@ -141,34 +141,39 @@ struct OptionsScreen : Scene
         //std::vector<std::unique_ptr<UIElement>> currentTarget;  
         //std::vector<std::unique_ptr<UIElement>>& ct = currentTarget;
 
-        ui.appendType<UIYHolder>(5); // 0
-        ui[0].appendType<UIBuffer>(.1) // 0 0
-            .appendType<UITextOneLine>(-111, soundTitle,.5); // 0 0 0 title
-        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) //0 1
-            .appendType<UIBuffer>(.1) // 0 1 0
+        // using an i instead of hard coding ints to make it more scalable when modifying
+        int i = 0;
+
+        i++;
+        ui.appendType<UIYHolder>(5);
+        ui[0].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, soundTitle,.5);
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
+            .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
-        ui[0][1].appendType<UIStack>().setKey(1) // 0 1 1
-            .appendType<UIXHolder>() // 0 1 1 0
-            //.appendSameType<TexUVNode>(10, 0, .25, 0, .5);
+        ui[0][i].appendType<UIStack>().setKey(1)
+            .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct) 
         {
             UIElement& node = *nodePtr;
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
-        ui[0][1].appendType<UIBuffer>(.1) // 0 1 2
-            .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT);
-        ui[0][1][1].appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
+        ui[0][i].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT)
+            .back().back()[1]
+            .appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
             .appendType<UIXRatio> (1.0)
             .appendType<TexUVNode>(.75, 1, 0, .5).setKey(11);
 
-        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 2
+        i++;
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct2 =
-            ui[0][2].appendType<UIStack>().setKey(2) // key
+            ui[0][i].appendType<UIStack>().setKey(2) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct2)
@@ -176,17 +181,19 @@ struct OptionsScreen : Scene
             UIElement& node = *nodePtr;
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
-        ui[0][2].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, musicValue, .2, XLEFT);
-        ui[0][2][1].appendType<UIXShifter>(musicVollumeLeft, musicVollumeWidth)
+        ui[0][i].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, musicValue, .2, XLEFT)
+            .back().back()[1]
+            .appendType<UIXShifter>(musicVollumeLeft, musicVollumeWidth)
             .appendType<UIXRatio>(1.0)
             .appendType<TexUVNode>(.75, 1, 0, .5).setKey(12);
 
-        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1) // 0 3
+        i++;
+        ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, soundEffectTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct3 =
-            ui[0][3].appendType<UIStack>().setKey(3) // key
+            ui[0][i].appendType<UIStack>().setKey(3) // key
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct3)
@@ -194,39 +201,20 @@ struct OptionsScreen : Scene
             UIElement& node = *nodePtr;
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
-        ui[0][3].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, soundEffectValue, .2, XLEFT);
-        ui[0][3][1].appendType<UIXShifter>(effectVollumeLeft, effectVollumeWidth)
+        ui[0][i].appendType<UIBuffer>(.1)
+            .appendType<UITextOneLine>(-111, soundEffectValue, .2, XLEFT)
+            .back().back()[1]
+            .appendType<UIXShifter>(effectVollumeLeft, effectVollumeWidth)
             .appendType<UIXRatio>(1.0)
             .appendType<TexUVNode>(.75, 1, 0, .5).setKey(13);
 
-        //ui[0][1][1].debugTreePrint(); // selector/drag here
-        
-            //.appendSameType<UIXRatio>(10, -1, -1, 2, 2, 1.0, true);
-        //ui[0][1][1][0].debugTreePrint();
-        //std::cout << "math " << ui[0][1][0][0].size() << "\n";
-            //.appendNode(std::make_unique<UIXRatio>(-1, -1, 2, 2, 1.0, true));
-            //.appendMultipleNodes(std::make_unique<TexUVNode>(0, .25, 0, .5), 5);
-            //.appendMultipleNodes(std::make_unique<UIXRatio>(-1, -1, 2, 2, 1.0, true),10);
-        /*    .appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][1][1].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][1][1].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][1].appendNode(std::make_unique<UIBuffer>(.1))
-            .appendNode(std::make_unique<UITextOneLine>(-111, masterValue, .2));
-        */
-
+        i++;
         ui[0].appendNode(std::make_unique<UIXHolder>());
-        ui[0][4].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][4].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        /*
-        ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0][0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0].appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0].appendNode(std::make_unique<TexUVNode>(0, 1, .5, 1));
-        ui[0].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        ui[0].appendNode(std::make_unique<UIXRatio>(1.0, true)).appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-        */
+        ui[0][i].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5))
+        .back().appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+
+
+
         aspectChange();
     }
     void render(float time = 0, bool updateDisplay = true) override

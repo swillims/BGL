@@ -13,12 +13,13 @@ struct UIElement
 {
     /*
         nodes is implemented in UIElement instead of container to make chains work
-        it is mem enefficient but it chains which is a big trade off
+        it is mem inefficient but it chains which is a big trade off
         parent[0][0][1] is doable
         the alternative is a series of castings which is hell
         if using something that doesn't have subnodes just pretend nodes doesn't exist
     */
     std::vector<std::unique_ptr<UIElement>> nodes;
+    UIElement* previousNode = nullptr;
 
     float xMin;
     float yMin;
@@ -112,6 +113,7 @@ struct UIElement
     }
     UIElement& appendNode(std::unique_ptr<UIElement> node)
     {
+        node->previousNode = this;
         nodes.push_back(std::move(node));
         return *nodes.back();
     }
@@ -126,7 +128,9 @@ struct UIElement
         //nodes.push_back(std::make_shared<UIElement>(node););
         return *nodes.back();
         */
+
         nodes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+        nodes.back()->previousNode = this;
         return *nodes.back();
     }
 
@@ -137,6 +141,12 @@ struct UIElement
             //nodes.push_back(node);
         }
         return *node;
+    }
+
+    UIElement& back()
+    {
+        if (previousNode == nullptr) { return *this; }
+        return *previousNode;
     }
 
     template<typename T, typename... Args>
