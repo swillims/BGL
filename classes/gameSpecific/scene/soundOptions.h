@@ -1,12 +1,30 @@
 //#include "glue/textShell.h"
+#pragma once
 #include <array>
 #include "scene/scene.h"
 #include "uiHelper.h"
 #include "singleton/staticInput.h"
+
+#include "graphicOptions.h"
 //#include "mainMenu.h"
 
-struct OptionsScreen : Scene
+struct SoundOptions : Scene
 {
+    // I don't want these button enums effecting other enums so I made them private
+private:
+    enum uiKeys
+    {
+        uiExit,
+        uiMasterVollume,
+        uiMusicVollume,
+        uiEffectVollume,
+        uiSave,
+
+        uiGraphicSettings,
+        uiKeySettings
+    };
+
+public:
     // textures
     unsigned int buttonImageRef;
     unsigned int uITex;
@@ -35,6 +53,8 @@ struct OptionsScreen : Scene
     UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
 
     // uiTextSources
+    std::string graphicTitle;
+    std::string keySettings;
     std::string soundTitle;
     std::string masterTitle;
     std::string masterValue;
@@ -42,6 +62,8 @@ struct OptionsScreen : Scene
     std::string musicValue;
     std::string soundEffectTitle;
     std::string soundEffectValue;
+    std::string exitText;
+    std::string saveText;
 
     // uiVariables
     float masterVollumeLeft;
@@ -61,7 +83,7 @@ struct OptionsScreen : Scene
 
     // constructor only used to instantiate a ui
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    OptionsScreen() : ui(-1, -1, 2, 2, 1.0, true) {}
+    SoundOptions() : ui(-1, -1, 2, 2, 1.0, true) {}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
@@ -121,6 +143,9 @@ struct OptionsScreen : Scene
         //uiY.yMin = 0;
         //uiY.xSize = 1;
         //uiY.ySize = 1;
+        graphicTitle = "Graphic Settings";
+        keySettings = "Key Bindings";
+
         soundTitle = "Sound Settings";
         masterTitle = "Master Vollume";
         masterValue = "100"; // change later
@@ -134,6 +159,9 @@ struct OptionsScreen : Scene
         soundEffectValue = "100"; // change later
         effectVollumeLeft = .5;
         effectVollumeWidth = .1;
+        exitText = "Exit Settings";
+        saveText = "Save Sound Settings";
+
 
         // exists to not have a ref not initialized
         // minimum decalration too large to keep code clean so ref needs to be declared up here
@@ -144,16 +172,31 @@ struct OptionsScreen : Scene
         // using an i instead of hard coding ints to make it more scalable when modifying
         int i = 0;
 
-        i++;
         ui.appendType<UIYHolder>(5);
         ui[0].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, soundTitle,.5);
+            //.appendType<UIXHolder>()
+            .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0, .25, 0, .5,uiKeySettings).back()
+            //.appendType<UITextOneLine>(-111, graphicTitle, .3, XCENTER).back().back().back()
+            .back().back()
+
+            .appendType<UITextOneLine>(-111, soundTitle,.35).back()
+
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
+            //.appendType<UITextOneLine>(-111, keySettings, .3, XCENTER);
+            ;
+
+        //i++;
+        //ui[0].appendType<UIXHolder>();
+
+        i++;
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
+
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
-        ui[0][i].appendType<UIStack>().setKey(1)
+        ui[0][i].appendType<UIStack>().setKey(uiMasterVollume)
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct) 
@@ -173,7 +216,7 @@ struct OptionsScreen : Scene
             .appendType<UIBuffer>(.1)
             .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct2 =
-            ui[0][i].appendType<UIStack>().setKey(2) // key
+            ui[0][i].appendType<UIStack>().setKey(uiMusicVollume)
             .appendType<UIXHolder>()
             .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct2)
@@ -209,9 +252,17 @@ struct OptionsScreen : Scene
             .appendType<TexUVNode>(.75, 1, 0, .5).setKey(13);
 
         i++;
-        ui[0].appendNode(std::make_unique<UIXHolder>());
-        ui[0][i].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5))
-        .back().appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
+        ui[0].appendType<UIXHolder>()
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
+            .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
+            .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
+
+
+        i++;
+        //ui[0].appendNode(std::make_unique<UIXHolder>());
+        //ui[0][i].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5))
+        //.back().appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
 
 
 
@@ -219,25 +270,24 @@ struct OptionsScreen : Scene
     }
     void render(float time = 0, bool updateDisplay = true) override
     {
+        // draw background scene
         previous->render(0, false);
 
+        // draw background shade
         StaticDraw::useShader(colorShaderRef);
-        //StaticDraw::noSpecifyDraw(0, 0, 1.0f, 1.0f);
         StaticDraw::halfDimImage(0, 0, 0, 1.0f, 1.0f); // 0 as a texture ref is valid because shader doesn't use a texture
 
-        //StaticDraw::noSpecifyDraw(0, 0, 1.0f, 1.0f);
-        //StaticDraw::noSpecifyDraw(0, 0, 1.0f, 1.0f);
-        
-        //StaticDraw::backGroundImageRepeat(backgroundRef, 3.5);
-
+        // switch back to default shader
         StaticDraw::useShader(shaderSimpleRef);
-        //StaticDraw::halfDimImage(uITex, 0, 0, 1, 1);
-        //StaticDraw::spriteImage(uITex, 0, 0, 1, 1, 0, 0, 4, 2);
+
+        // draw ui Elements from batch
         StaticDraw::multiDraw(uITex, batch);
 
+        // write text
         StaticWrite::StartWrite();
         StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
 
+        // call super? idk, I take several month breaks from this project
         Scene::render(time, updateDisplay);
     };
 
@@ -292,9 +342,8 @@ struct OptionsScreen : Scene
         }
         else if (StaticInput::MouseHeld(GLFW_MOUSE_BUTTON_LEFT))
         {
-            // magic numbers are keys for sliders
-            // this assumes buttonHover from click
-            if (buttonHover == 1 || buttonHover == 2 || buttonHover == 3)
+            // enums reference sliders
+            if (buttonHover == uiMasterVollume || buttonHover == uiMusicVollume || buttonHover == uiEffectVollume)
             {
                 int newHover = ui.findOneHover(mouseCordX, mouseCordY);
                 if (newHover != buttonHover){ buttonHover = -1;}
@@ -313,10 +362,10 @@ struct OptionsScreen : Scene
             //previous->clean(); // clean needs to be ran before canging scenes
             //DataHolder::SceneQueue(new (), true);
         }
-        else if (x == 1)
+        else if (x == uiMasterVollume)
         {
-            UIElement& barHolder = ui.findByKey(1);
-            if (barHolder.key == 1)
+            UIElement& barHolder = ui.findByKey(uiMasterVollume);
+            if (barHolder.key == uiMasterVollume)
             {
                 //float l = barHolder.xSize;
                 //float halfB = masterVollumeWidth / 2;
@@ -346,10 +395,10 @@ struct OptionsScreen : Scene
                 saveSetting();
             }
         }
-        else if (x == 2)
+        else if (x == uiMusicVollume)
         {
-            UIElement& barHolder = ui.findByKey(2);
-            if (barHolder.key == 2)
+            UIElement& barHolder = ui.findByKey(uiMusicVollume);
+            if (barHolder.key == uiMusicVollume)
             {
                 musicVollume = ((mouseCordX - barHolder.xMin) - (musicVollumeWidth * 0.5f)) / (barHolder.xSize - musicVollumeWidth);
                 if (musicVollume < 0) { musicVollume = 0; }
@@ -370,10 +419,10 @@ struct OptionsScreen : Scene
                 saveSetting();
             }
         }
-        else if (x == 3)
+        else if (x == uiEffectVollume)
         {
-            UIElement& barHolder = ui.findByKey(3);
-            if (barHolder.key == 3)
+            UIElement& barHolder = ui.findByKey(uiEffectVollume);
+            if (barHolder.key == uiEffectVollume)
             {
                 effectVollume = ((mouseCordX - barHolder.xMin) - (effectVollumeWidth * 0.5f)) / (barHolder.xSize - effectVollumeWidth);
                 if (effectVollume < 0) { effectVollume = 0; }
@@ -394,6 +443,16 @@ struct OptionsScreen : Scene
 
                 saveSetting();
             }
+        }
+        else if (x == uiGraphicSettings)
+        {
+            GraphicsOptions* graphics = new GraphicsOptions();
+            graphics->previous = previous;
+            DataHolder::SceneQueue(graphics, true);
+        }
+        else if ( x == uiKeySettings)
+        {
+
         }
     }
 

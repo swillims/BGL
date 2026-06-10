@@ -8,7 +8,7 @@
 
 // scenes
 #include "frogHop.h"
-#include "optionsScreen.h"
+#include "soundOptions.h"
 
 /*
     ---> IMPORTANT - READ THIS <---
@@ -309,9 +309,9 @@ struct MainMenu : Scene {
         if(x==0){ glfwSetWindowShouldClose(window, true); }
         else if (x==1)
         {
-            OptionsScreen* os = new OptionsScreen();
-            os->previous = this;
-            DataHolder::SceneQueue(os, false);
+            SoundOptions* so = new SoundOptions();
+            so->previous = this;
+            DataHolder::SceneQueue(so, false);
         }
         //else if(x==2){ DataHolder::changeSceneTwo(new mainMenu()); }
         else if (x == 3) { DataHolder::SceneQueue(new FrogHop()); }

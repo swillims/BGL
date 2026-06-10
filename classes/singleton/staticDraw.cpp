@@ -10,6 +10,12 @@
     #include <stb_image.h>
 #endif
 
+void StaticDraw::resize(int newW, int newH)
+{
+    glfwSetWindowSize(window, newW, newH);
+    updateView();
+}
+
 void StaticDraw::updateView()
 {
     glfwGetFramebufferSize(window, &w, &h);

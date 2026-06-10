@@ -43,6 +43,8 @@ public:
     static void windowImply() { window = glfwGetCurrentContext(); }
     static void windowSpecify(GLFWwindow* win) { window = win; }
 
+    static void resize(int newW, int newH);
+
     static void updateView();
 
     static void cleanIndices()

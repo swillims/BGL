@@ -158,7 +158,6 @@ struct UIElement
             //nodes.push_back(std::move(node));
             nodes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         }
-        std::cout << "here size nodes" << nodes.size() << "\n";
         return nodes;
     }
 
