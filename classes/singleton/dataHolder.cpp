@@ -58,11 +58,15 @@ void DataHolder::handleScene(float time)
         physicsTick = physicCap;
         currentScene->handle(physicCap); // use physicsCap for time variable to make it deterministic
     }
-    //if (frameCap > 0.0001) // if you want more than 10000 frames per second on your engine, no
-    //{
-    //    return currentScene->render(frameCap);
-    //}
-    currentScene->render(time, true);
+    if (frameCap < 0.0001) // if you want more than 10000 frames per second on your engine, no
+    {
+        currentScene->render(frameCap);
+    }
+    else if (frameTick < 0)
+    {
+        frameTick = frameCap;
+        currentScene->render(frameCap); // use physicsCap for time variable to make it deterministic
+    }
 
     // trash collection deletion
     trashEmpty();
@@ -82,6 +86,7 @@ void DataHolder::SetPhysicCap(float cap)
 
 void DataHolder::SetFrameCap(float cap)
 {
+    god.frameCapInt = static_cast<int>(cap);
     if (cap < .1f)// tolerance check prevents /0. If you want a game that only runs on 10 seconds per frame, you can change this tolerance urself.
     {
         god.frameCap = 0.0f;

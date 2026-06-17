@@ -40,8 +40,18 @@ private:
         uiY3d,
         uiY4d,
 
-        uiScaleDown,
-        uiScaleUp,
+        //uiScaleDown,
+        //uiScaleUp,
+
+        uiFPS1,
+        uiFPS2,
+        uiFPS3,
+        uiFPS4,
+
+        uiFPS1d,
+        uiFPS2d,
+        uiFPS3d,
+        uiFPS4d,
 
         uiSave,
         uiKeySettings,
@@ -80,6 +90,7 @@ public:
     std::string soundTitle;
     std::string xTitle;
     std::string yTitle;
+    std::string fpsTitle;
     std::string strx1;
     std::string strx2;
     std::string strx3;
@@ -88,23 +99,16 @@ public:
     std::string stry2;
     std::string stry3;
     std::string stry4;
-    std::string scaleTitle;
-    std::string scaleValue;
+    std::string strfps1;
+    std::string strfps2;
+    std::string strfps3;
+    std::string strfps4;
     std::string exitText;
     std::string saveText;
 
     // uiVariables
     int screenX;
     int screenY;
-    int x1;
-    int x2;
-    int x3;
-    int x4;
-    int y1;
-    int y2;
-    int y3;
-    int y4;
-    int resScale;
 
     // scene for backtracking and render
     Scene* previous;
@@ -160,20 +164,22 @@ public:
         screenX = StaticDraw::w;
         screenY = StaticDraw::h;
 
+        int fps = DataHolder::god.frameCapInt;
+
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
 
         soundTitle = "Graphic Settings";
 
-        x1 = screenX % 10;
-        x2 = screenX / 10 % 10;
-        x3 = screenX / 100 % 10;
-        x4 = screenX / 1000 % 10;
+        int x1 = screenX % 10;
+        int x2 = screenX / 10 % 10;
+        int x3 = screenX / 100 % 10;
+        int x4 = screenX / 1000 % 10;
 
-        y1 = screenY % 10;
-        y2 = screenY / 10 % 10;
-        y3 = screenY / 100 % 10;
-        y4 = screenY / 1000 % 10;
+        int y1 = screenY % 10;
+        int y2 = screenY / 10 % 10;
+        int y3 = screenY / 100 % 10;
+        int y4 = screenY / 1000 % 10;
 
         strx1 = std::to_string(x1);
         strx2 = std::to_string(x2);
@@ -185,12 +191,14 @@ public:
         stry3 = std::to_string(y3);
         stry4 = std::to_string(y4);
 
-        resScale = 1;
-        scaleValue = std::to_string(resScale); // change later
+        strfps1 = std::to_string(fps % 10);
+        strfps2 = std::to_string(fps / 10 % 10);
+        strfps3 = std::to_string(fps / 100 % 10);
+        strfps4 = std::to_string(fps / 1000 % 10);
 
         xTitle = "X Screen Size";
         yTitle = "Y Screen Size";
-        scaleTitle = "Resolution Scale";
+        fpsTitle = "FPS Cap";
 
         exitText = "Exit Settings";
         saveText = "Save Graphic Settings";
@@ -254,13 +262,25 @@ public:
                     .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiY4d).back().back().back();
 
         i++;
-        /*ui[0].appendType<UIXHolder>()
-            .appendType<UITextOneLine>(-111, scaleTitle,.35).back()
+        ui[0].appendType<UIXHolder>()
+            .appendType<UITextOneLine>(-111, fpsTitle,.35).back()
             .appendType<UIXHolder>()
-                .appendType<TexUVNode>(0, .25, 0, .5,uiScaleDown).back()
-                .appendType<UITextOneLine>(-111, scaleValue,.35).back()
-                .appendType<TexUVNode>(.75, 1, 0, .5,uiScaleUp).back().back();*/
-        ui[0].appendType<UIXHolder>();
+                .appendType<UIYHolder>()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS1).back().back()
+                    .appendType<UITextOneLine>(-111, strfps4,.35).back()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS1d).back().back().back()
+                .appendType<UIYHolder>()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS2).back().back()
+                    .appendType<UITextOneLine>(-111, strfps3,.35).back()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS2d).back().back().back()
+                .appendType<UIYHolder>()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS3).back().back()
+                    .appendType<UITextOneLine>(-111, strfps2,.35).back()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS3d).back().back().back()
+                .appendType<UIYHolder>()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS4).back().back()
+                    .appendType<UITextOneLine>(-111, strfps1,.35).back()
+                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS4d).back().back().back();
 
         i++;
         ui[0].appendType<UIXHolder>()
@@ -308,16 +328,17 @@ public:
 
         screenX = StaticDraw::w;
         screenY = StaticDraw::h;
+        int fps = DataHolder::god.frameCapInt;
 
-        x1 = screenX % 10;
-        x2 = screenX / 10 % 10;
-        x3 = screenX / 100 % 10;
-        x4 = screenX / 1000 % 10;
+        int x1 = screenX % 10;
+        int x2 = screenX / 10 % 10;
+        int x3 = screenX / 100 % 10;
+        int x4 = screenX / 1000 % 10;
 
-        y1 = screenY % 10;
-        y2 = screenY / 10 % 10;
-        y3 = screenY / 100 % 10;
-        y4 = screenY / 1000 % 10;
+        int y1 = screenY % 10;
+        int y2 = screenY / 10 % 10;
+        int y3 = screenY / 100 % 10;
+        int y4 = screenY / 1000 % 10;
 
         strx1 = std::to_string(x1);
         strx2 = std::to_string(x2);
@@ -328,6 +349,11 @@ public:
         stry2 = std::to_string(y2);
         stry3 = std::to_string(y3);
         stry4 = std::to_string(y4);
+
+        strfps1 = std::to_string(fps % 10);
+        strfps2 = std::to_string(fps / 10 % 10);
+        strfps3 = std::to_string(fps / 100 % 10);
+        strfps4 = std::to_string(fps / 1000 % 10);
 
         batch.clear();
         // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
@@ -348,11 +374,6 @@ public:
             buttonHover = ui.findOneHover(mouseCordX, mouseCordY);
 
             buttonPress(buttonHover);
-            //std::cout << "click\n";
-            //std::cout << "Mouse Cords: " << mouseCordX << " " << mouseCordY << "\n";
-            //std::cout << "hover: " << buttonHover << "\n";
-            
-            //std::cout << "test find by key\n" << ui.findByKey(buttonHover).key << "\n";
         }
     }
 

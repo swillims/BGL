@@ -11,7 +11,7 @@ void GraphicsOptions::buttonPress(int x)
     {
         DataHolder::SceneQueue(previous, true);
     }
-    else if (x == uiScaleUp)
+    /*else if (x == uiScaleUp)
     {
         resScale++;
         scaleValue = resScale;
@@ -20,7 +20,7 @@ void GraphicsOptions::buttonPress(int x)
     {
         if (resScale>1){resScale--;}
         scaleValue = resScale;
-    }
+    }*/
     else if (x == uiX1)
     {
         StaticDraw::resize(StaticDraw::w+1000, StaticDraw::h);
@@ -84,6 +84,58 @@ void GraphicsOptions::buttonPress(int x)
     else if (x == uiY4d && StaticDraw::h>=101)
     {
         StaticDraw::resize(StaticDraw::w, StaticDraw::h-1);
+    }
+    else if (x == uiFPS1)
+    {
+        DataHolder::god.frameCapInt += 1000;
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS2)
+    {
+        DataHolder::god.frameCapInt += 100;
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS3)
+    {
+        DataHolder::god.frameCapInt += 10;
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS4)
+    {
+        DataHolder::god.frameCapInt += 1;
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS1d)
+    {
+        DataHolder::god.frameCapInt -= 1000;
+        if (DataHolder::god.frameCapInt < 0){DataHolder::god.frameCapInt=0;}
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS2d)
+    {
+        DataHolder::god.frameCapInt -= 100;
+        if (DataHolder::god.frameCapInt < 0){DataHolder::god.frameCapInt=0;}
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS3d)
+    {
+        DataHolder::god.frameCapInt -= 10;
+        if (DataHolder::god.frameCapInt < 0){DataHolder::god.frameCapInt=0;}
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
+    }
+    else if (x == uiFPS4d)
+    {
+        DataHolder::god.frameCapInt -= 1;
+        if (DataHolder::god.frameCapInt < 0){DataHolder::god.frameCapInt=0;}
+        DataHolder::SetFrameCap(DataHolder::god.frameCapInt);
+        aspectChange();
     }
     else if (x==uiSoundSettings)
     {

@@ -21,6 +21,7 @@ public:
 	float physicsTick;
 	float physicCap;
 	float frameTick;
+	int frameCapInt; // this is an int instead of unsigned int to make negative values detectable and fixable
 	float frameCap;
 
 	// static vars
