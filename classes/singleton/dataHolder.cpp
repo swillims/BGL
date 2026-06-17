@@ -101,11 +101,10 @@ void DataHolder::trashEmpty()
 {
     while (!trashList.empty())
     {
-        delete trashList.back();
+        trashList.back().deleter(trashList.back().ptr);
         trashList.pop_back();
     }
 }
-
 // If you don't use setters and getters, just go ahead and delete these. 
 void DataHolder::setUnCatData(std::string key, std::any data) { uncategorizedData[key] = data; }
 bool DataHolder::checkKeyUnCatData(std::string key){return uncategorizedData.contains(key);}

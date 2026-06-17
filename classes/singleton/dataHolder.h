@@ -33,8 +33,15 @@ public:
 	//std::unordered_map<std::string, void*> uncategorizedData; = {};
 	std::unordered_map<std::string, std::any> uncategorizedData;
 
+	struct TrashItem
+	{
+		void* ptr;
+		void (*deleter)(void*);
+	};
+
+	std::vector<TrashItem> trashList;
 	// trash collection
-	std::vector<void*> trashList = {}; // trashList is for things that are dangerious to delete mid handle/render
+	//std::vector<void*> trashList = {}; // trashList is for things that are dangerious to delete mid handle/render
 
 	// static funcs
 	static void init();
@@ -66,6 +73,21 @@ public:
 	//trash collection functions
 	// - delayDelete is called manually. It is a safer way to delete things than using delete keyword.
 	// - trashEmpty is called after scene handle and render to avoid crashes from things getting destroyed to early.
-	static void DelayDelete(void* trash) { god.trashList.push_back(trash); }; 
+
+	//static void DelayDelete(void* trash) { god.trashList.push_back(trash); };
+	template<typename T>
+	static void DelayDelete(T* ptr){god.delayDelete<T>(ptr);}
+
+	template<typename T>
+	void delayDelete(T* ptr)
+	{
+		trashList.push_back({
+			ptr,
+			[](void* p)
+			{
+				delete static_cast<T*>(p);
+			}
+		});
+	}
 	void trashEmpty();
 };
