@@ -19,6 +19,12 @@ struct FrogHop : Scene
 	unsigned int hopSound;
 	unsigned int frogMusic;
 
+	//controls
+	unsigned int rotateCC;
+	unsigned int rotateC;
+	unsigned int hopButton;
+	unsigned int pauseButton;
+
 	// vertice storing
 	std::vector<float> batch;
 
@@ -46,7 +52,7 @@ struct FrogHop : Scene
 	float chance;
 
 	// frog physic data
-	// - note: frog is not a struct becasue unnessary with a 1 to 1 relationship
+	// - note: frog is not a struct because unnecessary with a 1 to 1 relationship
 	float frogX;
 	float frogY;
 	float gravity;
@@ -69,7 +75,7 @@ struct FrogHop : Scene
 	// hop related variables
 	float hopTimerCap;
 	float hopTimer;
-	bool sHeld; // I think that is supposed to be wHeld(wHeld) but its not worth fixing
+	bool wHeld;
 	float jumpSpeed;
 
 	// method/function header
@@ -77,6 +83,8 @@ struct FrogHop : Scene
 	void onLoad();
 
 	void jump();
+
+	void pause();
 
 	void processInput(GLFWwindow* window, float time);
 

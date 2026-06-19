@@ -4,11 +4,14 @@
 #include "singleton/staticDraw.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticWrite.h"
+#include "singleton/staticInput.h"
 #include <array>
 #include <random>
 #include "util.h"
 #include "vectorFUtil.h"
 #include "defeatScreen.h"
+
+#include "keyOptions.h"
 
 StaticWrite* writer;
 
@@ -73,12 +76,46 @@ void FrogHop::onLoad()
 
 	StaticAudio::updateSounds();
 
+	// Setting up Controls
+
+	// to get controls working, the class needs key bindings.
+	// - to make it possible to rebind keys, alias names are used.
+	// -- The Keybinding alias names are specified in keyOptions.h
+	// --- copy/pasting and maintaining two or more copies of the same string literal is not scalable for refactoring
+	// ---- This tutorial is going to reference the names of the aliases by pulling them from one location(KeyOptions)
+
+	// create a temp class that is not heap allocated and will go away when it goes out of scope
+	KeyOptions keyOptions;
+	// KeyOptions Class specifically needs a reference scene to function so we feed it a reference
+	keyOptions.previous = this;
+	// KeyOptions is also a scene. Its onLoad method sets up the needed aliases if they don't exist.
+	keyOptions.onLoad();
+
+	// For each control,
+	// - Reference the name of the alias where they are defined at(KeyOptions)
+	// - Load the controls from StaticInput using the aliases
+	rotateC = StaticInput::GetAlias(keyOptions.eTitle);
+	rotateCC = StaticInput::GetAlias(keyOptions.qTitle);
+	hopButton = StaticInput::GetAlias(keyOptions.wTitle);
+	pauseButton = StaticInput::GetAlias(keyOptions.escTitle);
+
+	// not tracking unused keys is a mild optimization.
+	// - It would be a bigger optimization if glfw was instead of a wrapper class but this is a tutorial.
+	StaticInput::KeyTrackSetAll(false);
+
+	// track keys we need
+	StaticInput::KeyTrack(rotateC);
+	StaticInput::KeyTrack(rotateCC);
+	StaticInput::KeyTrack(hopButton);
+	StaticInput::KeyTrack(pauseButton);
+
 	// set up text rendering for scene
 	// Assumption: StaticWrite::Init should have been ran somewhere else such as main menu
 	// Requirements - startWrite/StartWrite needs to be ran every time before writing text to set shader to text shader
 	//              - somewhere in the pipeline after writing text, the shader needs to be set back to whatever the default shader is for the scene.
 	//              - - This scene sets is to simple(the default shader) at the start of render
 	writer = StaticWrite::singleton;
+
 	batch.clear();
 
 	// code to clear the map. If an instance of this scene is reused(see defeatScrean) the blocks need to be reset.
@@ -132,7 +169,8 @@ void FrogHop::onLoad()
 
 void FrogHop::jump() // method for jumping
 {
-	if (hopTimer < 0 && !sHeld)
+	//if (hopTimer < 0 && !wHeld)
+	if (hopTimer < 0)
 	{
 		hopTimer = hopTimerCap;
 		if (true) // check if ground not implemented. Example file is not a complete game.
@@ -146,15 +184,25 @@ void FrogHop::jump() // method for jumping
 	}
 }
 
+void FrogHop::pause()
+{
+
+}
+
 // process input is part of scene class
 void FrogHop::processInput(GLFWwindow* window, float time) // control inputs
 {
-	// calling super does nothing here but it is done here to show how to use it.
-	Scene::processInput();
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { frogAngle -= time * frogRotationSpeed; }
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { frogAngle += time * frogRotationSpeed; }
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { jump(); sHeld = true; }
-	else { sHeld = false; }
+	// !? -> // calling super does nothing here but it is done here to show how to use it.
+	//Scene::processInput();
+	//if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { frogAngle -= time * frogRotationSpeed; }
+	//if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { frogAngle += time * frogRotationSpeed; }
+	//if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { jump(); wHeld = true; }
+	//else { wHeld = false; }
+
+	if (StaticInput::KeyHeld(rotateC)){frogAngle += time * frogRotationSpeed;}
+	if (StaticInput::KeyHeld(rotateCC)){frogAngle -= time * frogRotationSpeed;}
+	if (StaticInput::KeyClick(hopButton)){jump();}
+	if (StaticInput::KeyHeld(pauseButton)){pause();}
 }
 
 // the game logic part of this example code is going to have low documentation because the main focus is how to interact with Game Engine systems.
@@ -172,6 +220,9 @@ void FrogHop::handle(float time)
 	This function is handle.
 	*/
 
+	StaticInput::Tick();
+
+	// pretty sure the need to do this got eliminated with an update
 	if (resizing == true) { time = 0; resizing = false; } // while resizing the mainmain while loop stops(unrelated to this line), and because it stops, the time between frames can get massive can cause jumping through blocks if not zeroed.
 	// call process input
 	processInput(window, time);
@@ -461,5 +512,9 @@ void FrogHop::clean()
 	StaticDraw::unLoadImage("frog");
 	StaticDraw::unLoadImage(spike);
 	StaticDraw::unLoadImage("frogBlock");
+
+	// set all keys to not be tracked
+	// NOTE: mouse clicks are handled seperately from key clicks
+	StaticInput::KeyTrackSetAll(false);
 };
 // */

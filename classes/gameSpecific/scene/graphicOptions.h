@@ -159,8 +159,6 @@ public:
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
         //StaticAudio::applyTags(bwoo, { "soundEffect" });
 
-        StaticAudio::updateSounds();
-
         screenX = StaticDraw::w;
         screenY = StaticDraw::h;
 

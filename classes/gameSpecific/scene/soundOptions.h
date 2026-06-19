@@ -6,6 +6,7 @@
 #include "singleton/staticInput.h"
 
 #include "graphicOptions.h"
+#include "keyOptions.h"
 //#include "mainMenu.h"
 
 struct SoundOptions : Scene
@@ -354,13 +355,13 @@ public:
 
     void buttonPress(int x)
     {
-        if (x == 0)
+        if (x == uiExit)
         {
             DataHolder::SceneQueue(previous, true);
-            // correct way to delete things
-            //DataHolder::DelayDelete(previous); // delayed deletion is better than instant deletion in situations where multiple scenes are rendered(like this one)
-            //previous->clean(); // clean needs to be ran before canging scenes
-            //DataHolder::SceneQueue(new (), true);
+        }
+        else if (x == uiSave)
+        {
+
         }
         else if (x == uiMasterVollume)
         {
@@ -452,7 +453,9 @@ public:
         }
         else if ( x == uiKeySettings)
         {
-
+            KeyOptions* keys = new KeyOptions();
+            keys->previous = previous;
+            DataHolder::SceneQueue(keys, true);
         }
     }
 

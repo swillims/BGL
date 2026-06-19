@@ -3,24 +3,19 @@
 
 #include "soundOptions.h"
 
+#include "keyOptions.h"
 
 void GraphicsOptions::buttonPress(int x)
 {
     //std::cout<<x<<"\n";
-    if (x == 0)
+    if (x == uiExit)
     {
         DataHolder::SceneQueue(previous, true);
     }
-    /*else if (x == uiScaleUp)
+    else if (x == uiSave)
     {
-        resScale++;
-        scaleValue = resScale;
+
     }
-    else if (x == uiScaleDown)
-    {
-        if (resScale>1){resScale--;}
-        scaleValue = resScale;
-    }*/
     else if (x == uiX1)
     {
         StaticDraw::resize(StaticDraw::w+1000, StaticDraw::h);
@@ -142,5 +137,11 @@ void GraphicsOptions::buttonPress(int x)
         SoundOptions* sound = new SoundOptions();
         sound->previous = previous;
         DataHolder::SceneQueue(sound, true);
+    }
+    else if  (x==uiKeySettings)
+    {
+        KeyOptions* keys = new KeyOptions();
+        keys->previous = previous;
+        DataHolder::SceneQueue(keys, true);
     }
 }

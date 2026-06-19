@@ -3,11 +3,13 @@
 #include "singleton/gl_core.h"
 
 #include <bitset>
-#include "unordered_map"
+#include <unordered_map>
+#include <vector>
 
 // hard coded values are GLFW constants
 // have to use a normal map instead of bimap because of duplicate int values
-// A-Z and 1-9 are omitted becaue they are single char
+// Important -> A-Z and 1-9 are omitted because they are single char and handled in StringToInt <-- Important
+// ^^^ Important ^^^
 // - If you want them, they are easy to look up and implement
 static const std::unordered_map<std::string, int> keyMap = {
 	{"SPACE",32},
@@ -132,20 +134,16 @@ struct StaticInput
 	std::bitset<GLFW_KEY_LAST + 1> isClick;
 	std::bitset<GLFW_KEY_LAST + 1> isRelease;
 
-	// buttons
+	// mouse buttons
 	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseTracked;
 	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseHeld;
 	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseClick;
 	std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mouseRelease;
 
-	static void Init() 
-	{
-		singleton.init();
-	}
-	void init() 
-	{
-		window = glfwGetCurrentContext();
-	}
+	std::unordered_map<std::string, int> aliasList;
+
+	static void Init() {singleton.init();}
+	void init() {window = glfwGetCurrentContext();}
 	
 	static void GetMouse(double& x, double& y, bool normalize = true) { singleton.getMouse(x, y, normalize); }
 	void getMouse(double& x, double& y, bool normalize=true)
@@ -206,17 +204,23 @@ struct StaticInput
 	void keyUntrack(int key) { keyTrack(key, false); }
 	void keyUntrack(const std::string& key) { keyTrack(key, false); }
 
+	static void KeyTrackSetAll(bool on = true){singleton.keyTrackSetAll(on);}
+	void keyTrackSetAll(bool on = true)
+	{
+		if (on){tracked.set();}
+		else {tracked.reset();}
+	}
 	// templates used because will probably add string later
 	template<typename T>
-	bool KeyClick(T i) { return singleton.keyClick(i); }
+	static bool KeyClick(T i) { return singleton.keyClick(i); }
 	bool keyClick(int i) { return isClick[i]; }
 
 	template<typename T>
-	bool KeyHeld(T i) { return singleton.keyHeld(i); }
+	static bool KeyHeld(T i) { return singleton.keyHeld(i); }
 	bool keyHeld(int i) { return isHeld[i]; }
 
 	template<typename T>
-	bool KeyRelease(T i) { return singleton.keyRelease(i); }
+	static bool KeyRelease(T i) { return singleton.keyRelease(i); }
 	bool keyRelease(int i) { return isRelease[i]; }
 
 	template<typename T>
@@ -236,6 +240,12 @@ struct StaticInput
 	void mouseUntrack(int button){mouseTrack(button, false);}
 	void mouseUntrack(const std::string& button){mouseTrack(button, false);}
 
+	void mouseTrackSetAll(bool on = true)
+	{
+		if (on){mouseTracked.set();}
+		else {mouseTracked.reset();}
+	}
+
 	template<typename T>
 	static bool MouseClick(T i){return singleton.mouseClickState(i);}
 	bool mouseClickState(int i){return mouseClick[i];}
@@ -247,6 +257,40 @@ struct StaticInput
 	template<typename T>
 	static bool MouseRelease(T i){return singleton.mouseReleaseState(i);}
 	bool mouseReleaseState(int i){return mouseRelease[i];}
+
+	template<typename T>
+	static void AssignAlias(const std::string& name, T ref){singleton.assignAlias(name,ref);}
+	void assignAlias(const std::string& name, const std::string& ref){assignAlias(name, StringToInt(ref));}
+	void assignAlias(const std::string& name, int ref){aliasList[name] = ref;}
+
+	template<typename T>
+	static bool HasAlias(const std::string& name){return singleton.hasAlias(name);}
+	bool hasAlias(const std::string& name){return aliasList.find(name) != aliasList.end();}
+
+	static void ClearAllAlias(){singleton.clearAllAlias();}
+	void clearAllAlias(){aliasList.clear();}
+	// no int int for assin alias so no int for get alias
+
+	template<typename T>
+	static int GetAlias(T ref){return singleton.getAlias(ref);}
+	int getAlias(const std::string& ref){return aliasList[ref];}
+
+	static std::string GetStringAlias(std::string ref){return singleton.getStrintAlias(ref);}
+	std::string getStrintAlias(std::string ref){return IntToString(getAlias(ref));}
+
+	static std::vector<int> GetTrackedKeys(){return singleton.getTrackedKeys();}
+	std::vector<int> getTrackedKeys()
+	{
+		std::vector<int> out;
+		for (int i = 0; i < tracked.size(); i++)
+		{
+			if (tracked[i])
+			{
+				out.push_back(i);
+			}
+		}
+		return out;
+	}
 
 	static int StringToInt(const std::string& input)
 	{
@@ -260,6 +304,30 @@ struct StaticInput
 			return it->second;
 		}
 		return -1;
+	}
+
+	static std::string IntToString(unsigned int input)
+	{
+		if (input >= '0' && input <= '9')
+		{
+			return std::string(1, static_cast<char>(input));
+		}
+		if (input >= 'A' && input <= 'Z')
+		{
+			return std::string(1, static_cast<char>(input));
+		}
+		for (const auto& [name, value] : keyMap)
+		{
+			if (value == input)
+			{
+				return name;
+			}
+		}
+		if (input >= 32 && input <= 126) // this looks redundant because it is. Its function is to check for single char inputs not in keyMap for if keyMap gets changed. It also recovers ints and letters because no performance cost.
+		{
+			return std::string(1, static_cast<char>(input));
+		}
+		return "StaticInput failed to find key in keymap";
 	}
 };
 
