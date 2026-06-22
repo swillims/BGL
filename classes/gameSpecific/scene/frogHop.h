@@ -32,7 +32,8 @@ struct FrogHop : Scene
 	float yScale;
 	float xScale;
 
-	// is resizing? 
+	// technical things
+	bool alreadyLoaded = false;
 	bool resizing;
 
 	// offset before shifting and shifting

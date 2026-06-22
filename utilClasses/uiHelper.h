@@ -312,7 +312,7 @@ struct UIXHolder : UIContainer
             //node.xMin = xMin;
             //node.xSize = xSize;
             //node.yMin = yyMin;
-            
+
             //node.ySize = yySize;
             node.adjustNode(xxMin, yMin2, xxSize, ySize2);
             xxMin += xxSize;

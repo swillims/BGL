@@ -33,9 +33,7 @@ public:
     unsigned int uITex;
     // shaders
     unsigned int shaderSimpleRef;
-    //unsigned int shaderWhiteShadeRef;
     unsigned int colorShaderRef;
-    //unsigned int blackFadeShadeRef;
 
     // sound;
     unsigned int bwoo;
@@ -100,7 +98,7 @@ public:
         uITex = StaticDraw::imageFileRefs["optionsUi.png"];
 
         // shaders
-        if (!StaticDraw::hasShader("colorShader"))
+        if (!StaticDraw::hasShader("colorRef"))
         {
             StaticDraw::compileShader("assets/shaders/simple.vs", "assets/shaders/color.fs", "colorRef");
         }
@@ -108,7 +106,7 @@ public:
         // set color for color shader
         // -> very important <-
         // engine does not directly handle shader code, so learn how to do your own shaders
-        StaticDraw::useShader(colorShaderRef); // selecting shader is needed to modify shader for smoe reason
+        StaticDraw::useShader(colorShaderRef); // selecting shader is needed to modify shader in opengl
         GLint colorLoc = glGetUniformLocation(colorShaderRef, "color"); // get uniform location. Uniforms are shader vars
         //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
         glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
@@ -153,7 +151,10 @@ public:
 
         int i = 0;
 
-        ui.nodes.clear(); // nodes is vector and this is simplest way to empty it.
+        // This scene changes scenes without deleting itself when keybinding.
+        // - because it navigates back to itself without deleting, it has to either clear the nodes or not add new nodes if they already exist
+        // -- deleting the old nodes is better for readability than a massive if statement
+        ui.nodes.clear();
 
         ui.appendType<UIYHolder>(5);
         ui[0].appendType<UIBuffer>(.1)

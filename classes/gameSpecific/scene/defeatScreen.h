@@ -55,11 +55,11 @@ struct DefeatScreen : Scene
         }
         buttonImageRef = StaticDraw::imageFileRefs["button.png"];
 
-        if (!StaticDraw::hasShader("colorShader"))
+        if (!StaticDraw::hasShader("colorRef"))
         {
-            StaticDraw::compileShader("assets/shaders/simple.vs", "assets/shaders/color.fs", "colorShader");
+            StaticDraw::compileShader("assets/shaders/simple.vs", "assets/shaders/color.fs", "colorRef");
         }
-        colorShaderRef = StaticDraw::getShader("colorShader");
+        colorShaderRef = StaticDraw::getShader("colorRef");
         // set color for color shader
         // -> very important <-
         // engine does not directly handle shader code, so learn how to do your own shaders

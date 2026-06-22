@@ -109,7 +109,7 @@ public:
 
 
         // shaders
-        if (!StaticDraw::hasShader("colorShader"))
+        if (!StaticDraw::hasShader("colorRef"))
         {
             StaticDraw::compileShader("assets/shaders/simple.vs", "assets/shaders/color.fs", "colorRef");
         }

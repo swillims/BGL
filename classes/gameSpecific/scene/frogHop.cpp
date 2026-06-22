@@ -10,6 +10,7 @@
 #include "util.h"
 #include "vectorFUtil.h"
 #include "defeatScreen.h"
+#include "pauseMenu.h"
 
 #include "keyOptions.h"
 
@@ -116,54 +117,55 @@ void FrogHop::onLoad()
 	//              - - This scene sets is to simple(the default shader) at the start of render
 	writer = StaticWrite::singleton;
 
-	batch.clear();
+	//batch.clear();
 
-	// code to clear the map. If an instance of this scene is reused(see defeatScrean) the blocks need to be reset.
-	for (int i = 0; i < width * height; i++)
+	if (not alreadyLoaded)
 	{
-		blocks[i] = 0;
-	}
-	for (int i = 0; i < width; i++)
-	{
-		blocks[i * height] = 1;
-		blocks[(i * height) + height - 1] = 1;
-	}
+		// code to clear the map. If an instance of this scene is reused(see defeatScrean) the blocks need to be reset.
+		alreadyLoaded = true;
+		for (int i = 0; i < width * height; i++)
+		{
+			blocks[i] = 0;
+		}
+		for (int i = 0; i < width; i++)
+		{
+			blocks[i * height] = 1;
+			blocks[(i * height) + height - 1] = 1;
+		}
 
-	// set variables to default
-	// - the variables are messy and unsorted here. They are sorted in the .h file.
-	yScale = 1.0f / height;
-	visualOffset = 0.0f;
-	shift = 0;
-	chance = 0.3f;
-	currentPath = height / 2;
-	pathCount = 3; // DO NOT SET THIS TO 0, IT WILL UNDERFLOW IN "coid handle(...)"
-	minPathCount = 2;
-	maxPathCount = 3;
-	frogX = frogPhysicX = width / 2;
-	frogY = frogPhysicY = 2;
-	assumePhysics = false;
-	frogVelocityX = frogVelocityY = 0;
-	gravity = 3.25f;
-	bounceValue = -.5f; // negative because go other way when bouncing
-	frogRadius = 0.25f;
-	frogAngleDisplay = frogAngle = 0;
-	frogRotationSpeed = 1;
-	resizing = false;
-	hopTimer = 0;
-	hopTimerCap = .5f;
-	jumpSpeed = 5;
+		// variables that shouldn't be reloaded
+		frogX = frogPhysicX = width / 2;
+		frogY = frogPhysicY = 2;
+		frogVelocityX = frogVelocityY = 0;
+		hopTimer = 0;
+		visualOffset = 0.0f;
+		shift = 0;
+		frogAngleDisplay = frogAngle = 0;
+		yScale = 1.0f / height;
+		chance = 0.3f;
+		currentPath = height / 2;
+		pathCount = 3; // DO NOT SET THIS TO 0, IT WILL UNDERFLOW IN "handle(...)"
+		minPathCount = 2;
+		maxPathCount = 3;
+		assumePhysics = false;
+		gravity = 3.25f;
+		bounceValue = -.5f; // negative because go other way when bouncing
+		frogRadius = 0.25f;
+		frogRotationSpeed = 1;
+		resizing = false;
+		hopTimerCap = .5f;
+		jumpSpeed = 5;
+	}
 
 	// set music
 	StaticAudio::playSoundLoop(frogMusic);
-
 
 	// set physics framerate to 60
 	DataHolder::SetPhysicCap(60);
 
 	// it is good practice to aspectChange whenever loading a scene.
 	// - aspectChange() is only called when the aspect ratio is changed or when it is manually called. It is manually called here.
-	// -- There are things aspectChange() fixes and it won't fix those things because it is called very rarily(assumption).
-	// - This specific scene uses it to handle text generation as well. 
+	// - This scene uses it to handle text generation
 	aspectChange();
 }
 
@@ -186,7 +188,13 @@ void FrogHop::jump() // method for jumping
 
 void FrogHop::pause()
 {
-
+	// create a pause menu object and use the constructor to set this scene as "previous"
+	PauseMenu* menu = new PauseMenu(this);
+	// Set pause menu has a function for setting text channel.
+	// - The text channel needs to be a number not used by this scene or it will draw this scenes text over the manu.
+	menu->setTextChannel(-1111);
+	// Change scenes to menu and set clean to false to avoid deleting this scene
+	DataHolder::SceneQueue(menu, false);
 }
 
 // process input is part of scene class
@@ -329,6 +337,7 @@ void FrogHop::handle(float time)
 	// defeat conditions
 	if (frogPhysicX - frogRadius < .3f + visualOffset || frogPhysicX + frogRadius > width + visualOffset - 2.3f) // .3 seemed like a good amount of overlap to be fair
 	{
+		alreadyLoaded = false; // it is already loaded, it just needs to reload when returning to scene to not be in spikes
 		DefeatScreen* next = new DefeatScreen();
 		next->previous = this;
 		DataHolder::SceneQueue(next, false);
@@ -486,10 +495,15 @@ void FrogHop::aspectChange()
 	xScale = yScale / StaticDraw::aspectRatio;
 
 	StaticWrite::SetUpChannel(0); // clears channel 0
+	std::string q = StaticInput::IntToString(rotateC);
+	std::string e = StaticInput::IntToString(rotateCC);
+	std::string w = StaticInput::IntToString(hopButton);
+	std::string esc = StaticInput::IntToString(pauseButton);
 	// The number 0 is arbituary. It is ok to use whatever number as long as it is a valid int and it is deliberate.
 	StaticWrite::AppendText(0, "Controls:", -.95f, .9f, xScale * .8, yScale * .8); // add text to channel 0
-	StaticWrite::AppendText(0, "Q or E: Rotate Frog", -.9f, .8f, xScale * .8, yScale * .8); // add text to channel 0
-	StaticWrite::AppendText(0, "W: Jump", -.9f, .7f, xScale * .8, yScale * .8); // add text to channel 0
+	StaticWrite::AppendText(0, q + " or " + e + ": Rotate Frog", -.9f, .8f, xScale * .8, yScale * .8); // add text to channel 0
+	StaticWrite::AppendText(0, w + ": Jump", -.9f, .7f, xScale * .8, yScale * .8); // add text to channel 0
+	StaticWrite::AppendText(0, esc + ": Pause", -.9f, .6f, xScale * .8, yScale * .8);
 }
 
 void FrogHop::clean()
