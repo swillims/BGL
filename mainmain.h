@@ -56,7 +56,6 @@ static int mainmainmain()
     // init dataholder
     DataHolder::init(); // dataholder holder handles scene management. It can have game specific data added to it(code yourself).
     DataHolder& g = DataHolder::god;
-    //StaticDraw::init();
     StaticAudio::init();
 
     // defaults for if a setting doesn't exist or fails to load
@@ -81,26 +80,26 @@ static int mainmainmain()
             util::removeComments(line, "#");
             util::removeComments(line, "//");
             std::vector<std::string> data = util::split(line, ":");
-            // some people like to leave a space after ":" so remove trailing space
-            util::sanitizeString(data[1], {" "});
-            try
+            if (data.size() > 1)
             {
-                int n = std::stoi(data.at(1));
-                g.uncategorizedData[data.at(0)] = n;
-                // it's also possible to do it this way
-                // - g.setUnCatData(data.at(0), n);
-                // and this way
-                // - DataHolder::SetUnCatData(data.at(0), n);
+                util::sanitizeString(data[1], {" "});
+                try
+                {
+                    int n = std::stoi(data.at(1));
+                    g.uncategorizedData[data.at(0)] = n;
+                    // it's also possible to do it this way
+                    // - g.setUnCatData(data.at(0), n);
+                    // and this way
+                    // - DataHolder::SetUnCatData(data.at(0), n);
+                }
+                catch(std::exception e){}
             }
-            catch(std::exception e){}
         }
         if (g.uncategorizedData.contains("SCR_WIDTH"))
         {
             SCR_WIDTH = g.getUnCatData<int>("SCR_WIDTH");
             g.deleteUnCatData("SCR_WIDTH");
 
-            // can also do this but it involves manual converstion with any_cast
-            // - SCR_WIDTH = std::any_cast<int>(g.uncategorizedData["SCR_WIDTH"]);
         }
         // using struct method instead of c++ method to show anoher to check if key exists
         if (g.checkKeyUnCatData("SCR_HEIGHT"))
@@ -129,8 +128,11 @@ static int mainmainmain()
             util::removeComments(line, "#");
             util::removeComments(line, "//");
             std::vector<std::string> data = util::split(line, ":");
-            util::sanitizeString(data[1], {" "});
-            StaticInput::AssignAlias(data[0], data[1]);
+            if (data.size() > 1)
+            {
+                util::sanitizeString(data[1], {" "});
+                StaticInput::AssignAlias(data[0], data[1]);
+            }
         }
     }
 
@@ -147,14 +149,16 @@ static int mainmainmain()
             util::removeComments(line, "#");
             util::removeComments(line, "//");
             std::vector<std::string> data = util::split(line, ":");
-            // some people like to leave a space after ":" so remove trailing space
-            util::sanitizeString(data[1], {" "});
-            try
+            if (data.size() >1 )
             {
-                int n = std::stoi(data.at(1));
-                g.uncategorizedData[data.at(0)] = n;
+                util::sanitizeString(data[1], {" "});
+                try
+                {
+                    int n = std::stoi(data.at(1));
+                    g.uncategorizedData[data.at(0)] = n;
+                }
+                catch(std::exception e){}
             }
-            catch(std::exception e){}
         }
         if (g.uncategorizedData.contains("SOUND_MASTER"))
         {
@@ -249,10 +253,7 @@ static int mainmainmain()
         float deltaTime = elapsed.count(); // in seconds
         lastTime = currentTime; // update for next frame
 
-        //g.SceneUpdate(); // S is capitalized because it is static function
         DataHolder::SceneUpdate();
-
-        //std::cout << "framerate: " << 1 / deltaTime << "\n";
 
         g.handleScene(deltaTime);
 
@@ -288,7 +289,6 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // main/central method decoupled from entry point. It is at the bottom so it doesn't have to be forward declared
 struct mainmain
 {
-public:
     static void run()
     {
         mainmainmain();

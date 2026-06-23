@@ -9,7 +9,6 @@
 
 struct KeyOptions : Scene
 {
-// I don't want these button enums effecting other enums so I made them private
 private:
     enum uiKeys
     {
@@ -42,13 +41,7 @@ public:
     unsigned int buttonHover; // button being hovered
     double mouseCordX, mouseCordY; // mouse cords that need to be normalized
 
-    // there are only two button so I'm not using a for loop and I can get away with two hoverBatchs
     std::vector<float> batch;
-    //std::vector<float> hoverBatchA;
-    //std::vector<float> hoverBatchB;
-
-    // uiElementList
-    //std::vector<std::unique_ptr<uiElement>> elements;
 
     // uiElement
     UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
@@ -71,17 +64,11 @@ public:
     // scene for backtracking and render
     Scene* previous;
 
-
-
-    // constructor only used to instantiate a ui
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
     KeyOptions() : ui(-1, -1, 2, 2, 1.0, true) {}
 
-    // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
     {
-        //myButtonTexture.load("assets/core/button.png");
-        //window = glfwGetCurrentContext();
         Scene::onLoad();
 
         // textures
@@ -104,11 +91,8 @@ public:
         }
         colorShaderRef = StaticDraw::getShader("colorRef");
         // set color for color shader
-        // -> very important <-
-        // engine does not directly handle shader code, so learn how to do your own shaders
         StaticDraw::useShader(colorShaderRef); // selecting shader is needed to modify shader in opengl
         GLint colorLoc = glGetUniformLocation(colorShaderRef, "color"); // get uniform location. Uniforms are shader vars
-        //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
         glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
 
         // sounds
@@ -117,7 +101,6 @@ public:
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
-        //StaticAudio::applyTags(bwoo, { "soundEffect" });
 
         int fps = DataHolder::god.frameCapInt;
 
@@ -136,11 +119,6 @@ public:
         if (!StaticInput::HasAlias<std::string>(eTitle)){StaticInput::AssignAlias(eTitle,'E');}
         if (!StaticInput::HasAlias<std::string>(escTitle)){StaticInput::AssignAlias(escTitle,"ESCAPE");}
 
-        //qValue = StaticInput::GetAlias(qTitle);
-        //wValue = StaticInput::GetAlias(wTitle);
-        //eValue = StaticInput::GetAlias(eTitle);
-        //escValue = StaticInput::GetAlias(escTitle);
-
         qValue = StaticInput::GetStringAlias(qTitle);
         wValue = StaticInput::GetStringAlias(wTitle);
         eValue = StaticInput::GetStringAlias(eTitle);
@@ -149,8 +127,6 @@ public:
         exitText = "Exit Settings";
         saveText = "Save Key Bindings";
 
-        int i = 0;
-
         // This scene changes scenes without deleting itself when keybinding.
         // - because it navigates back to itself without deleting, it has to either clear the nodes or not add new nodes if they already exist
         // -- deleting the old nodes is better for readability than a massive if statement
@@ -158,19 +134,12 @@ public:
 
         ui.appendType<UIYHolder>(5);
         ui[0].appendType<UIBuffer>(.1)
-            //.appendType<UIXHolder>()
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
             .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
-            //.appendType<UITextOneLine>(-111, graphicTitle, .3, XCENTER).back().back().back()
             .back().back()
-
             .appendType<UITextOneLine>(-111, keyTitle,.35).back()
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings).back();
 
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings).back()
-            //.appendType<UITextOneLine>(-111, keySettings, .3, XCENTER);
-            ;
-
-        i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, qTitle,.25).back()
@@ -184,7 +153,7 @@ public:
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
                         .appendType<UITextOneLine>(-111, eValue,.15);
-        i++;
+
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, wTitle,.25).back()
@@ -192,15 +161,8 @@ public:
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
                         .appendType<UITextOneLine>(-111, wValue,.15).back().back().back().back()
-                .appendType<UIXHolder>();
-            //.appendType<UIXHolder>()
-            //    .appendType<UITextOneLine>(-111, escTitle,.35).back()
-            //    .appendType<UIXRatio>(1,true)
-            //        .appendType<UIStack>()
-            //            .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
-            //            .appendType<UITextOneLine>(-111, escValue,.35);
+                .appendType<UIEmpty>();
 
-        i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, escTitle,.25).back()
@@ -208,9 +170,8 @@ public:
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
                         .appendType<UITextOneLine>(-111, escValue,.15).back().back().back().back()
-                .appendType<UIXHolder>();
+                .appendType<UIEmpty>();
 
-        i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
             .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
@@ -238,7 +199,6 @@ public:
         StaticWrite::StartWrite();
         StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
 
-        // call super? idk, I take several month breaks from this project
         Scene::render(time, updateDisplay);
     };
 

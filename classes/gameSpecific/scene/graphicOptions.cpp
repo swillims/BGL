@@ -4,7 +4,6 @@
 
 void GraphicsOptions::buttonPress(int x)
 {
-    //std::cout<<x<<"\n";
     if (x == uiExit)
     {
         DataHolder::SceneQueue(previous, true);

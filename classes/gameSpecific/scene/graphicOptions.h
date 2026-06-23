@@ -7,14 +7,9 @@
 #include "singleton/dataHolder.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
-//#include "soundOptions.h" // should be in .cpp file
-
-// class reuses names from sound settings to save time
-
 
 struct GraphicsOptions : Scene
 {
-    // I don't want these button enums effecting other enums so I made them private
 private:
     enum uiKeys
     {
@@ -59,14 +54,10 @@ private:
     };
 
 public:
-    // textures
     unsigned int buttonImageRef;
     unsigned int uITex;
-    // shaders
     unsigned int shaderSimpleRef;
-    //unsigned int shaderWhiteShadeRef;
     unsigned int colorShaderRef;
-    //unsigned int blackFadeShadeRef;
 
     // sound;
     unsigned int bwoo;
@@ -75,14 +66,7 @@ public:
     unsigned int buttonHover; // button being hovered
     double mouseCordX, mouseCordY; // mouse cords that need to be normalized
 
-    // there are only two button so I'm not using a for loop and I can get away with two hoverBatchs
     std::vector<float> batch;
-    //std::vector<float> hoverBatchA;
-    //std::vector<float> hoverBatchB;
-
-    // uiElementList
-    //std::vector<std::unique_ptr<uiElement>> elements;
-
     // uiElement
     UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
 
@@ -113,15 +97,12 @@ public:
     // scene for backtracking and render
     Scene* previous;
 
-    // constructor only used to instantiate a ui
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
     GraphicsOptions() : ui(-1, -1, 2, 2, 1.0, true) {}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
     {
-        //myButtonTexture.load("assets/core/button.png");
-        //window = glfwGetCurrentContext();
         Scene::onLoad();
 
         // textures
@@ -308,7 +289,6 @@ public:
         StaticWrite::StartWrite();
         StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
 
-        // call super? idk, I take several month breaks from this project
         Scene::render(time, updateDisplay);
     };
 
@@ -356,8 +336,6 @@ public:
         batch.clear();
         // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
         StaticWrite::SetUpChannel(-111);
-        //std::cout << "AAAA\n";
-        //ui.adjustNode(ui.xMin, ui.yMin, ui.xSize, ui.ySize);
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
 

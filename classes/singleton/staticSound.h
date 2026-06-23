@@ -14,8 +14,6 @@
 
 struct StaticAudio
 {
-public:
-
     inline static ma_engine engine;
 
     // loaded sounds
@@ -29,17 +27,14 @@ public:
     inline static std::unordered_map<std::string, int> tagStringRefs;
 
     // loaded sound tags related to loaded sounds
-    // honestly, consider refactoring into using a struct merging ma_sound* and tags
     inline static std::unordered_map<int, std::vector<int>> tagSoundMap;
 
-    // referenc data
+    // reference data
     inline static float masterVolume = 1.0; // assumed default value when opening program before loading things
 
     static void init()
     {
-        // force mono because linux not working
         ma_engine_config config = ma_engine_config_init();
-        //config.channels = 1;          // force mono output
 
         ma_result result = ma_engine_init(&config, &engine);
         if (result != MA_SUCCESS)
@@ -49,11 +44,6 @@ public:
         }
         std::cout << "Audio engine initialized.\n";\
         ma_device* mm = ma_engine_get_device(&engine);
-        std::cout << "type: " << mm->type << " sample rate: " << mm->sampleRate << " playback channels: " << mm->playback.channels << "\n";
-        std::cout << "Engine " << ma_engine_get_device(&engine) << "\n";
-
-        // latest debug
-        std::cout << "Backend: " << ma_get_backend_name(mm->pContext->backend) << "\n";
     }
     static void playSoundFromFile(const char* path)
     {
@@ -64,38 +54,19 @@ public:
     static void playSoundEffect(int ref)
     {
         ma_sound* sound = soundRefs[ref];
-        //ma_sound_stop(sound);
         ma_sound_seek_to_pcm_frame(sound, 0);
         ma_sound_start(sound);
     }
     static void playSoundEffect(const std::string& ref) { playSoundEffect(soundStringRefs[ref]); }
 
-    // sound effect multi is different than regular play sound effect because allows for playing multiple of same sound
-    // definition is moved to .cpp file becuase it uses ma_sleep
+    // sound effect multi is different from regular play sound effect because allows for playing multiple of same sound
     static void playSoundEffectMulti(int ref);
-    /**
-    {
-        ma_sound* originalSound = soundRefs[ref];
-        ma_sound* clone = new ma_sound;
-        ma_sound_init_copy(&engine, originalSound, 0, NULL, clone);
-        ma_sound_start(clone);
-
-        // Optionally schedule cleanup:
-        std::thread([clone]() {
-            while (ma_sound_is_playing(clone)) ma_sleep(10);
-            ma_sound_uninit(clone);
-            delete clone;
-            }).detach();
-    }
-    //*/
 
     static void playSoundEffectMulti(const std::string& ref) { playSoundEffectMulti(soundStringRefs[ref]); }
 
     // This is meant for music and ambience
     static void playSoundLoop(int ref)
     {
-        //ma_sound_seek_to_pcm_frame(soundRefs[ref], 0);
-        //ma_sound_set_loop_point_in_pcm_frames(soundRefs[ref], 0, ma_sound_get_length_in_pcm_frames(soundRefs[ref]));
         ma_sound_set_looping(soundRefs[ref], true);
         ma_sound_start(soundRefs[ref]);
     }
@@ -107,29 +78,6 @@ public:
         ma_sound_stop(soundRefs[ref]);
     }
 
-    /*static void applyTags(std::string target, const std::vector<std::string>& tags)
-    {
-        int targetInt = soundStringRefs[target];
-        if (!tagSoundMap.contains(targetInt)) // check if it exists
-        {
-            tagSoundMap[targetInt] = {}; // set to empty if it doesn't exist
-        }
-        for (const std::string& tag : tags)
-        {
-            if (!tagStringRefs.contains(tag))
-            {
-                tagCount++;
-                tagStringRefs[tag] = tagCount;
-                tagSettings[tagCount] = 1.0f; // "magic number" is 100% default sound setting.
-            }
-            // this nasty if statement is here to avoid adding same tag twice.
-            if (std::find(tagSoundMap[targetInt].begin(), tagSoundMap[targetInt].end(), tagStringRefs[tag]) == tagSoundMap[targetInt].end())
-            {
-                tagSoundMap[targetInt].push_back(tagStringRefs[tag]);
-            }
-        }
-    }
-    //*/
     static void applyTags(int target, const std::vector<std::string>& tags)
     {
         if (!tagSoundMap.contains(target)) // check if it exists

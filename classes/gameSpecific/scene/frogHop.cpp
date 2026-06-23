@@ -5,7 +5,6 @@
 #include "singleton/staticSound.h"
 #include "singleton/staticWrite.h"
 #include "singleton/staticInput.h"
-#include <array>
 #include <random>
 #include "util.h"
 #include "vectorFUtil.h"

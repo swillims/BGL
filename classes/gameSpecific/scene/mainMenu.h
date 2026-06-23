@@ -321,9 +321,5 @@ struct MainMenu : Scene {
     {
         // Turn off music
         StaticAudio::stopSound(backgroundMusic);
-        // As an alternative to stopping the music, it can also be unloaded.
-        //StaticAudio::unLoad(backgroundMusic);
-        // unloading also stops the sound
-
     }; 
 };

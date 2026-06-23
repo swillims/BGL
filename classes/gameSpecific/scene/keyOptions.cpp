@@ -34,9 +34,6 @@ struct ButtonInput : Scene
         // draw background scene
         previous->render(0, false);
 
-        // switch back to default shader
-        //StaticDraw::useShader(shaderSimpleRef);
-
         // write text
         StaticWrite::StartWrite();
         StaticWrite::DrawChannel(-11111, glm::vec3(0.0f, 0.0f, 0.0f));

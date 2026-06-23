@@ -294,7 +294,6 @@ public:
     {
         StaticDraw::updateView(); // need for proper aspect ratio update
         batch.clear();
-        // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
         StaticWrite::SetUpChannel(-111);
 
         ui.adjustNodeDefault();
@@ -339,16 +338,6 @@ public:
             UIElement& barHolder = ui.findByKey(uiMasterVollume);
             if (barHolder.key == uiMasterVollume)
             {
-                //float l = barHolder.xSize;
-                //float halfB = masterVollumeWidth / 2;
-                //float mouseAdjust = mouseCordX - barHolder.xMin;
-                //std::cout << "bar holder xmin" << barHolder.xMin << "\n";
-                //float lb = barHolder.xSize - masterVollumeWidth;
-                //float mouseAndB = mouseAdjust - halfB;
-                // probably what I want
-                //std::cout << "attempted solution: " << mouseAndB / lb << "\n";
-                //masterVollume = mouseAndB / lb;
-                //masterVollume = ((mouseCordX - barHolder.xMin) - (masterVollumeWidth / 2)) / (barHolder.xSize - masterVollumeWidth);
                 masterVollume = ((mouseCordX - barHolder.xMin) - (masterVollumeWidth * 0.5f)) / (barHolder.xSize - masterVollumeWidth);
                 if (masterVollume < 0) { masterVollume = 0; }
                 else if (masterVollume > 1) { masterVollume =1; }
@@ -358,10 +347,7 @@ public:
 
                 StaticAudio::setMasterVollume(masterVollume);
 
-                ui.adjustNodeDefault();
-                StaticWrite::SetUpChannel(-111);
-                batch.clear();
-                ui.renderVerts(batch);
+                aspectChange();
             }
         }
         else if (x == uiMusicVollume)
@@ -380,10 +366,7 @@ public:
                 StaticAudio::updateTagVollume("music", musicVollume);
                 StaticAudio::updateSounds();
 
-                ui.adjustNodeDefault();
-                StaticWrite::SetUpChannel(-111);
-                batch.clear();
-                ui.renderVerts(batch);
+                aspectChange();
             }
         }
         else if (x == uiEffectVollume)
@@ -403,11 +386,7 @@ public:
 
                 StaticAudio::playSoundEffect(bwoo);
 
-                ui.adjustNodeDefault();
-                StaticWrite::SetUpChannel(-111);
-                batch.clear();
-                ui.renderVerts(batch);
-            }
+                aspectChange();            }
         }
         else if (x == uiGraphicSettings)
         {
