@@ -379,6 +379,22 @@ public:
 
     void saveSetting()
     {
+        StaticAudio::playSoundEffectMulti(bwoo);
 
+        std::string settingsFileName = "metadata/graphicsettings";
+        std::ostringstream write;
+
+        write << "SCR_WIDTH:" << StaticDraw::w << "\n";
+        write << "SCR_HEIGHT:" << StaticDraw::h << "\n";
+        write << "FPS_CAP:" << DataHolder::god.frameCapInt;
+
+        if(util::writeFile(settingsFileName, write.str()))
+        {
+            std::cout << "sound settings saved\n";
+        }
+        else
+        {
+            std::cout << "fail to write graphics settings\n";
+        }
     }
 };

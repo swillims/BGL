@@ -21,7 +21,7 @@ struct ButtonInput : Scene
         Scene::onLoad();
         message = "Press a Key";
 
-        ui.appendType<UIBuffer>(.2).appendType<UITextOneLine>(-1111, message, .15);
+        ui.appendType<UIBuffer>(.2).appendType<UITextOneLine>(-11111, message, .15);
 
         StaticInput::KeyTrackSetAll();
         ints = StaticInput::GetTrackedKeys(); // very unnecessary but showing tools
@@ -39,7 +39,7 @@ struct ButtonInput : Scene
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-1111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(-11111, glm::vec3(0.0f, 0.0f, 0.0f));
 
         // call super
         Scene::render(time, updateDisplay);
@@ -85,7 +85,7 @@ void KeyOptions::buttonPress(int x)
     }
     else if (x == uiSave)
     {
-
+        saveSetting();
     }
     else if (x == uiQ)
     {

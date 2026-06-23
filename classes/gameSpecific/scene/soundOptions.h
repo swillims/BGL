@@ -132,37 +132,37 @@ public:
 
         StaticAudio::updateSounds();
 
-        //if (!StaticDraw::hasShader("blackfadenoimage"))
-        //{
-        //    StaticDraw::compileShader("assets/shaders/simple.vs", "assets/gameSpecific/shaders/blackfadenoimage.fs", "blackfadenoimage");
-        //}
-
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
 
-        //uiY.xMin = 0;
-        //uiY.yMin = 0;
-        //uiY.xSize = 1;
-        //uiY.ySize = 1;
         graphicTitle = "Graphic Settings";
         keySettings = "Key Bindings";
-
         soundTitle = "Sound Settings";
-        masterTitle = "Master Vollume";
-        masterValue = "100"; // change later
-        masterVollumeLeft = .9;
+        masterTitle = "Master Volume";
+        masterVollumeLeft = StaticAudio::masterVolume;
+        masterValue = std::to_string(static_cast<int>(masterVollumeLeft * 100.0f + 0.5f));
         masterVollumeWidth = .1;
-        musicTitle = "Music Vollume";
-        musicValue = "100"; // change later
-        musicVollumeLeft = .7;
+        musicTitle = "Music Volume";
+        musicValue = "na";
+        musicVollumeLeft = .0;
         musicVollumeWidth = .1;
-        soundEffectTitle = "Sound Effects Vollume";
-        soundEffectValue = "100"; // change later
-        effectVollumeLeft = .5;
+        soundEffectTitle = "Sound Effects Volume";
+        soundEffectValue = "na";
+        effectVollumeLeft = .0;
         effectVollumeWidth = .1;
         exitText = "Exit Settings";
         saveText = "Save Sound Settings";
 
+        if (StaticAudio::tagStringRefs.contains("music"))
+        {
+            musicVollumeLeft = StaticAudio::tagSettings[StaticAudio::tagStringRefs["music"]];
+            musicValue = std::to_string(static_cast<int>(musicVollumeLeft * 100.0f + 0.5f));
+        }
+        if (StaticAudio::tagStringRefs.contains("soundEffect"))
+        {
+            effectVollumeLeft = StaticAudio::tagSettings[StaticAudio::tagStringRefs["soundEffect"]];
+            soundEffectValue = std::to_string(static_cast<int>(effectVollumeLeft * 100.0f + 0.5f));
+        }
 
         // exists to not have a ref not initialized
         // minimum decalration too large to keep code clean so ref needs to be declared up here
@@ -259,14 +259,6 @@ public:
             .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
             .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
 
-
-        i++;
-        //ui[0].appendNode(std::make_unique<UIXHolder>());
-        //ui[0][i].appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5))
-        //.back().appendNode(std::make_unique<TexUVNode>(0, .25, 0, .5));
-
-
-
         aspectChange();
     }
     void render(float time = 0, bool updateDisplay = true) override
@@ -288,14 +280,12 @@ public:
         StaticWrite::StartWrite();
         StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
 
-        // call super? idk, I take several month breaks from this project
         Scene::render(time, updateDisplay);
     };
 
     void handle(float time = 0) override
     {
         StaticInput::GetMouse(mouseCordX,mouseCordY);
-        //std::cout << "start search\n";
         
         processInput(window);
     }
@@ -303,26 +293,12 @@ public:
     void aspectChange()
     {
         StaticDraw::updateView(); // need for proper aspect ratio update
-        //float yScale = .25; // fontsize
-        //float xScale = yScale / StaticDraw::aspectRatio;
-
         batch.clear();
         // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
         StaticWrite::SetUpChannel(-111);
-        //std::cout << "AAAA\n";
-        //ui.adjustNode(ui.xMin, ui.yMin, ui.xSize, ui.ySize);
+
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
-        // non-positive number used for channel to avoid conflict with game allocated channels
-        // also underflow logic error is fine
-        //StaticWrite::SetUpChannel(-1);
-
-        //float x = -.5;
-        //float y = .5;
-        //float shift = .1;
-
-        //StaticWrite::AppendText(-1, "Exit", x, -y - shift, xScale, yScale);
-        //StaticWrite::AppendText(-1, "Retry", x, y - shift, xScale, yScale);
 
         previous->aspectChange();
     }
@@ -335,11 +311,6 @@ public:
             buttonHover = ui.findOneHover(mouseCordX, mouseCordY);
 
             buttonPress(buttonHover);
-            //std::cout << "click\n";
-            //std::cout << "Mouse Cords: " << mouseCordX << " " << mouseCordY << "\n";
-            //std::cout << "hover: " << buttonHover << "\n";
-            
-            //std::cout << "test find by key\n" << ui.findByKey(buttonHover).key << "\n";
         }
         else if (StaticInput::MouseHeld(GLFW_MOUSE_BUTTON_LEFT))
         {
@@ -361,7 +332,7 @@ public:
         }
         else if (x == uiSave)
         {
-
+            saveSetting();
         }
         else if (x == uiMasterVollume)
         {
@@ -381,8 +352,7 @@ public:
                 masterVollume = ((mouseCordX - barHolder.xMin) - (masterVollumeWidth * 0.5f)) / (barHolder.xSize - masterVollumeWidth);
                 if (masterVollume < 0) { masterVollume = 0; }
                 else if (masterVollume > 1) { masterVollume =1; }
-                //masterValue = std::to_string((int)std::round(masterVollume*100));
-                masterValue = std::to_string((int)(masterVollume * 100.0f + 0.5f));
+                masterValue = std::to_string(static_cast<int>(masterVollume * 100.0f + 0.5f));
 
                 masterVollumeLeft = masterVollume / (1.0 + masterVollumeWidth);
 
@@ -392,8 +362,6 @@ public:
                 StaticWrite::SetUpChannel(-111);
                 batch.clear();
                 ui.renderVerts(batch);
-
-                saveSetting();
             }
         }
         else if (x == uiMusicVollume)
@@ -404,7 +372,7 @@ public:
                 musicVollume = ((mouseCordX - barHolder.xMin) - (musicVollumeWidth * 0.5f)) / (barHolder.xSize - musicVollumeWidth);
                 if (musicVollume < 0) { musicVollume = 0; }
                 else if (musicVollume > 1) { musicVollume = 1; }
-                musicValue = std::to_string((int)(musicVollume * 100.0f + 0.5f));
+                musicValue = std::to_string(static_cast<int>(musicVollume * 100.0f + 0.5f));
 
                 musicVollumeLeft = musicVollume / (1.0 + musicVollumeWidth);
 
@@ -416,8 +384,6 @@ public:
                 StaticWrite::SetUpChannel(-111);
                 batch.clear();
                 ui.renderVerts(batch);
-
-                saveSetting();
             }
         }
         else if (x == uiEffectVollume)
@@ -428,7 +394,7 @@ public:
                 effectVollume = ((mouseCordX - barHolder.xMin) - (effectVollumeWidth * 0.5f)) / (barHolder.xSize - effectVollumeWidth);
                 if (effectVollume < 0) { effectVollume = 0; }
                 else if (effectVollume > 1) { effectVollume = 1; }
-                soundEffectValue = std::to_string((int)(effectVollume * 100.0f + 0.5f));
+                soundEffectValue = std::to_string(static_cast<int>(effectVollume * 100.0f + 0.5f));
 
                 effectVollumeLeft = effectVollume / (1.0 + effectVollumeWidth);
 
@@ -441,8 +407,6 @@ public:
                 StaticWrite::SetUpChannel(-111);
                 batch.clear();
                 ui.renderVerts(batch);
-
-                saveSetting();
             }
         }
         else if (x == uiGraphicSettings)
@@ -461,6 +425,21 @@ public:
 
     void saveSetting()
     {
+        StaticAudio::playSoundEffectMulti(bwoo);
+        std::string settingsFileName = "metadata/soundsettings";
+        std::ostringstream write;
 
+        write << "SOUND_MASTER:" << static_cast<int>(masterVollume * 100) << "\n";
+        write << "SOUND_MUSIC:" << static_cast<int>(musicVollume * 100) << "\n";
+        write << "SOUND_EFFECT:" << static_cast<int>(effectVollume * 100);
+
+        if(util::writeFile(settingsFileName, write.str()))
+        {
+            std::cout << "sound settings saved\n";
+        }
+        else
+        {
+            std::cout << "fail to write sound settings\n";
+        }
     }
 };

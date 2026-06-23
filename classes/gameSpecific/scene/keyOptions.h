@@ -278,6 +278,23 @@ public:
 
     void saveSetting()
     {
+        StaticAudio::playSoundEffectMulti(bwoo);
 
+        std::string settingsFileName = "metadata/keybindsettings";
+        std::ostringstream write;
+
+        write << qTitle << ":" << qValue << "\n";
+        write << eTitle << ":" << eValue << "\n";
+        write << wTitle << ":" << wValue << "\n";
+        write << escTitle << ":" << escValue;
+
+        if(util::writeFile(settingsFileName, write.str()))
+        {
+            std::cout << "keybind settings saved\n";
+        }
+        else
+        {
+            std::cout << "fail to write keybind settings\n";
+        }
     }
 };

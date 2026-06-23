@@ -32,6 +32,9 @@ public:
     // honestly, consider refactoring into using a struct merging ma_sound* and tags
     inline static std::unordered_map<int, std::vector<int>> tagSoundMap;
 
+    // referenc data
+    inline static float masterVolume = 1.0; // assumed default value when opening program before loading things
+
     static void init()
     {
         // force mono because linux not working
@@ -153,6 +156,7 @@ public:
     static void setMasterVollume(float v, bool power = true)
     {
         v = std::clamp(v, 0.0f, 1.0f);
+        masterVolume = v;
         if (power)
         {
             // v's value is defaultly squared becuase human hearing is log and not linear

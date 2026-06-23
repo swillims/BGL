@@ -53,9 +53,11 @@ public:
 	void handleScene(float time=0); // scene render and scene handle are called here.
 	
 	// framerate function
-	static void SetPhysicCap(float cap);
-	static void SetFrameCap(float cap);
-	
+	static void SetPhysicsCap(float cap){god.setPhysicsCap(cap);}
+	void setPhysicsCap(float cap);
+	static void SetFrameCap(float cap){god.setFrameCap(cap);}
+	void setFrameCap(float cap);
+
 	// uncategorized data management
 	// - If you don't use setters and getters, just go ahead and delete these. 
 	static void SetUnCatData(std::string key, std::any data) { god.setUnCatData(key, data); };

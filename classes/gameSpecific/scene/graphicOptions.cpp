@@ -1,8 +1,5 @@
-
 #include "graphicOptions.h"
-
 #include "soundOptions.h"
-
 #include "keyOptions.h"
 
 void GraphicsOptions::buttonPress(int x)
@@ -14,7 +11,7 @@ void GraphicsOptions::buttonPress(int x)
     }
     else if (x == uiSave)
     {
-
+        saveSetting();
     }
     else if (x == uiX1)
     {

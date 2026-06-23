@@ -72,28 +72,28 @@ void DataHolder::handleScene(float time)
     trashEmpty();
 }
 
-void DataHolder::SetPhysicCap(float cap)
+void DataHolder::setPhysicsCap(float cap)
 {
     if (cap < .1f)// tolerance check prevents /0. If you want a game that only runs on 10 seconds per frame, you can change this tolerance urself.
     {
-        god.physicCap = 0.0f;
+        physicCap = 0.0f;
     }
     else
     {
-        god.physicCap = 1 / cap;
+        physicCap = 1 / cap;
     }
 }
 
-void DataHolder::SetFrameCap(float cap)
+void DataHolder::setFrameCap(float cap)
 {
     god.frameCapInt = static_cast<int>(cap);
     if (cap < .1f)// tolerance check prevents /0. If you want a game that only runs on 10 seconds per frame, you can change this tolerance urself.
     {
-        god.frameCap = 0.0f;
+        frameCap = 0.0f;
     }
     else
     {
-        god.frameCap = 1 / cap;
+        frameCap = 1 / cap;
     }
 }
 

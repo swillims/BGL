@@ -161,7 +161,7 @@ void FrogHop::onLoad()
 	StaticAudio::playSoundLoop(frogMusic);
 
 	// set physics framerate to 60
-	DataHolder::SetPhysicCap(60);
+	DataHolder::SetPhysicsCap(60);
 
 	// it is good practice to aspectChange whenever loading a scene.
 	// - aspectChange() is only called when the aspect ratio is changed or when it is manually called. It is manually called here.

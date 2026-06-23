@@ -1,6 +1,5 @@
 #include <iostream>
 
-
 #ifdef _WIN32
     #include <GLFW/glfw3.h> // windows // comment added to make ignoring in grep easier
     #include <GL/gl.h>
@@ -10,27 +9,15 @@
     #include <glm/gtc/type_ptr.hpp>
 #elif __linux__
     #include "singleton/gl_core.h"
-    //#define GLFW_INCLUDE_NONE
-    //#include <glad/glad.h>
-    //#include <GLFW/glfw3.h>
-    //#include "lib/shared/include/GLFW/glfw3.h"
-
     #include <glm/glm.hpp>
     #include <glm/gtc/matrix_transform.hpp>
     #include <glm/gtc/type_ptr.hpp>
-    //#include "lib/shared/include/glad/glad.h"
-    //#include "lib/shared/glm/glm.hpp"
-    //#include "lib/shared/glm/gtc/matrix_transform.hpp"
-    //#include "lib/shared/glm/gtc/type_ptr.hpp"
 #endif
 
 #include <map>
 #include <string>
 #include <vector>
 #include <chrono>
-
-//#include <shader.h>
-//#include "glue/textShell.h"
 
 #include "singleton/dataHolder.h"
 #include "singleton/staticWrite.h"
@@ -69,19 +56,23 @@ static int mainmainmain()
     // init dataholder
     DataHolder::init(); // dataholder holder handles scene management. It can have game specific data added to it(code yourself).
     DataHolder& g = DataHolder::god;
+    //StaticDraw::init();
+    StaticAudio::init();
 
-    // defaults
+    // defaults for if a setting doesn't exist or fails to load
     unsigned int SCR_WIDTH = 800;
     unsigned int SCR_HEIGHT = 600;
-    
-    // load graphics settings if they exist
-    std::string settingsFileName = "metadata/graphicsettings";
 
+    // variable for loading settings
+    std::string settingsFileName;
+
+    // load graphics settings
+    settingsFileName = "metadata/graphicsettings";
     if (util::fileExists(settingsFileName))
     {
         // read file and split by line
         // - note: util::split handles Windows (\r\n) and Unix (\n) line endings automatically. Look this up if you don't know it.
-        std::cout << "file exists and read init\n";
+        std::cout << "graphics settings file exists\n";
         std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
 
         // handle each line
@@ -90,7 +81,8 @@ static int mainmainmain()
             util::removeComments(line, "#");
             util::removeComments(line, "//");
             std::vector<std::string> data = util::split(line, ":");
-            //std::cout << line << "\n";
+            // some people like to leave a space after ":" so remove trailing space
+            util::sanitizeString(data[1], {" "});
             try
             {
                 int n = std::stoi(data.at(1));
@@ -105,6 +97,7 @@ static int mainmainmain()
         if (g.uncategorizedData.contains("SCR_WIDTH"))
         {
             SCR_WIDTH = g.getUnCatData<int>("SCR_WIDTH");
+            g.deleteUnCatData("SCR_WIDTH");
 
             // can also do this but it involves manual converstion with any_cast
             // - SCR_WIDTH = std::any_cast<int>(g.uncategorizedData["SCR_WIDTH"]);
@@ -113,24 +106,78 @@ static int mainmainmain()
         if (g.checkKeyUnCatData("SCR_HEIGHT"))
         {
             SCR_HEIGHT = g.getUnCatData<int>("SCR_HEIGHT");
+            g.deleteUnCatData("SCR_HEIGHT");
         }
-        // if either of the above two things fail to check, it should use the default values of SCR_WIDTH and SCR_HEIGHT
+        if (g.uncategorizedData.contains("FPS_CAP"))
+        {
+            g.setFrameCap(g.getUnCatData<int>("FPS_CAP"));
+            g.deleteUnCatData("FPS_KEY");
+        }
     }
-    else
+
+    // keybind settings
+    settingsFileName = "metadata/keybindsettings";
+    if (util::fileExists(settingsFileName))
     {
-        std::ostringstream write;
-        write << "SCR_WIDTH: " << SCR_WIDTH << "\n";
-        write << "SCR_HEIGHT: " << SCR_HEIGHT << "\n";
-        if(util::writeFile("metadata/graphicsettings", write.str()))
+        // read file and split by line
+        std::cout << "keybind settings file exists\n";
+        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+
+        // handle each line
+        for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
         {
-            std::cout << "graphic settings defaulted\n";
-        }
-        else
-        {
-            std::cout << "fail to write graphic settings\n";
+            util::removeComments(line, "#");
+            util::removeComments(line, "//");
+            std::vector<std::string> data = util::split(line, ":");
+            util::sanitizeString(data[1], {" "});
+            StaticInput::AssignAlias(data[0], data[1]);
         }
     }
-    
+
+    // sound settings
+    settingsFileName = "metadata/soundsettings";
+    if (util::fileExists(settingsFileName))
+    {
+        std::cout << "sound settings file exists\n";
+        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+
+        // handle each line
+        for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
+        {
+            util::removeComments(line, "#");
+            util::removeComments(line, "//");
+            std::vector<std::string> data = util::split(line, ":");
+            // some people like to leave a space after ":" so remove trailing space
+            util::sanitizeString(data[1], {" "});
+            try
+            {
+                int n = std::stoi(data.at(1));
+                g.uncategorizedData[data.at(0)] = n;
+            }
+            catch(std::exception e){}
+        }
+        if (g.uncategorizedData.contains("SOUND_MASTER"))
+        {
+            float m = g.getUnCatData<int>("SOUND_MASTER");
+            m /= 100;
+            StaticAudio::setMasterVollume(m);
+            g.deleteUnCatData("SOUND_MASTER");
+        }
+        if (g.checkKeyUnCatData("SOUND_MUSIC"))
+        {
+            float m = g.getUnCatData<int>("SOUND_MUSIC");
+            m /= 100;
+            StaticAudio::updateTagVollume("music", m);
+            g.deleteUnCatData("SOUND_MUSIC");
+        }
+        if (g.uncategorizedData.contains("SOUND_EFFECT"))
+        {
+            float m = g.getUnCatData<int>("SOUND_EFFECT");
+            m /= 100;
+            StaticAudio::updateTagVollume("soundEffect", m);
+            g.deleteUnCatData("SOUND_EFFECT");
+        }
+    }
 
     // glfw window creation
     // --------------------
@@ -178,7 +225,9 @@ static int mainmainmain()
     // inits
     StaticDraw::init();
     StaticDraw::windowSpecify(window);
-    StaticAudio::init();
+    //StaticAudio::init();
+    // Order of Init calls does matter. StaticInput has to go after window specification.
+    // - StaticInput's init doesn't create or change objects, so it is ok to modify it in the load code above.
     StaticInput::Init();
     //StaticInput::singleton;//.init();
 

@@ -3,7 +3,6 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
-
 void StaticAudio::playSoundEffectMulti(int ref)
 {
     ma_sound* originalSound = soundRefs[ref];
