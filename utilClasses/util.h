@@ -90,41 +90,6 @@ struct util
             s.erase(pos);   // removes delimiter AND everything after
         }
     }
-    // I don't think this is used anymore
-    // it worked for an older version of text gen
-    /*
-    static std::vector<std::string> splitWrap(const std::string& s, unsigned int length)
-    {
-        std::vector<std::string> r;
-        std::vector<std::string> ss = split(s, "\n");
-        std::reverse(ss.begin(), ss.end());
-        while (!ss.empty())
-        {
-            std::string sss = ss.back(); ss.pop_back(); // 2 statement in one line because every other languages has pop_back as not void
-            if (!sss.empty() && sss[0] == ' '){sss = sss.substr(1);}
-            if(sss.size() <= length){r.push_back(sss);}
-            else
-            {
-                std::string pre = sss.substr(0, length);
-                int n = pre.find_last_of(" ");
-                std::string sr;
-                if (n == std::string::npos) {
-                    n = length;
-                    sr = sss.substr(0, n);
-                    ss.push_back(sss.substr(n));
-                }
-                else {
-                    sr = sss.substr(0, n);
-                    std::string rem = sss.substr(n + 1);
-                    rem.erase(0, rem.find_first_not_of(" "));
-                    if (!rem.empty()) ss.push_back(rem);
-                }
-                if (!sr.empty()) {r.push_back(sr);}
-            }
-        }
-        return r;
-    }
-    //*/
 
     // array helpers
     static int get1DIndex(unsigned int size1, unsigned int size2, unsigned int index1, unsigned int index2) // these are simple enough to where you should not use them
@@ -150,32 +115,18 @@ struct util
         std::unordered_map<B, A> bA;
         const B& operator[](const A& a) const 
         {
-            //auto it = aB.find(a);
-            //if (it == aB.end()) throw std::runtime_error("Key not found in BiMap");
-            //return it->second;
             return aB.at(a);
         }
         const A& operator[](const B& b) const 
         {
-            //auto it = bA.find(b);
-            //if (it == bA.end()) throw std::runtime_error("Key not found in BiMap");
-            //return it->second;
             return bA.at(b);
         }
         void insert(const A& a, const B& b)
         {
-            //if (aB.contains(a) || bA.contains(b)) { return }
             aB[a] = b;
             bA[b] = a;
         }
-        /*
-        void insert(const B& b, const A& a)
-        {
-            //if (aB.contains(a) || bA.contains(b)) { return }
-            aB[a] = b;
-            bA[b] = a;
-        }
-        //*/
+
         void erase(const A& a)
         {
             

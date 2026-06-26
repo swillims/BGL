@@ -1,19 +1,15 @@
 #pragma once
-#include "singleton/staticDraw.h" // used for ratio
-#include "singleton/staticWrite.h" // used for appending text to a channel
-//#include "vectorFUtil.h"
+#include "singleton/staticDraw.h"
+#include "singleton/staticWrite.h"
 
 // main purpose of UIElement is to return a vector<float> list for batching
-// - batching uses single texture and the intended use implies that with a reference to a batch
-// it also has secondary functionality for a channel using staticWrite
-
-// Non-contaienor elements should receive cord values after being adjustNode is called from parent node
+// it also has secondary functionality for appending to a staticWrite channel
 
 struct UIElement
 {
     /*
         nodes is implemented in UIElement instead of container to make chains work
-        it is mem inefficient but it chains which is a big trade off
+        it is memory inefficient but it chains which is a big trade off
         parent[0][0][1] is doable
         the alternative is a series of castings which is hell
         if using something that doesn't have subnodes just pretend nodes doesn't exist
@@ -26,7 +22,7 @@ struct UIElement
     float xSize;
     float ySize;
 
-    int key; // key is referenced
+    int key;
 
     UIElement(){}
     UIElement(int key = -1): key(key) {}
@@ -57,7 +53,6 @@ struct UIElement
         return -1;
     }
 
-    // returns a subNode matchig the key if it exists, otherwise returns self. After running method, check key to see if it matches.
     virtual UIElement& findByKey(int findKey)
     {
         if (findKey == key)
@@ -72,9 +67,6 @@ struct UIElement
                 return nodes[i]->findByKey(findKey);
             }
         }
-        // different(logically) from above value.
-        // above value return because found key. This return returns a non-match for a default + for loop
-        // can not nullptr a reference return and see no difference between a default
         return *this;
     }
 
@@ -120,27 +112,9 @@ struct UIElement
     template<typename T, typename... Args>
     UIElement& appendType(Args&&... args)
     {
-        /*
-        //std::make_shared<A>(node);
-        auto node = std::make_unique<T>(std::forward<Args>(args)...);
-        nodes.push_back(std::move(node));
-        //nodes.push_back(node.clone());
-        //nodes.push_back(std::make_shared<UIElement>(node););
-        return *nodes.back();
-        */
-
         nodes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         nodes.back()->previousNode = this;
         return *nodes.back();
-    }
-
-    UIElement& appendSameNode(std::unique_ptr<UIElement> node, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            //nodes.push_back(node);
-        }
-        return *node;
     }
 
     UIElement& back()
@@ -154,8 +128,6 @@ struct UIElement
     {
         for (int i = 0; i < count; i++)
         {
-            //auto node = std::make_unique<T>(std::forward<Args>(args)...);
-            //nodes.push_back(std::move(node));
             nodes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         }
         return nodes;
@@ -198,7 +170,6 @@ struct UIEmpty : UIElement
 
 struct UIContainer : UIElement
 {
-    //std::vector<std::unique_ptr<UIElement>> nodes; // moved to parent class to enable chaining
     UIContainer(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
         : UIElement(xMin, yMin, xSize, ySize, key) {}
     UIContainer(int key = -1): UIElement(key) {}
@@ -218,7 +189,6 @@ struct UIXRatio : UIContainer
     float ratio;
     bool relativeToScreenSize;
 
-    //UIXRatio() {}
     UIXRatio(float xMin, float yMin, float xSize, float ySize, float ratio, bool relativeToScreenSize = true, int key = -1)
         : UIContainer(xMin, yMin, xSize, ySize, key), ratio(ratio), relativeToScreenSize(relativeToScreenSize) {}
     UIXRatio(float ratio, bool relativeToScreenSize = true, int key = -1)
@@ -261,7 +231,6 @@ struct UIXRatio : UIContainer
 
 struct UIXShifter : UIContainer
 {
-    // using non-recommended numbers it technically valid but it should make findOneHover not work relative to parent container
     float& xLeft; // 0 to 1.0
     float& xSubSize; // 0 to 1.0
 
@@ -293,7 +262,6 @@ struct UIStack : UIContainer
     }
 };
 
-// this is broken and wrong. I haven't gotten around to fixing it
 struct UIXHolder : UIContainer
 {
     UIXHolder(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
@@ -309,11 +277,6 @@ struct UIXHolder : UIContainer
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
         {
             UIElement& node = *nodePtr;
-            //node.xMin = xMin;
-            //node.xSize = xSize;
-            //node.yMin = yyMin;
-
-            //node.ySize = yySize;
             node.adjustNode(xxMin, yMin2, xxSize, ySize2);
             xxMin += xxSize;
         }
@@ -337,7 +300,6 @@ struct UIYHolder : UIContainer
             yyMin -= yySize;
             UIElement& node = *nodePtr;
             node.adjustNode(xMin, yyMin, xSize, yySize);
-            //yyMin += yySize;
         }
     }
 };
@@ -422,7 +384,7 @@ struct UITextOneLine : UIElement
     int yAlign;
 
     UITextOneLine(unsigned int textChannel, std::string& textSource, float fontPercent, 
-        int xAlign = XCENTER, int yAlign = YCENTER, bool relativeToScreenSize = true, int key = -1) // you really shouldn't use key with text
+        int xAlign = XCENTER, int yAlign = YCENTER, bool relativeToScreenSize = true, int key = -1)
         : UIElement(key), textSource(textSource), textChannel(textChannel), fontPercent(fontPercent), 
         xAlign(xAlign), yAlign(yAlign), relativeToScreenSize(relativeToScreenSize) {}
     
@@ -436,42 +398,15 @@ struct UITextOneLine : UIElement
         }
         std::vector<float> textVerts = StaticWrite::GenerateVertices(textSource, xMin, yMin, xScale, yScale);
 
-        
-        // this code is scapped becuase it is centering relative to total text size and not window size
-        /*
-        // magic number 4 is X,Y,U,V
-        if (xAlign == XCENTER)
-        {
-            VectorFUtil::centerAlign(textVerts, 4);
-        }
-        else if (xAlign == XRIGHT)
-        {
-            VectorFUtil::rightAlign(textVerts, 4);
-        }
-        */
-        // magic number 4 is X,Y,U,V
-        // check if textVerts has vertices and is formatted correctly
-        //std::cout << "size: " << textVerts.size() << "\n";
-        //std::cout << "%: " << textVerts.size() % 4 << "\n";
         if (textVerts.size() > 0 && textVerts.size()%4==0)
         {
-            // check if needs to alignX
             if (xAlign == XCENTER || xAlign == XRIGHT)
             {
-                // calc min and max xValues
-                //float xxMin = textVerts[0];
                 float xxMax = textVerts[0];
                 for (int i = 4; i < textVerts.size(); i += 4)
                 {
-                    //code changed because xxMin does not need to be solved, it should be same as xMin
-                    //if (xxMin > textVerts[i]) { xxMin = textVerts[i]; }
-                    //else if (xxMax < textVerts[i]) { xxMax = textVerts[i]; }
                     if (xxMax < textVerts[i]) { xxMax = textVerts[i]; }
                 }
-                //std::cout << "Text: " << textSource << "\nxMin: " << xxMin << "\nxMax" << xxMax << "\n";
-                //float xxRange = xxMax - xxMin;
-                //float shiftAmount = xSize - xxRange;
-                // xxMin and xMin are same number
                 float shiftAmount = xSize + xMin - xxMax;
                 if (xAlign == XCENTER)
                 {
@@ -501,8 +436,6 @@ struct UITextOneLine : UIElement
             }
             StaticWrite::AppendChannel(textChannel, textVerts);
         }
-        //StaticWrite::AppendChannel(textChannel, textVerts);
-        //StaticWrite::AppendText(textChannel, textSource, xMin, yMin, xScale, yScale);
     }
 };
 
