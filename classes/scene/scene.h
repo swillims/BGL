@@ -1,15 +1,15 @@
 #pragma once
 
 #ifdef _WIN32
-	#include <GLFW/glfw3.h> // windows // comment added to make ignoring in grep easier
+	#include <GLFW/glfw3.h>
 #elif __linux__
 	#include "singleton/gl_core.h"
 #endif
-#include <vector>
 
-//#include <string>
-//#include <string>
-//#include <glm/glm.hpp>
+// This is my first c++ project
+// - Deleting the next include statement breaks it because a scene that inherits this scene uses it.
+// - It is not worth refactoring.
+#include <vector>
 
 struct Scene
 {

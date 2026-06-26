@@ -28,7 +28,6 @@ private:
 
 public:
     // textures
-    unsigned int buttonImageRef;
     unsigned int uITex;
     // shaders
     unsigned int shaderSimpleRef;
@@ -72,12 +71,6 @@ public:
         Scene::onLoad();
 
         // textures
-        if (!StaticDraw::imageFileRefs.contains("button.png"))
-        {
-            StaticDraw::loadImage("assets/core/button.png");
-        }
-        buttonImageRef = StaticDraw::imageFileRefs["button.png"];
-
         if (!StaticDraw::imageFileRefs.contains("optionsUi.png"))
         {
             StaticDraw::loadImage("assets/core/optionsUi.png");
@@ -135,10 +128,12 @@ public:
         ui.appendType<UIYHolder>(5);
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
-            .back().back()
+                .appendType<UIStack>().appendType<UIXRatio>(2, true)
+                        .appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
+                    .back()
+            .back()
             .appendType<UITextOneLine>(-111, keyTitle,.35).back()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings).back();
+            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
@@ -146,7 +141,8 @@ public:
                 .appendType<UIXRatio>(1,true)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
-                        .appendType<UITextOneLine>(-111, qValue,.15).back().back().back().back()
+                        .appendType<UITextOneLine>(-111, qValue,.15)
+            .back().back().back().back()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, eTitle,.25).back()
                 .appendType<UIXRatio>(1,true)
@@ -160,8 +156,9 @@ public:
                 .appendType<UIXRatio>(1,true)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
-                        .appendType<UITextOneLine>(-111, wValue,.15).back().back().back().back()
-                .appendType<UIEmpty>();
+                        .appendType<UITextOneLine>(-111, wValue,.15).back()
+            .back().back().back()
+            .appendType<UIEmpty>();
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
@@ -169,7 +166,8 @@ public:
                 .appendType<UIXRatio>(1,true)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
-                        .appendType<UITextOneLine>(-111, escValue,.15).back().back().back().back()
+                        .appendType<UITextOneLine>(-111, escValue,.15).back()
+                .back().back().back()
                 .appendType<UIEmpty>();
 
         ui[0].appendType<UIXHolder>()

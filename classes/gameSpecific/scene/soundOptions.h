@@ -1,17 +1,13 @@
-//#include "glue/textShell.h"
 #pragma once
-#include <array>
 #include "scene/scene.h"
 #include "uiHelper.h"
 #include "singleton/staticInput.h"
 
 #include "graphicOptions.h"
 #include "keyOptions.h"
-//#include "mainMenu.h"
 
 struct SoundOptions : Scene
 {
-    // I don't want these button enums effecting other enums so I made them private
 private:
     enum uiKeys
     {
@@ -27,13 +23,10 @@ private:
 
 public:
     // textures
-    unsigned int buttonImageRef;
     unsigned int uITex;
     // shaders
     unsigned int shaderSimpleRef;
-    //unsigned int shaderWhiteShadeRef;
     unsigned int colorShaderRef;
-    //unsigned int blackFadeShadeRef;
 
     // sound;
     unsigned int bwoo;
@@ -42,13 +35,7 @@ public:
     unsigned int buttonHover; // button being hovered
     double mouseCordX, mouseCordY; // mouse cords that need to be normalized
 
-    // there are only two button so I'm not using a for loop and I can get away with two hoverBatchs
     std::vector<float> batch;
-    //std::vector<float> hoverBatchA;
-    //std::vector<float> hoverBatchB;
-
-    // uiElementList
-    //std::vector<std::unique_ptr<uiElement>> elements;
 
     // uiElement
     UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
@@ -89,24 +76,14 @@ public:
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
     {
-        //myButtonTexture.load("assets/core/button.png");
-        //window = glfwGetCurrentContext();
         Scene::onLoad();
 
         // textures
-        if (!StaticDraw::imageFileRefs.contains("button.png"))
-        {
-            StaticDraw::loadImage("assets/core/button.png");
-        }
-        buttonImageRef = StaticDraw::imageFileRefs["button.png"];
-
         if (!StaticDraw::imageFileRefs.contains("optionsUi.png"))
         {
             StaticDraw::loadImage("assets/core/optionsUi.png");
         }
         uITex = StaticDraw::imageFileRefs["optionsUi.png"];
-
-
 
         // shaders
         if (!StaticDraw::hasShader("colorRef"))
@@ -119,7 +96,6 @@ public:
         // engine does not directly handle shader code, so learn how to do your own shaders
         StaticDraw::useShader(colorShaderRef); // selecting shader is needed to modify shader for smoe reason
         GLint colorLoc = glGetUniformLocation(colorShaderRef, "color"); // get uniform location. Uniforms are shader vars
-        //glUniform4f(colorLoc, 0.0f, 0.0f, 0.0f, 0.5f);  // change shader unfiorm
         glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 0.8f);
 
         // sounds
@@ -128,7 +104,6 @@ public:
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
-        //StaticAudio::applyTags(bwoo, { "soundEffect" });
 
         StaticAudio::updateSounds();
 
@@ -175,31 +150,26 @@ public:
 
         ui.appendType<UIYHolder>(5);
         ui[0].appendType<UIBuffer>(.1)
-            //.appendType<UIXHolder>()
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0, .25, 0, .5,uiKeySettings).back()
-            //.appendType<UITextOneLine>(-111, graphicTitle, .3, XCENTER).back().back().back()
-            .back().back()
-
-            .appendType<UITextOneLine>(-111, soundTitle,.35).back()
-
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
-            //.appendType<UITextOneLine>(-111, keySettings, .3, XCENTER);
+                .appendType<UIStack>()
+                    .appendType<UIXRatio>(2, true)
+                        .appendType<TexUVNode>(0, .25, 0, .5,uiKeySettings).back()
+                    .back()
+                .back()
+                .appendType<UITextOneLine>(-111, soundTitle,.35).back()
+                .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
             ;
-
-        //i++;
-        //ui[0].appendType<UIXHolder>();
 
         i++;
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
+                .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
 
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
         ui[0][i].appendType<UIStack>().setKey(uiMasterVollume)
             .appendType<UIXHolder>()
-            .appendSameType<UIXRatio>(10, 1.0, true);
+                .appendSameType<UIXRatio>(10, 1.0, true);
         for (auto& nodePtr : ct) 
         {
             UIElement& node = *nodePtr;

@@ -4,7 +4,7 @@
 #include "mainMenu.h"
 
 /*
-    Most of this scene is poorly implemented. Just copy the scene transition logic in buttonPress().
+    This scene was made before uiHelper and StaticInput. I recommend refactoring if you make your own game.
 */
 
 struct DefeatScreen : Scene
@@ -24,7 +24,7 @@ struct DefeatScreen : Scene
     // click handling bools
     bool click;
     bool loadAntiClick;
-    unsigned int buttonHover = -1; // technically wraps to a large number and is not negative
+    unsigned int buttonHover = -1;
     unsigned int buttonStart = -1;
 
     // render stuffs
@@ -43,7 +43,6 @@ struct DefeatScreen : Scene
     // ref used to backtrack to previous scene
     Scene* previous;
 
-    // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
     {
         // extremely important to call super at start of onLoad to declare window
@@ -82,18 +81,14 @@ struct DefeatScreen : Scene
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
 
-        // update sounds should be ran after adding sounds, so that the volumes change
         StaticAudio::updateSounds();
 
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
 
-        // do yCords for menu button here instead of aspect change because they do not change when ratio changes
         yCords = {};
         int aa = a + 1;
         float af = a;
-        // I had to brute force this. I don't know correct math for doing this.
-        // - It's ok to be slightly not efficient here because it is in onLoad and not handle/render
         float bfh = buttonHeightExtra;
         for (float i = 1.5f; i < aa * 2 - 1; i++)
         {
@@ -110,7 +105,7 @@ struct DefeatScreen : Scene
         previous->render(0, false);
         
         StaticDraw::useShader(colorShaderRef2);
-        StaticDraw::halfDimImage(0, 0, 0, 1.0f, 1.0f); // 0 as a texture ref is valid because shader doesn't use a texture
+        StaticDraw::halfDimImage(0, 0, 0, 1.0f, 1.0f);
         StaticDraw::useShader(shaderSimpleRef);
 
         // draw buttons
@@ -124,8 +119,6 @@ struct DefeatScreen : Scene
         if (buttonHover != -1 || buttonStart != -1)
         {
             StaticDraw::useShader(colorShaderRef); // this is just white.
-            // 0 is used because it doesn't matter what texture is used here because colorShaderRef ignores texture.
-            // hover batch is set when handle detects a button is hovered
             StaticDraw::multiDraw(0, hoverBatch);
         }
 
@@ -140,7 +133,7 @@ struct DefeatScreen : Scene
 
     void aspectChange()
     {
-        StaticDraw::updateView(); // need for proper aspect ratio update
+        StaticDraw::updateView();
         
         // update window - needed for mouse
         glfwGetWindowSize(window, &winWidth, &winHeight);
@@ -166,7 +159,6 @@ struct DefeatScreen : Scene
         float fontYScale = .25; // fontsize
         float fontXScale = fontYScale / StaticDraw::aspectRatio;
 
-        // math to prepare a variable Y axis center text inside of button
         if (yCords.size() >= 2)
         {
             textYShift = yCords[1] - yCords[0];
@@ -177,11 +169,8 @@ struct DefeatScreen : Scene
         StaticWrite::SetUpChannel(-11);
         for (int i = 0; i < a; i++)
         {
-            // set up channel
-            //float h = b * (i * 2 - a) + b / 2;
             
             float h = yCords[i * 2];
-            // -11 magic number used for channel to avoid conflict with scene and avoid conflict with other things that are using negative to avoid conflict
             if (i == 0) { StaticWrite::AppendText(-11, "Exit", -.5, h + textYShift, fontXScale, fontYScale); }
             else if (i == 1) { StaticWrite::AppendText(-11, "Retry", -.5, h + textYShift, fontXScale, fontYScale); }
         }
@@ -202,7 +191,7 @@ struct DefeatScreen : Scene
 
         if (!loadAntiClick)
         {
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) // check mouse button
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
             {
                 click = true;
                 if (buttonStart == -1)
@@ -210,7 +199,7 @@ struct DefeatScreen : Scene
                     buttonStart = buttonHover;
                 }
             }
-            else if (click) // mouse button not pressed + click bool==true means release
+            else if (click)
             {
                 if (buttonStart == buttonHover)
                 {
@@ -246,24 +235,17 @@ struct DefeatScreen : Scene
         // Check if mouse is over button y cords
         for (int i = 0; i < a; i++)
         {
-            // i starts at lowest button
-            // if mouseY is lower than current button's bottom cord return because not on a button
             if (mouseY < yCords[i * 2])
             {
                 buttonHover = -1;
                 return;
             }
-            // if passes previous return check and below button top, it is within y range of current button
             if (mouseY < yCords[i * 2 + 1])
             {
-                // update current button if it is new and another button isn't held down
                 if (buttonHover != i && buttonStart == -1)
                 {
                     buttonHover = i;
                     StaticAudio::playSoundEffectMulti(bwoo);
-                    // using batching because it simplifies the problem
-                    // there is a complicated solution that is easy read using StaticDraw::halfDimImage
-                    // and a solution that uses batching but looks more complicated than it is
                     hoverBatch.clear();
                     hoverBatch.insert(hoverBatch.end(), {
                         .8f,  yCords[i * 2 + 1], 1.0f, 1.0f,
@@ -278,7 +260,6 @@ struct DefeatScreen : Scene
                 return;
             }
         }
-        // logically it should be above top button here
         buttonHover = -1;
     }
 
@@ -295,8 +276,6 @@ struct DefeatScreen : Scene
     }
     void clean()
     {
-        // not deleting button asser because reused enough
-        // not deleting other colorRef because it is reused enough
         if (StaticDraw::hasShader("colorRef2"))
         {
             StaticDraw::unLoadShader("colorRef2");

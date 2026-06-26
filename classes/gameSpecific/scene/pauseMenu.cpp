@@ -106,7 +106,6 @@ void PauseMenu::aspectChange()
     ui.renderVerts(batch);
 
     previous->aspectChange();
-
 }
 
 void PauseMenu::processInput()

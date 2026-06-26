@@ -79,8 +79,6 @@ struct FrogHop : Scene
 	bool wHeld;
 	float jumpSpeed;
 
-	// method/function header
-	// - this class uses method/functions headers in the .h file and definitions only in the .cpp file. It is unnessary but just one way to do things.
 	void onLoad();
 
 	void jump();

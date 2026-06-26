@@ -64,19 +64,16 @@ void FrogHop::onLoad()
 		StaticAudio::load("assets/gameSpecific/sound/hopChirp.wav", "hopChirp", { "soundEffect" });
 	}
 	hopSound = StaticAudio::soundStringRefs["hopChirp"];
-	//StaticAudio::applyTags(hopSound, { "soundEffect" });
 
 	if (!StaticAudio::soundStringRefs.contains("frogMusic"))
 	{
-		//StaticAudio::load("assets/gameSpecific/sound/frogSong.wav", "frogMusic", { "music" });
 		StaticAudio::load("assets/gameSpecific/sound/225simplebass.wav", "frogMusic", { "music" });
 	}
 	frogMusic = StaticAudio::soundStringRefs["frogMusic"];
-	//StaticAudio::applyTags(frogMusic, { "music" });
 
 	StaticAudio::updateSounds();
 
-	// Setting up Controls
+	// Load Controls
 
 	// to get controls working, the class needs key bindings.
 	// - to make it possible to rebind keys, alias names are used.
@@ -115,8 +112,6 @@ void FrogHop::onLoad()
 	//              - somewhere in the pipeline after writing text, the shader needs to be set back to whatever the default shader is for the scene.
 	//              - - This scene sets is to simple(the default shader) at the start of render
 	writer = StaticWrite::singleton;
-
-	//batch.clear();
 
 	if (not alreadyLoaded)
 	{
@@ -170,11 +165,10 @@ void FrogHop::onLoad()
 
 void FrogHop::jump() // method for jumping
 {
-	//if (hopTimer < 0 && !wHeld)
 	if (hopTimer < 0)
 	{
 		hopTimer = hopTimerCap;
-		if (true) // check if ground not implemented. Example file is not a complete game.
+		if (true)
 		{
 			StaticAudio::playSoundEffectMulti(hopSound);
 			frogVelocityX *= .2f;
@@ -199,13 +193,6 @@ void FrogHop::pause()
 // process input is part of scene class
 void FrogHop::processInput(GLFWwindow* window, float time) // control inputs
 {
-	// !? -> // calling super does nothing here but it is done here to show how to use it.
-	//Scene::processInput();
-	//if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { frogAngle -= time * frogRotationSpeed; }
-	//if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { frogAngle += time * frogRotationSpeed; }
-	//if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { jump(); wHeld = true; }
-	//else { wHeld = false; }
-
 	if (StaticInput::KeyHeld(rotateC)){frogAngle += time * frogRotationSpeed;}
 	if (StaticInput::KeyHeld(rotateCC)){frogAngle -= time * frogRotationSpeed;}
 	if (StaticInput::KeyClick(hopButton)){jump();}
@@ -215,24 +202,17 @@ void FrogHop::processInput(GLFWwindow* window, float time) // control inputs
 // the game logic part of this example code is going to have low documentation because the main focus is how to interact with Game Engine systems.
 void FrogHop::handle(float time)
 {
-	// inherited from scene
-
 	/*
-	This function will have low comments.
-	The main goal of this class is to be an educational example on how to use game engine and api.
-	The game engine is minimalistic. 
-	With the philosophy of being minimalistic, most logic is internal to a scene and not an api call.
-	It is necessary for graphics/sounds/text/helperfunction to use api calls.
-	Most comments should be relating to graphics. Graphics should not be part of handle(). Graphics are part of render().
-	This function is handle.
+	This function will have low comments because the goal is to be an educational demo and explaining it here would be optimal.
+	Handle should handle game logic and physics and render should handle graphics.
+	The engine is minimalistic and most logic is contained to the scene.
 	*/
 
 	StaticInput::Tick();
 
-	// pretty sure the need to do this got eliminated with an update
-	if (resizing == true) { time = 0; resizing = false; } // while resizing the mainmain while loop stops(unrelated to this line), and because it stops, the time between frames can get massive can cause jumping through blocks if not zeroed.
-	// call process input
 	processInput(window, time);
+
+	// assume physics is used by render to approximate movement indepent of game logic. It is set to false here because there is no reason to approximate on a game step.
 	assumePhysics = false;
 	if (hopTimer >= 0) { hopTimer -= time; }
 
@@ -330,13 +310,15 @@ void FrogHop::handle(float time)
 		}
 	}
 
+	//with square hitboxes, it is better to adjust 1 before checking the other. These are circles. Circles are not the same as squares.
 	frogX = frogPhysicX += deltaX;
-	frogY = frogPhysicY += deltaY; //with square hitboxes, it is better to adjust 1 before checking the other. These are circles. Circles are not the same as squares.
+	frogY = frogPhysicY += deltaY;
 
 	// defeat conditions
 	if (frogPhysicX - frogRadius < .3f + visualOffset || frogPhysicX + frogRadius > width + visualOffset - 2.3f) // .3 seemed like a good amount of overlap to be fair
 	{
-		alreadyLoaded = false; // it is already loaded, it just needs to reload when returning to scene to not be in spikes
+		// onLoad uses already loaded and setting to false enables reloading the level.
+		alreadyLoaded = false;
 		DefeatScreen* next = new DefeatScreen();
 		next->previous = this;
 		DataHolder::SceneQueue(next, false);
@@ -348,8 +330,8 @@ void FrogHop::render(float time, bool updateDisplay)
 	// inherited from scene
 	if (assumePhysics)
 	{
-		frogX += frogVelocityX * time; // smooth physics
-		frogY += frogVelocityY * time; // smooth physics
+		frogX += frogVelocityX * time;
+		frogY += frogVelocityY * time;
 	}
 	else
 	{
@@ -357,12 +339,11 @@ void FrogHop::render(float time, bool updateDisplay)
 	}
 	StaticDraw::useShader(shaderSimpleRef);
 
-	//glClearColor(0.2f, 0.35f, 0.85f, 0.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 		
 	int column = 0;
-	batch.clear(); // whether or not you code you clean batches before or after drawing is up to you
+	batch.clear();
 	// bad because it draws things not on screen.
 	for (unsigned int i = 0; i < arrSize; i++)
 	{
@@ -422,7 +403,6 @@ void FrogHop::render(float time, bool updateDisplay)
 	float frame = 0;
 	if (hopTimer > 0) { frame += 1; } // the sprite is only 1x2, so only 1 varaible is need for figuring out which frame to use.
 
-	//StaticDraw::spriteRotatedImage(frogImage, 0, frogGraphicY, frogAngleDisplay, xScale, yScale, 0, frame, 1, 2);
 
 	// use rotation shader
 	glUseProgram(shaderRotationRef); // use correct shader for rotation
@@ -455,7 +435,6 @@ void FrogHop::render(float time, bool updateDisplay)
 		y -= height / 2; // convert to -x to x
 		float yf = ((y + .5f) * 2.0f / height);	// convert to -1 to 1
 		yMin = yf - yScale; // adjust to square bottom
-		//yMax = yf + yScale; // adjust to square top
 
 		// add quads to batch.
 		// A quad is a name for two triangles that form a rectangle.
@@ -466,8 +445,6 @@ void FrogHop::render(float time, bool updateDisplay)
 		batch.insert(batch.end(), v.begin(), v.end());
 		v = VectorFUtil::getVectorFromCornor(xRMin, yMin, -twoX, twoY);
 		batch.insert(batch.end(), v.begin(), v.end());
-		//StaticDraw::halfDimImage(spike, xL, yf, xScale, yScale); // this works and is easier than batching but is suboptimal performance due to not batching
-		//StaticDraw::halfDimImage(spike, xR, yf, -xScale, yScale); // this works and is easier than batching but is suboptimal performance due to not batching
 	}
 	StaticDraw::multiDraw(spike, batch); // batch drawing StaticDraw call
 

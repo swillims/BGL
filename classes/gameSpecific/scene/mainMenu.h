@@ -1,5 +1,4 @@
 #pragma once
-// libs/tools
 
 #include "singleton/staticDraw.h"
 #include "singleton/staticSound.h"
@@ -11,20 +10,12 @@
 #include "soundOptions.h"
 
 /*
-    ---> IMPORTANT - READ THIS <---
-    If you make your own menus, this scene is an ok example of how to make one.
-    - "onLoad" functions loads all things used by this scene, and sets up other init tasks.
-    - "aspectChange" runs whenever aspect ratio changes. It should be called by onLoad because it sets up several init things as well.
-    - "handle" runs once per frame or PhysicsFrameRate. It should be used to handle/track any game/menu logic
-    - "render" runs once per frame or GraphicFrameRate. It should be used to Render anything that needs to be drawn using the "Static" libs the engine provides.
-    - "clean" should be used when cleaning up a scene. It should unload things but this specific scene doesn't
+    This scene was written before the uiHelper util class and StaticInput were made.
+    - If you want a better tutorial for how to make uiElements, the options menus are better examples:
+    -- keyOptions graphicsOptions, soundOptions
 
-    The cleanest way to make a starting menu for a new game is to modify this scene.
-    - Make a class that inherits from the scene class and then replace this classes scenes with that one.
-    - "render" has a variable named a. Change it specify the amount of buttons.
-    - If the menu changes, make sure to change the text <- text is updated at aspectChange()
-    - If the menu changes, make sure to change the code in buttonPress() to change what happens when a button is pressed.
-    - If a modified version of this scene does not use a resource, remove the code to load it.
+    The easiest way to make a starting menu for a new game is to modify this scene.
+    - The cleanest way is to make a new scene written with uiHelper.
 */
 
 struct MainMenu : Scene {
@@ -42,7 +33,7 @@ struct MainMenu : Scene {
     unsigned int backgroundMusic;
 
     // click handling tools
-    unsigned int buttonHover = -1; // technically wraps to a large number and is not negative
+    unsigned int buttonHover = -1;
     unsigned int buttonStart = -1;
     bool click;
     bool loadAntiClick;
@@ -50,9 +41,9 @@ struct MainMenu : Scene {
     // writer
     StaticWrite* writer;
 
-    // math I don't remember
-    int a = 4; // <-- change this number to get a different number of buttons.
-    float b = 1.0f / a;
+    // math
+    int a = 4; // hard coded number of buttons // bad but not worth refactoring
+    float b = 1.0f / a; // inverse of "a"
     float buttonHeightExtra = .05f;
 
     // graphic things
@@ -106,22 +97,19 @@ struct MainMenu : Scene {
         }
         backgroundMusic = StaticAudio::soundStringRefs["2151bar"];
 
-        //StaticAudio::applyTags(bwoo, { "soundEffect" });
         StaticAudio::updateSounds();
 
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
 
         // set up write
-        writer = StaticWrite::singleton; // this is going to be reused a lot so better to just save the ref instead of looking up every time
-        writer->destroyChannels(); // reset channels
+        writer = StaticWrite::singleton;
+        writer->destroyChannels();
         
         // do yCords for menu button here instead of aspect change because they do not change when ratio changes
         yCords = {};
         int aa = a + 1;
         float af = a;
-        // I had to brute force this. I don't know correct math for doing this.
-        // - It's ok to be slightly not efficient here because it is in onLoad and not handle/render
         float bfh = buttonHeightExtra;
         for (float i = 1.5f; i < aa * 2 - 1; i++) 
         {
@@ -129,7 +117,7 @@ struct MainMenu : Scene {
             yCords.push_back((i - aa) / af + bfh);
         }
         
-        aspectChange(); // aspect change hangles text regeneration and generation
+        aspectChange();
         
         // stop autoclick on menu load
         loadAntiClick = true;
@@ -137,18 +125,10 @@ struct MainMenu : Scene {
         // play background music
         StaticAudio::playSoundLoop(backgroundMusic);
 
-        //StaticInput::Track(GLFW_MOUSE_BUTTON_LEFT);
         StaticInput::MouseTrack(GLFW_MOUSE_BUTTON_LEFT);
     }
     void render(float time = 0, bool updateDisplay = true)
     {
-        //std::cout << "keyBoard" << glfwGetKey(window, GLFW_MOUSE_BUTTON_LEFT) << "\n";
-        //std::cout << "mouseMethod" << glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) << "\n";
-        
-        // clear previous render
-        //glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        //glClear(GL_COLOR_BUFFER_BIT);
-
         // set shader to simple <- this is big
         StaticDraw::useShader(shaderSimpleRef);
         StaticDraw::backGroundImageRepeat(backgroundRef, 3.5);
@@ -157,10 +137,10 @@ struct MainMenu : Scene {
         StaticDraw::multiDraw(buttonImageRef, batch); // batch is set in aspectChange()
 
         // render draw channels
-        writer->startWrite(); // needed to start writing
+        writer->startWrite();
         for (int i = 0; i < a; i++)
         {
-            writer->drawChannel(i, glm::vec3(0.0f, 0.0f, 0.0f)); // channels are set in aspectChange()
+            writer->drawChannel(i, glm::vec3(0.0f, 0.0f, 0.0f));
         }
 
         // make hovered button white
@@ -168,26 +148,21 @@ struct MainMenu : Scene {
         {
             StaticDraw::useShader(colorShaderRef); // this is just white.
             // 0 is used because it doesn't matter what texture is used here because colorShaderRef ignores texture.
-            // hover batch is set when handle detects a button is hovered
             StaticDraw::multiDraw(0, hoverBatch); 
         }
 
-        // call super
         Scene::render(time, updateDisplay);
     };
 
     void handle(float time = 0)
     {
-        // this scene does not do anything outside of processing user input
         processInput();
     }
 
-    // aspectChange() is an inherited scene method that runs every time aspect ratio changes
     void aspectChange()
     {
-        StaticDraw::updateView(); // need for proper aspect ratio update
-        
-        // update window - needed for mouse
+        StaticDraw::updateView();
+
         glfwGetWindowSize(window, &winWidth, &winHeight);
 
         // load button batches
@@ -214,7 +189,7 @@ struct MainMenu : Scene {
         {
             // set up channel
             writer->setUpChannel(i);
-            float h = b * (i*2-a) + b/2; // I don't remember this math but it works
+            float h = b * (i*2-a) + b/2;
             if(i==0){ StaticWrite::AppendText(i, "Exit", -.5, h, fontXScale, fontYScale); }
             else if(i == 1){ StaticWrite::AppendText(i, "Options", -.5, h, fontXScale, fontYScale); }
             else if(i == 2){ StaticWrite::AppendText(i, "...", -.5, h, fontXScale, fontYScale); }
@@ -224,9 +199,6 @@ struct MainMenu : Scene {
 
     void processInput()
     {
-        // call super
-        // unnessary because window is already bound in onload and all super does is specify window
-        // done as a demo because the posted version of this is a demo of game with the engine
         Scene::processInput();
 
         // Tick is required to check for inputs
@@ -253,11 +225,7 @@ struct MainMenu : Scene {
     {
         //mouse vars
         double mouseX, mouseY;
-        //glfwGetCursorPos(window, &mouseX, &mouseY);
         StaticInput::GetMouse(mouseX, mouseY);
-        // convert mouse vars from window size to -1.0 to 1.0 engine and openGl readable cords
-        //mouseX = (mouseX / winWidth) * 2.0 - 1.0;
-        //mouseY = -((mouseY / winHeight) * 2.0 - 1.0);
 
         // All buttons have same width. Check if mouse is in that range.
         if (mouseX < -0.8 || mouseX > 0.8)
@@ -268,8 +236,6 @@ struct MainMenu : Scene {
         // Check if mouse is over button y cords
         for (int i = 0; i < a; i++)
         {
-            // i starts at lowest button
-            // if mouseY is lower than current button's bottom cord return because not on a button
             if (mouseY < yCords[i * 2])
             {
                 buttonHover = -1;
@@ -283,9 +249,6 @@ struct MainMenu : Scene {
                 {
                     buttonHover = i;
                     StaticAudio::playSoundEffectMulti(bwoo);
-                    // using batching because it simplifies the problem
-                    // there is a complicated solution that is easy read using StaticDraw::halfDimImage
-                    // and a solution that uses batching but looks more complicated than it is
                     hoverBatch.clear();
                     hoverBatch.insert(hoverBatch.end(), {
                         .8f,  yCords[i * 2 + 1], 1.0f, 1.0f,
@@ -300,7 +263,6 @@ struct MainMenu : Scene {
                 return;
             }
         }
-        // logically it should be above top button here
         buttonHover = -1;
     }
 
@@ -317,7 +279,7 @@ struct MainMenu : Scene {
         else if (x == 3) { DataHolder::SceneQueue(new FrogHop()); }
     }
 
-    void clean() // unload assets and turn off music
+    void clean()
     {
         // Turn off music
         StaticAudio::stopSound(backgroundMusic);
