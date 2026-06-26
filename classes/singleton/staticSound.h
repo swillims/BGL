@@ -80,7 +80,7 @@ struct StaticAudio
 
     static void applyTags(int target, const std::vector<std::string>& tags)
     {
-        if (!tagSoundMap.contains(target)) // check if it exists
+        if (!tagSoundMap.contains(target))
         {
             tagSoundMap[target] = {}; // set to empty if it doesn't exist
         }
@@ -92,7 +92,7 @@ struct StaticAudio
                 tagStringRefs[tag] = tagCount;
                 tagSettings[tagCount] = 1.0f; // "magic number" is 100% default sound setting.
             }
-            // this nasty if statement is here to avoid adding same tag twice.
+            // this ugly "if statement" is here to avoid adding same tag twice.
             if (std::find(tagSoundMap[target].begin(), tagSoundMap[target].end(), tagStringRefs[tag]) == tagSoundMap[target].end())
             {
                 tagSoundMap[target].push_back(tagStringRefs[tag]);
@@ -107,9 +107,8 @@ struct StaticAudio
         masterVolume = v;
         if (power)
         {
-            // v's value is defaultly squared becuase human hearing is log and not linear
-            // pow is used instead of v*v to make it easier to change later. Maybe 2.2 or something idk.
-            v = std::pow(v, 2.0f); 
+            // power value is defaultly squared because human hearing is log and not linear
+            v = std::pow(v, 1.41f);
         }
         ma_engine_set_volume(&engine, v);
     }
@@ -134,9 +133,8 @@ struct StaticAudio
         }
         if (power)
         {
-            // v's value is defaultly squared becuase human hearing is log and not linear
-            // pow is used instead of v*v to make it easier to change later. Maybe 2.2 or something idk.
-            v = std::pow(v, 2.0f);
+            // power value is defaultly squared because human hearing is log and not linear
+            v = std::pow(v, 1.41f);
         }
         ma_sound_set_volume(soundRefs[soundRef], v);
     }
@@ -156,7 +154,6 @@ struct StaticAudio
         ma_sound* sound = new ma_sound;
 
         ma_result result = ma_sound_init_from_file(&engine, path, 0, NULL, NULL, sound);
-        //ma_result result = ma_sound_init_from_file(&engine, path, MA_SOUND_FLAG_DECODE, NULL, NULL, sound);
         if (result == MA_SUCCESS) {
             std::cout << "Audio Load Success : " << path << "\n";
         }
@@ -173,7 +170,6 @@ struct StaticAudio
         applyTags(name, tags);
     }
 
-    // contrary to previous functions were it is better to use int, this time use string if you can
     static void unLoad(const std::string& ref);
 
     static void unLoad(unsigned int ref);
