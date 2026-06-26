@@ -2,43 +2,32 @@
 
 #include "singleton/gl_core.h"
 
-//#include <GL/gl.h>
-
 #include <string>
 #include <iostream>
 #include <unordered_map>
 #include <filesystem>
-//#include <map>
 
 #include "util.h"
-//#include "shader.h"
 
 struct StaticDraw
 {
-public:
-    // active window
+    // draw window
     inline static GLFWwindow* window;
 
-    //
+    // ints used by buffers
     inline static unsigned int VAO, VBO, EBO;
 
+    // x and y
     inline static int w, h;
     inline static float aspectRatio;
 
+    // shader(program) references
     inline static int simpleRef;
     inline static int currentRef;
 
-    /*struct shaderLib
-    {
-        std::unordered_map<std::string, Shader> shaderRefs;
-    };
-    inline static shaderLib tapeLib;
-    //*/
-
-    // downloaded files
+    // loaded files
     inline static util::BiMap<unsigned int, std::string> shaderRefs;
     inline static util::BiMap<unsigned int, std::string> imageFileRefs;
-    //inline static std::unordered_map<std::string, unsigned int> imageFileRefs;
 
     static void windowImply() { window = glfwGetCurrentContext(); }
     static void windowSpecify(GLFWwindow* win) { window = win; }
@@ -89,12 +78,11 @@ public:
 
     static unsigned int compileShader(const char* vertexSource, const char* fragmentSource, std::string shaderName = "")
     {
-        // self written debug
-        std::cout << shaderName << "\n" << vertexSource << "\n" << fragmentSource << "\n";
-        //Shader s(vertexSource, fragmentSource);
-        //tapeLib.shaderRefs[shaderName] = s;
+
+        std::cout << "Loading shader" << shaderName << "\n" << vertexSource << "\n" << fragmentSource << "\n";
         
-        // Borrowed tutorial code starts here. Read a book.
+        // Borrowed tutorial code starts here. This section is modified from a book.
+        // ignore the lack of spaces in the comments. Copy pastiing from a pdf is silly sometimes.
         //1.retrievethevertex/fragmentsourcecodefromfilePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -193,8 +181,6 @@ public:
         glUseProgram(shaderRef);
     }
 
-    //static void useShader(std::string shaderString){tapeLib.shaderRefs[shaderString].use();}
-
     static void useShaderSimple(){ useShader(simpleRef); }
 
     static int getShader(const std::string& shaderString)
@@ -215,6 +201,7 @@ public:
         return shaderRefs.contains(shaderInt);
     }
 
+    // This one is a debug method. I recommend deleting it if you modify my engine and make a custom engine.
     static void printShaderUniforms(GLuint programID) {
         GLint uniformCount;
         glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &uniformCount);
@@ -412,7 +399,6 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
         glBindTexture(GL_TEXTURE_2D, imageRef);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -446,7 +432,6 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
         glBindTexture(GL_TEXTURE_2D, imageRef);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -469,10 +454,7 @@ public:
         glBindTexture(GL_TEXTURE_2D, imageRef);
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 4);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
-    //static void fractionImage(std::string stringRef, float xCenter, float yCenter, float halfWidth, float halfHeight, float repeatX, float repeatY) { fractionImage(imageFileRefs[stringRef], xCenter, yCenter, halfWidth, halfHeight, repeatX, repeatY); }
-
     //*/
 };

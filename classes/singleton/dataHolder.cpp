@@ -6,8 +6,6 @@
 
 DataHolder DataHolder::god;
 
-// documentation in the dataholder.h file.
-
 void DataHolder::init()
 {   
     god.physicsTick = 0;
@@ -49,7 +47,7 @@ void DataHolder::handleScene(float time)
     frameTick -= time;
 
     // handle physics
-    if (physicCap < 0.0001) // if you want more than 10000 frames per second on your engine, no
+    if (physicCap < 0.0001) // if you want more than 10000 frames per second on your engine, change this number
     {
         currentScene->handle(time);
     }
@@ -58,14 +56,14 @@ void DataHolder::handleScene(float time)
         physicsTick = physicCap;
         currentScene->handle(physicCap); // use physicsCap for time variable to make it deterministic
     }
-    if (frameCap < 0.0001) // if you want more than 10000 frames per second on your engine, no
+    if (frameCap < 0.0001) // if you want more than 10000 frames per second on your engine, change this number
     {
         currentScene->render(frameCap);
     }
     else if (frameTick < 0)
     {
         frameTick = frameCap;
-        currentScene->render(frameCap); // use physicsCap for time variable to make it deterministic
+        currentScene->render(frameCap);
     }
 
     // trash collection deletion
@@ -74,27 +72,17 @@ void DataHolder::handleScene(float time)
 
 void DataHolder::setPhysicsCap(float cap)
 {
-    if (cap < .1f)// tolerance check prevents /0. If you want a game that only runs on 10 seconds per frame, you can change this tolerance urself.
-    {
-        physicCap = 0.0f;
-    }
-    else
-    {
-        physicCap = 1 / cap;
-    }
+    // tolerance check prevents /0
+    if (cap < .01f){ physicCap = 0.0f; }
+    else { physicCap = 1 / cap; }
 }
 
 void DataHolder::setFrameCap(float cap)
 {
     god.frameCapInt = static_cast<int>(cap);
-    if (cap < .1f)// tolerance check prevents /0. If you want a game that only runs on 10 seconds per frame, you can change this tolerance urself.
-    {
-        frameCap = 0.0f;
-    }
-    else
-    {
-        frameCap = 1 / cap;
-    }
+    //tolerance check prevents /0
+    if (cap < .1f){ frameCap = 0.0f; }
+    else { frameCap = 1 / cap; }
 }
 
 void DataHolder::trashEmpty()
@@ -105,7 +93,6 @@ void DataHolder::trashEmpty()
         trashList.pop_back();
     }
 }
-// If you don't use setters and getters, just go ahead and delete these. 
 void DataHolder::setUnCatData(std::string key, std::any data) { uncategorizedData[key] = data; }
 bool DataHolder::checkKeyUnCatData(std::string key){return uncategorizedData.contains(key);}
 void  DataHolder::deleteUnCatData(std::string key) { uncategorizedData.erase(key); }
