@@ -145,10 +145,12 @@ void FrogHop::onLoad()
 		gravity = 3.25f;
 		bounceValue = -.5f; // negative because go other way when bouncing
 		frogRadius = 0.25f;
-		frogRotationSpeed = 1;
+		frogRotationSpeed = 1.75;
 		resizing = false;
 		hopTimerCap = .5f;
 		jumpSpeed = 5;
+		scoreScale = 5.0f;
+		score = 0;
 	}
 
 	// set music
@@ -212,11 +214,13 @@ void FrogHop::handle(float time)
 
 	processInput(window, time);
 
-	// assume physics is used by render to approximate movement indepent of game logic. It is set to false here because there is no reason to approximate on a game step.
+	// assume physics is used by render to approximate movement independent of game logic. It is set to false here because there is no reason to approximate on a game step.
 	assumePhysics = false;
 	if (hopTimer >= 0) { hopTimer -= time; }
 
-	visualOffset += time / 2;
+	visualOffset += scrollSpeed * time;
+	score += time * scrollSpeed * scoreScale;
+
 	frogAngleDisplay = frogAngle;
 	// make the game move
 	if (visualOffset > 1)
@@ -451,11 +455,16 @@ void FrogHop::render(float time, bool updateDisplay)
 	// set needed to use writing shader
 	writer->startWrite();
 
+
 	// First variable in drawChannel is the channel being drawn to
 	// Second variable drawChannel is a color. RGB
-	// The contents/text of the channel aren't declared here
-	// - The contents are are declared in aspectChange()
+	// - The text of channel 0 is defined in aspectChange()
 	writer->drawChannel(0, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	StaticWrite::SetUpChannel(1);
+	std::string scoreStr = std::to_string(static_cast<int>(score));
+	StaticWrite::AppendText(1, "Score: " + scoreStr, .5f, .9f, xScale * .8, yScale * .8);
+	writer->drawChannel(1, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// call super
 	Scene::render(time, updateDisplay);

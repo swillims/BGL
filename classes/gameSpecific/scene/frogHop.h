@@ -40,7 +40,11 @@ struct FrogHop : Scene
 	float visualOffset;
 	unsigned int shift;
 
-	// map array and size params
+	// world vars
+	// - gameSpeed
+	float scrollSpeed = 1.25f;
+
+	// - map array and size params
 	static const unsigned int height = 8;
 	static const unsigned int width = 32;
 	unsigned int arrSize = height * width;
@@ -53,7 +57,6 @@ struct FrogHop : Scene
 	float chance;
 
 	// frog physic data
-	// - note: frog is not a struct because unnecessary with a 1 to 1 relationship
 	float frogX;
 	float frogY;
 	float gravity;
@@ -78,6 +81,11 @@ struct FrogHop : Scene
 	float hopTimer;
 	bool wHeld;
 	float jumpSpeed;
+
+	// meta variables
+	// - I'm not going to save score because this is just a demo and the option menus show how to save things
+	float score;
+	float scoreScale;
 
 	void onLoad();
 
