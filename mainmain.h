@@ -243,11 +243,12 @@ static int mainmainmain()
     //StaticDraw::init();
     std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
 
+    StaticDraw::cleanIndices();
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        StaticDraw::cleanIndices();
         std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
         std::chrono::duration<float> elapsed = currentTime - lastTime;
         float deltaTime = elapsed.count(); // in seconds
