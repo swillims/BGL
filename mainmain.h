@@ -221,7 +221,7 @@ static int mainmainmain()
     glClearColor(0.25f, 0.25, 0.25f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     //StaticWrite::RenderText("Loading...", -50.0f, -50.0f, 0.5f, glm::vec3(1, 1, 1));
-    StaticWrite::AppendText(0, "Loading...", -.8f, -.2f, 0.006f, 0.006f);
+    StaticWrite::AppendText(0, "Loading...", -.95f, 0.0f, 0.2f, 0.2f);
     StaticWrite::StartWrite();
     StaticWrite::DrawChannel(0, glm::vec3(1, 1, 1));
     glfwSwapBuffers(window);
