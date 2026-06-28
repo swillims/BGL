@@ -77,31 +77,7 @@ elseif(UNIX AND NOT APPLE)
         Xrandr
         Xi
     )
-    # to get glfw on your linux pc
-    # sudo apt install libglfw3-dev
 
-    #find_package(PkgConfig REQUIRED)
-
-    #throws error here
-    #pkg_check_modules(GLFW REQUIRED glfw3)
-
-
-    #ignore past here because it does not get that far
-    #target_include_directories(BGL PRIVATE ${GLFW_INCLUDE_DIRS})
-    #target_link_libraries(BGL PRIVATE ${GLFW_LIBRARIES})
-
-    #target_include_directories(BGL PRIVATE
-    #    ${CMAKE_SOURCE_DIR}/lib/shared/include
-    ##    ${CMAKE_SOURCE_DIR}/lib/shared
-     #   ${CMAKE_SOURCE_DIR}/lib/linux
-    #)
-
-    #target_link_libraries(
-    #    BGL
-    #    ${CMAKE_SOURCE_DIR}/lib/linux/glfw/libglfw.so
-    #    ${CMAKE_SOURCE_DIR}/lib/shared/freetype.lib
-        #opengl32.lib
-    #)
 endif()
 
 add_custom_command(

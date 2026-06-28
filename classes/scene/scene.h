@@ -14,6 +14,8 @@
 struct Scene
 {
 public:
+	virtual ~Scene() = default;
+
 	GLFWwindow* window = nullptr;
 	// run on scene change
 	virtual void onLoad(){ window = glfwGetCurrentContext(); } 
