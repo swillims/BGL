@@ -343,8 +343,7 @@ void FrogHop::render(float time, bool updateDisplay)
 	}
 	StaticDraw::useShader(shaderSimpleRef);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	StaticDraw::clear();
 		
 	int column = 0;
 	batch.clear();

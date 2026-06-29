@@ -218,8 +218,7 @@ static int mainmainmain()
     StaticWrite::Init("assets/fonts/TeX-Gyre-Heros/texgyreheros-regular.otf", 64); // replace string for different default font
     
     // minimalistic load screan. Replace next four lines if you write your own. Requires Static write init.
-    glClearColor(0.25f, 0.25, 0.25f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    StaticDraw::clear(.25,.25,.25);
     //StaticWrite::RenderText("Loading...", -50.0f, -50.0f, 0.5f, glm::vec3(1, 1, 1));
     StaticWrite::AppendText(0, "Loading...", -.95f, 0.0f, 0.2f, 0.2f);
     StaticWrite::StartWrite();

@@ -8,6 +8,7 @@
 #include <filesystem>
 
 #include "util.h"
+#include <glm/glm.hpp>
 
 struct StaticDraw
 {
@@ -455,6 +456,24 @@ struct StaticDraw
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 4);
         glBindVertexArray(0);
+    }
+
+    static void clear(glm::vec3 color)
+    {
+        glClearColor(color.r, color.g, color.b, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    static void clear(glm::vec4 color)
+    {
+        glClearColor(color.r, color.g, color.b, color.a);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    static void clear(const float r = 0.0f, const float g = 0.0f, const float b = 0.0f, const float a = 1.0f)
+    {
+        glClearColor(r, g, b, a);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
     //*/
 };
