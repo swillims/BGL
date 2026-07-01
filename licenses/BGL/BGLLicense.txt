@@ -1,5 +1,5 @@
 ================================================================================
-BGL – License Overview
+BGL License
 ================================================================================
 This LICENSE file applies to the entirety of this repository. It is divided into three sections: your engine code, your assets, and third-party libraries.
 
