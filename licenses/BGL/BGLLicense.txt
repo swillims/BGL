@@ -1,13 +1,12 @@
 ================================================================================
-BGL – License Overview
+BGL â€“ License Overview
 ================================================================================
 This LICENSE file applies to the entirety of this repository. It is divided into three sections: your engine code, your assets, and third-party libraries.
 
 --------------------------------------------------------------------------------
-1. Your Engine Code
+1. Engine Code
 --------------------------------------------------------------------------------
-All original code written by the author(s) of this repository is released
-into the public domain under the Unlicense:
+All original code written by the author(s) of this repository is released into the public domain under the Unlicense:
 
     This is free and unencumbered software released into the public domain.
 
@@ -28,17 +27,18 @@ released under Creative Commons Zero (CC0 1.0 Universal):
 
     See <https://creativecommons.org/publicdomain/zero/1.0/> for the full text.
 
+In addition to the assets created by the author(s), there are assets borrowed from other places such as fonts. Their licenses should be respected and can most likely be found saved next to them in the asset folders.
+
 --------------------------------------------------------------------------------
 3. Third-Party Libraries
 --------------------------------------------------------------------------------
 The following third-party libraries are included in this repository. You must comply with their respective licenses when using them:
 
 1. FreeType (Font Engine)
-   - License options: FreeType License (FTL.TXT) OR GNU GPL v2 (GPLv2.TXT)
-   - You may pick one license to comply with.
+   - License: FreeType is distributed under either the FreeType License or the GNU GPL v2. Users may comply with either license.
 
 2. MiniAudio
-   - License: Public Domain (or MIT-style)
+   - License: Public Domain or MIT License
 
 3. GLM (OpenGL Mathematics)
    - License: MIT License or The Happy Bunny License
@@ -46,7 +46,7 @@ The following third-party libraries are included in this repository. You must co
 4. GLFW
    - License: zlib/libpng license
 
-5. glad
+5. GLAD
    - License: MIT License
 
 6. Any other included third-party libraries
