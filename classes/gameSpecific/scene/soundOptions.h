@@ -131,13 +131,17 @@ public:
         if (StaticAudio::tagStringRefs.contains("music"))
         {
             musicVollumeLeft = StaticAudio::tagSettings[StaticAudio::tagStringRefs["music"]];
+            musicVollume = StaticAudio::tagSettings[StaticAudio::tagStringRefs["music"]];
             musicValue = std::to_string(static_cast<int>(musicVollumeLeft * 100.0f + 0.5f));
         }
         if (StaticAudio::tagStringRefs.contains("soundEffect"))
         {
             effectVollumeLeft = StaticAudio::tagSettings[StaticAudio::tagStringRefs["soundEffect"]];
+            effectVollume = StaticAudio::tagSettings[StaticAudio::tagStringRefs["soundEffect"]];
             soundEffectValue = std::to_string(static_cast<int>(effectVollumeLeft * 100.0f + 0.5f));
         }
+
+        masterVollume = StaticAudio::masterVolume;
 
         // exists to not have a ref not initialized
         // minimum decalration too large to keep code clean so ref needs to be declared up here
