@@ -78,6 +78,19 @@ struct StaticAudio
         ma_sound_stop(soundRefs[ref]);
     }
 
+    static int createTag(const std::string& tag)
+    {
+        if (tagStringRefs.contains(tag))
+        {
+            return tagStringRefs[tag];
+        }
+        tagCount++;
+        tagStringRefs[tag] = tagCount;
+        // default vollume
+        tagSettings[tagCount] = 1.0f;
+        return tagCount;
+    }
+
     static void applyTags(int target, const std::vector<std::string>& tags)
     {
         if (!tagSoundMap.contains(target))

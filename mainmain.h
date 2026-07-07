@@ -137,6 +137,9 @@ static int mainmainmain()
     }
 
     // sound settings
+    StaticAudio::createTag("music");
+    StaticAudio::createTag("soundEffect");
+
     settingsFileName = "metadata/soundsettings";
     if (util::fileExists(settingsFileName))
     {
@@ -165,6 +168,7 @@ static int mainmainmain()
             float m = g.getUnCatData<int>("SOUND_MASTER");
             m /= 100;
             StaticAudio::setMasterVollume(m);
+            std::cout << "sound master volume loaded: " << StaticAudio::masterVolume << std::endl;
             g.deleteUnCatData("SOUND_MASTER");
         }
         if (g.checkKeyUnCatData("SOUND_MUSIC"))
@@ -172,6 +176,7 @@ static int mainmainmain()
             float m = g.getUnCatData<int>("SOUND_MUSIC");
             m /= 100;
             StaticAudio::updateTagVollume("music", m);
+            std::cout << "\"music\" tag loaded: " << StaticAudio::tagSettings[StaticAudio::tagStringRefs["music"]] << std::endl;
             g.deleteUnCatData("SOUND_MUSIC");
         }
         if (g.uncategorizedData.contains("SOUND_EFFECT"))
@@ -179,9 +184,11 @@ static int mainmainmain()
             float m = g.getUnCatData<int>("SOUND_EFFECT");
             m /= 100;
             StaticAudio::updateTagVollume("soundEffect", m);
+            std::cout << "\"soundEffect\" tag loaded: " << StaticAudio::tagSettings[StaticAudio::tagStringRefs["soundEffect"]] << std::endl;
             g.deleteUnCatData("SOUND_EFFECT");
         }
     }
+    //StaticAudio::updateSounds();
 
     // glfw window creation
     // --------------------
