@@ -46,6 +46,27 @@ struct util
     }
 
     // string manipulation
+    static void removeComments(std::string& s, const std::string& delimiter)
+    {
+        size_t pos = s.find(delimiter);
+        if (pos != std::string::npos)
+        {
+            s.erase(pos);   // removes delimiter AND everything after
+        }
+    }
+
+    static void sanitizeString(std::string& s, const std::initializer_list<std::string>& delimiters)
+    {
+        for (const std::string& k : delimiters)
+        {
+            size_t pos = 0;
+            while ((pos = s.find(k, pos)) != std::string::npos)
+            {
+                s.erase(pos, k.size());
+            }
+        }
+    }
+
     static std::vector<std::string> split(const std::string& s, const std::string& delimiter, bool convertToUnix = true) // always keep "convertToUnix = true" unless there is very a good reason to not convert
     {
         std::string working = s;
@@ -71,24 +92,35 @@ struct util
         tokens.push_back(working.substr(start)); // last piece
         return tokens;
     }
-    static void sanitizeString(std::string& s, const std::initializer_list<std::string>& delimiters)
+
+    static std::string translateToHumanReadable(const std::string& original)
     {
-        for (const std::string& k : delimiters)
+        std::string returnString;
+
+        for (char c : original)
         {
-            size_t pos = 0;
-            while ((pos = s.find(k, pos)) != std::string::npos)
+            if (c >= 32 && c <= 126)
             {
-                s.erase(pos, k.size());
+                returnString += c;
+            }
+            else if (c == 9)
+            {
+                returnString += "[TAB]";
+            }
+            else if (c == 10)
+            {
+                returnString += "[NEW_LINE]";
+            }
+            else if (c == 13)
+            {
+                returnString += "[DASH_R]";
+            }
+            else
+            {
+                returnString += "[ missing :( ]";
             }
         }
-    }
-    static void removeComments(std::string& s, const std::string& delimiter)
-    {
-        size_t pos = s.find(delimiter);
-        if (pos != std::string::npos)
-        {
-            s.erase(pos);   // removes delimiter AND everything after
-        }
+        return returnString;
     }
 
     // array helpers

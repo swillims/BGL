@@ -149,7 +149,7 @@ struct UIElement
         std::cout << "node end here\n";
     }
 
-    std::vector<float> getVerts()
+    virtual std::vector<float> getVerts()
     {
         return {
             xMin + xSize, yMin + ySize, 1, 1, // v0
@@ -174,7 +174,7 @@ struct UIContainer : UIElement
         : UIElement(xMin, yMin, xSize, ySize, key) {}
     UIContainer(int key = -1): UIElement(key) {}
 
-    void renderVerts(std::vector<float>& vertices)
+    void renderVerts(std::vector<float>& vertices) override
     {
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
         {
@@ -194,7 +194,7 @@ struct UIXRatio : UIContainer
     UIXRatio(float ratio, bool relativeToScreenSize = true, int key = -1)
         : ratio(ratio), relativeToScreenSize(relativeToScreenSize), UIContainer(key) {}
 
-    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         float xxSize;
@@ -236,7 +236,7 @@ struct UIXShifter : UIContainer
 
     UIXShifter(float& xLeft, float& xSubSize, int key = -1)
         : UIContainer(key), xLeft(xLeft), xSubSize(xSubSize){}
-    void adjustNode(float xMin, float yMin, float xSize, float ySize)
+    void adjustNode(float xMin, float yMin, float xSize, float ySize) override
     {
         UIElement::adjustNode(xMin, yMin, xSize, ySize);
         if (nodes.size() > 0)
@@ -246,12 +246,36 @@ struct UIXShifter : UIContainer
     }
 };
 
+struct UIYShifter : UIContainer
+{
+    float& yBottom;   // 0.0 to 1.0
+    float& ySubSize;  // 0.0 to 1.0
+
+    UIYShifter(float& yBottom, float& ySubSize, int key = -1)
+        : UIContainer(key), yBottom(yBottom), ySubSize(ySubSize) {}
+
+    void adjustNode(float xMin, float yMin, float xSize, float ySize) override
+    {
+        UIElement::adjustNode(xMin, yMin, xSize, ySize);
+
+        if (!nodes.empty())
+        {
+            nodes[0]->adjustNode(
+                xMin,
+                yMin + ySize * yBottom,
+                xSize,
+                ySize * ySubSize
+            );
+        }
+    }
+};
+
 struct UIStack : UIContainer
 {
     UIStack(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
         : UIContainer(xMin, yMin, xSize, ySize, key) {}
 
-    void adjustNode(float xMin, float yMin, float xSize, float ySize)
+    void adjustNode(float xMin, float yMin, float xSize, float ySize) override
     {
         UIElement::adjustNode(xMin, yMin, xSize, ySize);
         for (std::unique_ptr<UIElement>& nodePtr : nodes)
@@ -262,12 +286,18 @@ struct UIStack : UIContainer
     }
 };
 
+struct UIBase : UIStack
+{
+    UIBase() : UIStack(-1,-1,2,2,-1) {}
+};
+
 struct UIXHolder : UIContainer
 {
-    UIXHolder(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
+    UIXHolder(float xMin, float yMin, float xSize, float ySize, int key = -1)
         : UIContainer(xMin, yMin, xSize, ySize, key) {}
+    UIXHolder(int key = -1): UIContainer(key) {}
 
-    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         int n = nodes.size();
@@ -285,10 +315,11 @@ struct UIXHolder : UIContainer
 
 struct UIYHolder : UIContainer
 {
-    UIYHolder(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
+    UIYHolder(float xMin, float yMin, float xSize, float ySize, int key = -1)
         : UIContainer(xMin, yMin, xSize, ySize, key) {}
+    UIYHolder(int key = -1): UIContainer(key) {}
 
-    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         int n = nodes.size();
@@ -313,7 +344,7 @@ struct UIXSplits : UIContainer
     UIXSplits(std::vector<float> splits, int key = -1)
         : UIContainer(key), splits(splits) {}
 
-    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         float xxSize;
@@ -325,6 +356,32 @@ struct UIXSplits : UIContainer
             UIElement& node = *nodes[i];
             node.adjustNode(xxMin, yMin2, xxSize, ySize2);
             xxMin += xxSize;
+        }
+    }
+};
+
+struct UIYSplits : UIContainer
+{
+    std::vector<float> splits;
+
+    UIYSplits(float xMin, float yMin, float xSize, float ySize, std::vector<float> splits, int key = -1)
+        : UIContainer(xMin, yMin, xSize, ySize, key), splits(splits) {}
+
+    UIYSplits(std::vector<float> splits, int key = -1)
+        : UIContainer(key), splits(splits) {}
+
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    {
+        UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
+        float yySize;
+        float yyMin = yMin2 + ySize2;
+
+        for (int i = 0; i < nodes.size() && i < splits.size(); i++)
+        {
+            yySize = ySize2 * splits[i];
+            yyMin -= yySize;
+            UIElement& node = *nodes[i];
+            node.adjustNode(xMin2, yyMin, xSize2, yySize);
         }
     }
 };
@@ -345,7 +402,7 @@ struct UIBuffer : UIContainer
     UIBuffer(float xL, float xR, float yB, float yT, int key = -1)
         : UIContainer(key), xLeftBuffer(xL), xRightBuffer(xR), yBottomBuffer(yB), yTopBuffer(yT) {}
 
-    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
         UIElement::adjustNode(xMin2, yMin2, xSize2, ySize2);
         xMin2 += xSize2 * xLeftBuffer;
@@ -388,7 +445,72 @@ struct UITextOneLine : UIElement
         : UIElement(key), textSource(textSource), textChannel(textChannel), fontPercent(fontPercent), 
         xAlign(xAlign), yAlign(yAlign), relativeToScreenSize(relativeToScreenSize) {}
     
-    void renderVerts(std::vector<float>& vertices)
+    void renderVerts(std::vector<float>& vertices) override
+    {
+        float yScale = fontPercent * ySize;
+        float xScale = yScale;
+        if (relativeToScreenSize)
+        {
+            xScale /= StaticDraw::aspectRatio;
+        }
+        std::vector<float> textVerts = StaticWrite::GenerateVertices(textSource, xMin, yMin, xScale, yScale);
+
+        if (textVerts.size() > 0 && textVerts.size()%4==0)
+        {
+            if (xAlign == XCENTER || xAlign == XRIGHT)
+            {
+                float xxMax = textVerts[0];
+                for (int i = 4; i < textVerts.size(); i += 4)
+                {
+                    if (xxMax < textVerts[i]) { xxMax = textVerts[i]; }
+                }
+                float shiftAmount = xSize + xMin - xxMax;
+                if (xAlign == XCENTER)
+                {
+                    shiftAmount /= 2;
+                }
+                for (int i = 0; i < textVerts.size(); i += 4)
+                {
+                    textVerts[i] += shiftAmount;
+                }
+            }
+            if (yAlign == YCENTER || YTOP)
+            {
+                float yyMax = textVerts[1];
+                for (int i = 5; i < textVerts.size(); i += 4)
+                {
+                    if (yyMax < textVerts[i]) { yyMax = textVerts[i]; }
+                }
+                float shiftAmount = ySize + yMin - yyMax;
+                if (yAlign == XCENTER)
+                {
+                    shiftAmount /= 2;
+                }
+                for (int i = 1; i < textVerts.size(); i += 4)
+                {
+                    textVerts[i] += shiftAmount;
+                }
+            }
+            StaticWrite::AppendChannel(textChannel, textVerts);
+        }
+    }
+};
+
+struct UITextOneLineConst : UIElement
+{
+    unsigned int textChannel;
+    float fontPercent;
+    std::string textSource;
+    bool relativeToScreenSize;
+    int xAlign;
+    int yAlign;
+
+    UITextOneLineConst(unsigned int textChannel, std::string textSource, float fontPercent,
+        int xAlign = XCENTER, int yAlign = YCENTER, bool relativeToScreenSize = true, int key = -1)
+        : UIElement(key), textSource(textSource), textChannel(textChannel), fontPercent(fontPercent),
+        xAlign(xAlign), yAlign(yAlign), relativeToScreenSize(relativeToScreenSize) {}
+
+    void renderVerts(std::vector<float>& vertices) override
     {
         float yScale = fontPercent * ySize;
         float xScale = yScale;
@@ -448,7 +570,7 @@ struct TexUVNode : UIElement
     TexUVNode(float xMinUV=0, float xMaxUv = 1, float yMinUv = 0, float yMaxUv = 1, int key = -1)
     : xMinUV(xMinUV), xMaxUv(xMaxUv), yMinUv(yMinUv), yMaxUv(yMaxUv), UIElement(key){}
 
-    void renderVerts(std::vector<float>& vertices)
+    void renderVerts(std::vector<float>& vertices) override
     {
         vertices.insert(vertices.end(),
             {
@@ -462,7 +584,7 @@ struct TexUVNode : UIElement
             });
     }
 
-    std::vector<float> getVerts()
+    std::vector<float> getVerts() override
     {
         return
         {
