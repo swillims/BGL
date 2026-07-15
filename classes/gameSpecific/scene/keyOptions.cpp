@@ -14,7 +14,7 @@ struct ButtonInput : Scene
 
     UIXRatio ui;
 
-    ButtonInput(std::string aliasTarget, Scene* previous) : ui(-1, -1, 2, 2, 1.0, true), aliasTarget(aliasTarget), previous(previous) {}
+    ButtonInput(std::string aliasTarget, Scene* previous) : ui(1.0, true), aliasTarget(aliasTarget), previous(previous) {}
 
     void onLoad() override
     {

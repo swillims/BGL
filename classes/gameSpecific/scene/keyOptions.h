@@ -64,7 +64,7 @@ public:
     Scene* previous;
 
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    KeyOptions() : ui(-1, -1, 2, 2, 1.0, true) {}
+    KeyOptions() : ui(1.0, true) {}
 
     void onLoad() override
     {
@@ -125,7 +125,7 @@ public:
         // -- deleting the old nodes is better for readability than a massive if statement
         ui.nodes.clear();
 
-        ui.appendType<UIYHolder>(5);
+        ui.appendType<UIYHolder>();
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
                 .appendType<UIStack>().appendType<UIXRatio>(2, true)

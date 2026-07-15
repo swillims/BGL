@@ -17,12 +17,12 @@ struct UIElement
     std::vector<std::unique_ptr<UIElement>> nodes;
     UIElement* previousNode = nullptr;
 
-    float xMin;
-    float yMin;
-    float xSize;
-    float ySize;
+    float xMin = -1.0f;
+    float yMin = -1.0f;
+    float xSize = 2.0f;
+    float ySize = 2.0f;
 
-    int key;
+    int key = -1;
 
     UIElement(){}
     UIElement(int key = -1): key(key) {}
@@ -170,8 +170,6 @@ struct UIEmpty : UIElement
 
 struct UIContainer : UIElement
 {
-    UIContainer(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
-        : UIElement(xMin, yMin, xSize, ySize, key) {}
     UIContainer(int key = -1): UIElement(key) {}
 
     void renderVerts(std::vector<float>& vertices) override
@@ -189,8 +187,6 @@ struct UIXRatio : UIContainer
     float ratio;
     bool relativeToScreenSize;
 
-    UIXRatio(float xMin, float yMin, float xSize, float ySize, float ratio, bool relativeToScreenSize = true, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key), ratio(ratio), relativeToScreenSize(relativeToScreenSize) {}
     UIXRatio(float ratio, bool relativeToScreenSize = true, int key = -1)
         : ratio(ratio), relativeToScreenSize(relativeToScreenSize), UIContainer(key) {}
 
@@ -272,8 +268,6 @@ struct UIYShifter : UIContainer
 
 struct UIStack : UIContainer
 {
-    UIStack(float xMin = 0.f, float yMin = 0.f, float xSize = 1.f, float ySize = 1.f, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key) {}
 
     void adjustNode(float xMin, float yMin, float xSize, float ySize) override
     {
@@ -288,13 +282,18 @@ struct UIStack : UIContainer
 
 struct UIBase : UIStack
 {
-    UIBase() : UIStack(-1,-1,2,2,-1) {}
+    UIBase()
+    {
+        xMin = -1;
+        yMin = -1;
+        xSize = 2;
+        ySize = 2;
+        key = -1;
+    }
 };
 
 struct UIXHolder : UIContainer
 {
-    UIXHolder(float xMin, float yMin, float xSize, float ySize, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key) {}
     UIXHolder(int key = -1): UIContainer(key) {}
 
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
@@ -315,8 +314,6 @@ struct UIXHolder : UIContainer
 
 struct UIYHolder : UIContainer
 {
-    UIYHolder(float xMin, float yMin, float xSize, float ySize, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key) {}
     UIYHolder(int key = -1): UIContainer(key) {}
 
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
@@ -339,8 +336,6 @@ struct UIXSplits : UIContainer
 {
     std::vector<float> splits;
 
-    UIXSplits(float xMin, float yMin, float xSize, float ySize, std::vector<float> splits, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key), splits(splits){}
     UIXSplits(std::vector<float> splits, int key = -1)
         : UIContainer(key), splits(splits) {}
 
@@ -363,9 +358,6 @@ struct UIXSplits : UIContainer
 struct UIYSplits : UIContainer
 {
     std::vector<float> splits;
-
-    UIYSplits(float xMin, float yMin, float xSize, float ySize, std::vector<float> splits, int key = -1)
-        : UIContainer(xMin, yMin, xSize, ySize, key), splits(splits) {}
 
     UIYSplits(std::vector<float> splits, int key = -1)
         : UIContainer(key), splits(splits) {}

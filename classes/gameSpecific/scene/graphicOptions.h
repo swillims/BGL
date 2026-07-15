@@ -64,7 +64,7 @@ public:
 
     std::vector<float> batch;
     // uiElement
-    UIXRatio ui;//(0.f, 0.f, 1.f, 1.f);
+    UIXRatio ui;
 
     // uiTextSources
     std::string soundTitle;
@@ -94,7 +94,7 @@ public:
     Scene* previous;
 
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    GraphicsOptions() : ui(-1, -1, 2, 2, 1.0, true) {}
+    GraphicsOptions() : ui(1.0, true){}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
@@ -172,14 +172,13 @@ public:
 
         int i = 0;
 
-        ui.appendType<UIYHolder>(5);
+        ui.appendType<UIYHolder>();
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
                 .appendType<UIStack>().appendType<UIXRatio>(2, true)
                     .appendType<TexUVNode>(0, .25, 0, .5,uiSoundSettings).back()
                 .back()
             .back()
-
             .appendType<UITextOneLine>(-111, soundTitle,.35).back()
 
             .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiKeySettings);
