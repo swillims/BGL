@@ -71,7 +71,7 @@ public:
 
     // constructor only used to instantiate a ui
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    SoundOptions() : ui(1.0, true) {}
+    SoundOptions() : ui(1.0) {}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
@@ -156,12 +156,12 @@ public:
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
                 .appendType<UIStack>()
-                    .appendType<UIXRatio>(2, true)
+                    .appendType<UIXRatio>(2)
                         .appendType<TexUVNode>(0, .25, 0, .5,uiKeySettings).back()
                     .back()
                 .back()
                 .appendType<UITextOneLine>(-111, soundTitle,.35).back()
-                .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
+                .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
             ;
 
         i++;
@@ -173,7 +173,7 @@ public:
         std::vector<std::unique_ptr<UIElement>>& ct =
         ui[0][i].appendType<UIStack>().setKey(uiMasterVollume)
             .appendType<UIXHolder>()
-                .appendSameType<UIXRatio>(10, 1.0, true);
+                .appendSameType<UIXRatio>(10, 1.0);
         for (auto& nodePtr : ct) 
         {
             UIElement& node = *nodePtr;
@@ -193,7 +193,7 @@ public:
         std::vector<std::unique_ptr<UIElement>>& ct2 =
             ui[0][i].appendType<UIStack>().setKey(uiMusicVollume)
             .appendType<UIXHolder>()
-            .appendSameType<UIXRatio>(10, 1.0, true);
+            .appendSameType<UIXRatio>(10, 1.0);
         for (auto& nodePtr : ct2)
         {
             UIElement& node = *nodePtr;
@@ -213,7 +213,7 @@ public:
         std::vector<std::unique_ptr<UIElement>>& ct3 =
             ui[0][i].appendType<UIStack>().setKey(3) // key
             .appendType<UIXHolder>()
-            .appendSameType<UIXRatio>(10, 1.0, true);
+            .appendSameType<UIXRatio>(10, 1.0);
         for (auto& nodePtr : ct3)
         {
             UIElement& node = *nodePtr;
@@ -228,9 +228,9 @@ public:
 
         i++;
         ui[0].appendType<UIXHolder>()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
             .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
             .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
 
         aspectChange();

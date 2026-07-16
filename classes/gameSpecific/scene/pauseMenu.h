@@ -42,8 +42,8 @@ public:
     // scene to return to
     Scene* previous;
 
-    PauseMenu() : ui(1.0, true) {}
-    PauseMenu(Scene* scene) : ui(1.0, true), previous(scene) {};
+    PauseMenu() : ui(1.0) {}
+    PauseMenu(Scene* scene) : ui(1.0), previous(scene) {};
 
 
     void onLoad() override;

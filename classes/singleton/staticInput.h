@@ -327,5 +327,45 @@ struct StaticInput
 		}
 		return "StaticInput failed to find key in keymap";
 	}
+
+	static char keyToChar(int key, bool shift)
+	{
+		// A-Z
+		if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z)
+		{
+			char c = 'a' + (key - GLFW_KEY_A);
+			return shift ? (c - ('a' - 'A')) : c;
+		}
+
+		// 0-9
+		if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9)
+		{
+			if (!shift)
+			{
+				return '0' + (key - GLFW_KEY_0);
+			}
+
+			const char shiftedNumbers[] = ")!@#$%^&*(";
+			return shiftedNumbers[key - GLFW_KEY_0];
+		}
+
+		switch(key)
+		{
+			case GLFW_KEY_SPACE: return ' ';
+			case GLFW_KEY_MINUS: return shift ? '_' : '-';
+			case GLFW_KEY_EQUAL: return shift ? '+' : '=';
+			case GLFW_KEY_COMMA: return shift ? '<' : ',';
+			case GLFW_KEY_PERIOD: return shift ? '>' : '.';
+			case GLFW_KEY_SLASH: return shift ? '?' : '/';
+			case GLFW_KEY_LEFT_BRACKET:  return shift ? '{' : '[';
+			case GLFW_KEY_RIGHT_BRACKET: return shift ? '}' : ']';
+			case GLFW_KEY_BACKSLASH:     return shift ? '|' : '\\';
+			case GLFW_KEY_SEMICOLON:     return shift ? ':' : ';';
+			case GLFW_KEY_APOSTROPHE:    return shift ? '"' : '\'';
+			case GLFW_KEY_GRAVE_ACCENT: return shift ? '~' : '`';
+		}
+
+		return '\0';
+	}
 };
 

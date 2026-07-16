@@ -38,28 +38,28 @@ void PauseMenu::onLoad()
     exitStr = "Exit Game";
 
     ui.appendType<UIYHolder>()
-    .appendType<UIXRatio>(3, true)
+    .appendType<UIXRatio>(3)
         .appendType<UIStack>()
             .appendType<TexUVNode>(0, 1, .5, 1, uiReturnToGame).back()
             .appendType<UITextOneLine>(writeChannel, returnStr, .25).back()
         .back()
     .back()
 
-    .appendType<UIXRatio>(3, true)
+    .appendType<UIXRatio>(3)
         .appendType<UIStack>()
             .appendType<TexUVNode>(0, 1, .5, 1, uiOptions).back()
             .appendType<UITextOneLine>(writeChannel, optionsStr, .25).back()
         .back()
     .back()
 
-    .appendType<UIXRatio>(3, true)
+    .appendType<UIXRatio>(3)
         .appendType<UIStack>()
             .appendType<TexUVNode>(0, 1, .5, 1, uiMainMenu).back()
             .appendType<UITextOneLine>(writeChannel, mainMenuStr, .25).back()
         .back()
     .back()
 
-    .appendType<UIXRatio>(3, true)
+    .appendType<UIXRatio>(3)
         .appendType<UIStack>()
             .appendType<TexUVNode>(0, 1, .5, 1, uiCloseProgram).back()
             .appendType<UITextOneLine>(writeChannel, exitStr, .25);

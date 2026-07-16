@@ -185,10 +185,9 @@ struct UIContainer : UIElement
 struct UIXRatio : UIContainer
 {
     float ratio;
-    bool relativeToScreenSize;
 
-    UIXRatio(float ratio, bool relativeToScreenSize = true, int key = -1)
-        : ratio(ratio), relativeToScreenSize(relativeToScreenSize), UIContainer(key) {}
+    UIXRatio(float ratio, int key = -1)
+        : ratio(ratio), UIContainer(key) {}
 
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
@@ -197,12 +196,9 @@ struct UIXRatio : UIContainer
         float yySize;
         float xxMin;
         float yyMin;
-        float r = ratio;
+        float r = ratio / StaticDraw::aspectRatio;
         float sizeRatio = xSize / ySize;
-        if (relativeToScreenSize)
-        {
-            r /= StaticDraw::aspectRatio;
-        }
+
         if (sizeRatio > r)
         {
             xxSize = r * ySize;
@@ -222,6 +218,18 @@ struct UIXRatio : UIContainer
             UIElement& node = *nodePtr;
             node.adjustNode(xxMin, yyMin, xxSize, yySize);
         }
+    }
+};
+
+struct UIXRefRatio : UIXRatio
+{
+    float& refRatio;
+    UIXRefRatio(float& refRatio, int key = -1) : refRatio(refRatio), UIXRatio(refRatio, key){}
+
+    void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
+    {
+        ratio = refRatio;
+        UIXRatio::adjustNode(xMin2, yMin2, xSize2, ySize2);
     }
 };
 

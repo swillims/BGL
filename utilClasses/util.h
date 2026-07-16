@@ -113,7 +113,7 @@ struct util
             }
             else if (c == 13)
             {
-                returnString += "[DASH_R]";
+                returnString += "[WINR]";
             }
             else
             {

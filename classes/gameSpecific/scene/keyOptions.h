@@ -64,7 +64,7 @@ public:
     Scene* previous;
 
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    KeyOptions() : ui(1.0, true) {}
+    KeyOptions() : ui(1.0) {}
 
     void onLoad() override
     {
@@ -128,24 +128,24 @@ public:
         ui.appendType<UIYHolder>();
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
-                .appendType<UIStack>().appendType<UIXRatio>(2, true)
+                .appendType<UIStack>().appendType<UIXRatio>(2)
                         .appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
                     .back()
             .back()
             .appendType<UITextOneLine>(-111, keyTitle,.35).back()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, qTitle,.25).back()
-                .appendType<UIXRatio>(1,true)
+                .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
                         .appendType<UITextOneLine>(-111, qValue,.15)
             .back().back().back().back()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, eTitle,.25).back()
-                .appendType<UIXRatio>(1,true)
+                .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
                         .appendType<UITextOneLine>(-111, eValue,.15);
@@ -153,7 +153,7 @@ public:
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, wTitle,.25).back()
-                .appendType<UIXRatio>(1,true)
+                .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
                         .appendType<UITextOneLine>(-111, wValue,.15).back()
@@ -163,7 +163,7 @@ public:
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
                 .appendType<UITextOneLine>(-111, escTitle,.25).back()
-                .appendType<UIXRatio>(1,true)
+                .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
                         .appendType<UITextOneLine>(-111, escValue,.15).back()
@@ -171,9 +171,9 @@ public:
                 .appendType<UIEmpty>();
 
         ui[0].appendType<UIXHolder>()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
             .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
             .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
 
         aspectChange();

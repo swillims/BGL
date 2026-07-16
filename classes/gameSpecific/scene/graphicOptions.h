@@ -94,7 +94,7 @@ public:
     Scene* previous;
 
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    GraphicsOptions() : ui(1.0, true){}
+    GraphicsOptions() : ui(1.0){}
 
     // DO NOT CALL BEFORE StaticDraw::Init
     void onLoad() override
@@ -175,37 +175,37 @@ public:
         ui.appendType<UIYHolder>();
         ui[0].appendType<UIBuffer>(.1)
             .appendType<UIXSplits>(std::vector<float>{.2,.6,.2})
-                .appendType<UIStack>().appendType<UIXRatio>(2, true)
+                .appendType<UIStack>().appendType<UIXRatio>(2)
                     .appendType<TexUVNode>(0, .25, 0, .5,uiSoundSettings).back()
                 .back()
             .back()
             .appendType<UITextOneLine>(-111, soundTitle,.35).back()
 
-            .appendType<UIStack>().appendType<UIXRatio>(2, true).appendType<TexUVNode>(.75, 1, 0, .5,uiKeySettings);
+            .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiKeySettings);
 
         i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UITextOneLine>(-111, xTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiX1).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX1).back().back()
                     .appendType<UITextOneLine>(-111, strx4,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiX1d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiX2).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX2).back().back()
                     .appendType<UITextOneLine>(-111, strx3,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiX2d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiX3).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX3).back().back()
                     .appendType<UITextOneLine>(-111, strx2,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiX3d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiX4).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX4).back().back()
                     .appendType<UITextOneLine>(-111, strx1,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiX4d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX4d).back().back()
                 .back();
 
         i++;
@@ -213,24 +213,24 @@ public:
             .appendType<UITextOneLine>(-111, yTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiY1).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY1).back().back()
                     .appendType<UITextOneLine>(-111, stry4,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiY1d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiY2).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY2).back().back()
                     .appendType<UITextOneLine>(-111, stry3,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiY2d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiY3).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY3).back().back()
                     .appendType<UITextOneLine>(-111, stry2,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiY3d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiY4).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY4).back().back()
                     .appendType<UITextOneLine>(-111, stry1,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiY4d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY4d).back().back()
                 .back();
                 // The .back()s at the end of a chain do nothing. They are stylistically left in to look better.
 
@@ -239,35 +239,35 @@ public:
             .appendType<UITextOneLine>(-111, fpsTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS1).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS1).back().back()
                     .appendType<UITextOneLine>(-111, strfps4,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS1d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS2).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS2).back().back()
                     .appendType<UITextOneLine>(-111, strfps3,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS2d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS3).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS3).back().back()
                     .appendType<UITextOneLine>(-111, strfps2,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS3d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS4).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS4).back().back()
                     .appendType<UITextOneLine>(-111, strfps1,.35).back()
-                    .appendType<UIXRatio>(1,true).appendType<TexUVNode>(0, .25, 0, .5,uiFPS4d).back().back()
+                    .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS4d).back().back()
                 .back();
 
         i++;
         ui[0].appendType<UIXHolder>()
-            .appendType<UIStack>().appendType<UIXRatio>(2, true)
+            .appendType<UIStack>().appendType<UIXRatio>(2)
                     .appendType<TexUVNode>(0,1,.5,1,uiExit).back()
                     .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back()
                 .back()
             .back()
             .appendType<UIStack>()
-                .appendType<UIXRatio>(2, true)
+                .appendType<UIXRatio>(2)
                     .appendType<TexUVNode>(0,1,.5,1,uiSave).back()
                     .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
 
