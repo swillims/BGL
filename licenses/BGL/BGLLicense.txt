@@ -32,22 +32,10 @@ In addition to the assets created by the author(s), there are assets borrowed fr
 --------------------------------------------------------------------------------
 3. Third-Party Libraries
 --------------------------------------------------------------------------------
-The following third-party libraries are included in this repository. You must comply with their respective licenses when using them:
+This repository includes third-party software that is distributed under
+licenses separate from this repository's code and assets.
 
-1. FreeType (Font Engine)
-   - License: FreeType is distributed under either the FreeType License or the GNU GPL v2. Users may comply with either license.
+Third-party software retains all rights and restrictions specified by its
+original authors. Their license terms can be found in the license directory.
 
-2. MiniAudio
-   - License: Public Domain or MIT License
-
-3. GLM (OpenGL Mathematics)
-   - License: MIT License or The Happy Bunny License
-
-4. GLFW
-   - License: zlib/libpng license
-
-5. GLAD
-   - License: MIT License
-
-6. Any other included third-party libraries
-   - Please see their respective LICENSE files in the repository.
+This repository does not grant additional rights to third-party software.

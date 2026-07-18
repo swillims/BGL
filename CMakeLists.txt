@@ -21,6 +21,7 @@ if(WIN32)
     #"winmain.cpp"
     "mainmain.h"
     "lib/shared/glad.c"
+            "lib/shared/tinyfiledialogs.c" # I couldn't figure out how to get it to indent correctly
     ${PROJECT_SOURCES}
     )
 elseif(UNIX AND NOT APPLE)
@@ -28,6 +29,7 @@ elseif(UNIX AND NOT APPLE)
     "2ndmain.cpp"
     "mainmain.h"
     "lib/shared/glad.c"
+            "lib/shared/tinyfiledialogs.c" # I couldn't figure out how to get it to indent correctly
     ${PROJECT_SOURCES}
     )
 endif()
