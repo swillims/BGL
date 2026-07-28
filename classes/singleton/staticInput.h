@@ -156,6 +156,21 @@ struct StaticInput
 			y = -((y / height) * 2.0 - 1);
 		}
 	}
+	static void GetMouseF(float& x, float& y, bool normalize = true) { singleton.getMouseF(x, y, normalize); }
+	void getMouseF(float& x, float& y, bool normalize=true)
+	{
+		double xd, yd;
+		glfwGetCursorPos(window, &xd, &yd);
+		x = static_cast<float>(xd);
+		y = static_cast<float>(yd);
+		if (normalize)
+		{
+			int width, height;
+			glfwGetWindowSize(window, &width, &height);
+			x = (x / width) * 2.0 - 1;
+			y = -((y / height) * 2.0 - 1);
+		}
+	}
 
 	static void Tick() { singleton.tick(); }
 	void tick(bool keyboard=true, bool mouse=true)
