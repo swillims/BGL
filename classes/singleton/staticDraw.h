@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <filesystem>
+#include <ranges>
 
 #include "util.h"
 #include <glm/glm.hpp>
@@ -16,7 +17,18 @@ struct StaticDraw
     inline static GLFWwindow* window;
 
     // ints used by buffers
-    inline static unsigned int VAO, VBO, EBO;
+    inline static unsigned int VAOSimple, VBO, EBO;
+
+    struct VAOInfo
+    {
+        std::string name;
+        GLuint ref;
+        int vertexSize; // idk a good name for this each vertex has x amount of floats in side of it. X,Y,U,V is 4. X,Y,Z,U,V is 5
+
+        VAOInfo(std::string name, GLuint ref, int vertexSize) : name(name), ref(ref), vertexSize(vertexSize){}
+    };
+
+    inline static std::vector<VAOInfo> VAOs;
 
     // x and y
     inline static int w, h;
@@ -37,10 +49,11 @@ struct StaticDraw
 
     static void updateView();
 
+    // sets indices to default
     static void cleanIndices()
     {
         unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
         glBindVertexArray(0);
@@ -58,11 +71,13 @@ struct StaticDraw
         useShader(simpleRef);
         updateView();
         
-        glGenVertexArrays(1, &VAO);
+        glGenVertexArrays(1, &VAOSimple);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
 
-        glBindVertexArray(VAO);
+        VAOs.emplace_back("VAOSimple",VAOSimple, 4);
+
+        glBindVertexArray(VAOSimple);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
@@ -82,14 +97,13 @@ struct StaticDraw
 
         std::cout << "Loading shader" << shaderName << "\n" << vertexSource << "\n" << fragmentSource << "\n";
         
-        // Borrowed tutorial code starts here. This section is modified from a book.
-        // ignore the lack of spaces in the comments. Copy pastiing from a pdf is silly sometimes.
-        //1.retrievethevertex/fragmentsourcecodefromfilePath
+        // Borrowed tutorial code starts here. This section is modified/reverse engineered from a book.
+
         std::string vertexCode;
         std::string fragmentCode;
         std::ifstream vShaderFile;
         std::ifstream fShaderFile;
-        //ensureifstreamobjectscanthrow exceptions:
+
         vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try
@@ -98,33 +112,28 @@ struct StaticDraw
             vShaderFile.open(vertexSource);
             fShaderFile.open(fragmentSource);
             std::stringstream vShaderStream, fShaderStream;
-            //readfile�sbuffercontentsintostreams
             vShaderStream << vShaderFile.rdbuf();
             fShaderStream << fShaderFile.rdbuf();
-            //closefilehandlers
             vShaderFile.close();
             fShaderFile.close();
-            //convertstreamintostring
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
         }
         catch (std::ifstream::failure e)
         {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+            std::cout << "ERROR::SHADER::File read ;-;" << std::endl;
             std::cout << vertexSource << fragmentSource << std::endl;
         }
         const char* vShaderCode = vertexCode.c_str();
         const char* fShaderCode = fragmentCode.c_str();
 
-        // ...
         unsigned int vertex, fragment;
         int success;
         char infoLog[512];
-        //vertexShader
+
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, &vShaderCode, NULL);
         glCompileShader(vertex);
-        //printcompileerrorsifany
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
         if (!success)
         {
@@ -184,22 +193,47 @@ struct StaticDraw
 
     static void useShaderSimple(){ useShader(simpleRef); }
 
-    static int getShader(const std::string& shaderString)
+    static int getShader(const std::string& shaderString){return shaderRefs[shaderString];}
+    static std::string getShader(const int shaderInt){return shaderRefs[shaderInt];}
+
+    static bool hasShader(const std::string& shaderString) {return shaderRefs.contains(shaderString);}
+    static bool hasShader(const int shaderInt){return shaderRefs.contains(shaderInt);}
+
+    // there is no "use" call like there is with shader and texture because VAO is bound every draw
+
+    static VAOInfo getVAO(const std::string& vaoString)
     {
-        return shaderRefs[shaderString];
-    }
-    static std::string getShader(const int& shaderInt)
-    {
-        return shaderRefs[shaderInt];
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].name == vaoString) { return VAOs[i];}
+        }
+        return {"ERROR: VAO NOT FOUND",0,0};
     }
 
-    static bool hasShader(const std::string& shaderString)
+    static VAOInfo getVAO(const int vaoInt)
     {
-        return shaderRefs.contains(shaderString);
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].ref == vaoInt) { return VAOs[i];}
+        }
+        return {"ERROR: VAO NOT FOUND",0,0};
     }
-    static bool hasShader(const int& shaderInt)
+
+    static bool hasVAO(const std::string& vaoString)
     {
-        return shaderRefs.contains(shaderInt);
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].name == vaoString) { return true;}
+        }
+        return false;
+    }
+    static bool hasVAO(const int vaoInt)
+    {
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].ref == vaoInt) { return true;}
+        }
+        return false;
     }
 
     // This one is a debug method. I recommend deleting it if you modify my engine and make a custom engine.
@@ -292,7 +326,7 @@ struct StaticDraw
              xCenter - halfWidth, yCenter + halfHeight, 0.0f, 1.0f  // top left
         };
         //*/ 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
         glBindTexture(GL_TEXTURE_2D, imageRef);
@@ -316,7 +350,7 @@ struct StaticDraw
              xCenter - halfWidth, yCenter + halfHeight, x1, y1  // top left
         };
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -375,7 +409,7 @@ struct StaticDraw
             }
         }
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -395,7 +429,7 @@ struct StaticDraw
              xCenter - halfWidth, yCenter + halfHeight, -repeatX, repeatY  // top left
         };
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -428,7 +462,7 @@ struct StaticDraw
              -1, 1, -x, y  // top left
         };
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOSimple);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -440,9 +474,9 @@ struct StaticDraw
     }
     static void backGroundImageRepeat(std::string stringRef, float repeat) { backGroundImageRepeat(imageFileRefs[stringRef], repeat); }
 
-    static void multiDraw(int imageRef, const std::vector<float>& vertices)
+    static void multiDraw(int imageRef, const std::vector<float>& vertices, GLuint vao = VAOSimple, int vertexSize = 4)
     {
-        glBindVertexArray(VAO);
+        glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(
@@ -454,7 +488,7 @@ struct StaticDraw
 
         glBindTexture(GL_TEXTURE_2D, imageRef);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 4);
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / vertexSize);
         glBindVertexArray(0);
     }
 
