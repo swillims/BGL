@@ -201,6 +201,56 @@ struct StaticDraw
 
     // there is no "use" call like there is with shader and texture because VAO is bound every draw
 
+    static VAOInfo CreateVAO(std::string vaoString, int vertexSize)
+    {
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+        glVertexAttribPointer
+        (
+            0,
+            vertexSize,
+            GL_FLOAT,
+            GL_FALSE,
+            vertexSize * sizeof(float),
+            (void*)0
+        );
+
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+        VAOs.emplace_back(vaoString, vao, vertexSize);
+        return VAOs.back();
+    }
+
+    static void deleteVAO(std::string name)
+    {
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].name == name)
+            {
+                glDeleteVertexArrays(1, &VAOs[i].ref);
+                VAOs.erase(VAOs.begin() + i);
+                return;
+            }
+        }
+    }
+
+    static void deleteVAO(int ref)
+    {
+        for (int i = 0; i < VAOs.size(); i++)
+        {
+            if (VAOs[i].ref == ref)
+            {
+                glDeleteVertexArrays(1, &VAOs[i].ref);
+                VAOs.erase(VAOs.begin() + i);
+                return;
+            }
+        }
+    }
+
     static VAOInfo getVAO(const std::string& vaoString)
     {
         for (int i = 0; i < VAOs.size(); i++)
@@ -362,7 +412,8 @@ struct StaticDraw
         glBindVertexArray(0);
     }
 
-    // I probably won't delete this. It works. Rotating using vertex shader is a better alternative. If you want to do things the wrong way, go ahead and uncomment the next method.
+    // I probably won't delete this. It works(on an older version of the engine). Rotating using vertex shader is a better alternative. If you want to do things the wrong way, go ahead and uncomment the next method.
+    // -  CPU side rotational transformations are suboptimal and should be done gpu side
     /*
     static void spriteRotatedImage(int imageRef, float xCenter, float yCenter, float radians, float halfWidth, float halfHeight, int frameX, int frameY, int xFrames, int yFrames)
     {
