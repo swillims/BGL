@@ -23,9 +23,9 @@ struct StaticDraw
     {
         std::string name;
         GLuint ref;
-        int vertexSize; // idk a good name for this each vertex has x amount of floats in side of it. X,Y,U,V is 4. X,Y,Z,U,V is 5
+        int floatCount; // idk a good name for this each vertex has x amount of floats in side of it. X,Y,U,V is 4. X,Y,Z,U,V is 5
 
-        VAOInfo(std::string name, GLuint ref, int vertexSize) : name(name), ref(ref), vertexSize(vertexSize){}
+        VAOInfo(std::string name, GLuint ref, int floatCount) : name(name), ref(ref), floatCount(floatCount){}
     };
 
     inline static std::vector<VAOInfo> VAOs;
@@ -201,7 +201,7 @@ struct StaticDraw
 
     // there is no "use" call like there is with shader and texture because VAO is bound every draw
 
-    static VAOInfo CreateVAO(std::string vaoString, int vertexSize)
+    static VAOInfo CreateVAO(const std::vector<int>& attributes, const std::string& vaoString)
     {
         GLuint vao;
         glGenVertexArrays(1, &vao);
@@ -209,19 +209,31 @@ struct StaticDraw
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        glVertexAttribPointer
-        (
-            0,
-            vertexSize,
-            GL_FLOAT,
-            GL_FALSE,
-            vertexSize * sizeof(float),
-            (void*)0
-        );
+        int stride = 0;
+        for (int size : attributes)
+        {
+            stride += size;
+        }
 
-        glEnableVertexAttribArray(0);
+        int offset = 0;
+        for (int i = 0; i < attributes.size(); i++)
+        {
+            glVertexAttribPointer
+            (
+                i,
+                attributes[i],
+                GL_FLOAT,
+                GL_FALSE,
+                stride * sizeof(float),
+                (void*)(offset * sizeof(float))
+            );
+            glEnableVertexAttribArray(i);
+
+            offset += attributes[i];
+        }
         glBindVertexArray(0);
-        VAOs.emplace_back(vaoString, vao, vertexSize);
+
+        VAOs.emplace_back(vaoString, vao, stride);
         return VAOs.back();
     }
 
@@ -525,7 +537,7 @@ struct StaticDraw
     }
     static void backGroundImageRepeat(std::string stringRef, float repeat) { backGroundImageRepeat(imageFileRefs[stringRef], repeat); }
 
-    static void multiDraw(int imageRef, const std::vector<float>& vertices, GLuint vao = VAOSimple, int vertexSize = 4)
+    static void multiDraw(int imageRef, const std::vector<float>& vertices, GLuint vao = VAOSimple, unsigned floatCount = 4)
     {
         glBindVertexArray(vao);
 
@@ -539,7 +551,7 @@ struct StaticDraw
 
         glBindTexture(GL_TEXTURE_2D, imageRef);
 
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / vertexSize);
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / floatCount);
         glBindVertexArray(0);
     }
 

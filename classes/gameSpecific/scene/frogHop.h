@@ -11,6 +11,11 @@ struct FrogHop : Scene
 	unsigned int block;
 	unsigned int spike;
 
+	//vao
+	unsigned int baseVao;
+	unsigned int frogRotationVaoRef;
+	unsigned int frogRotationVaoSize;
+
 	//shader
 	unsigned int shaderSimpleRef;
 	unsigned int shaderRotationRef;

@@ -35,11 +35,23 @@ void FrogHop::onLoad()
 	
 	// load shaders
 	shaderSimpleRef = StaticDraw::getShader("simple");
+
 	if (!StaticDraw::hasShader("simpleRotation"))
 	{
 		StaticDraw::compileShader("assets/shaders/rotation.vs", "assets/shaders/simple.fs", "simpleRotation");
 	}
 	shaderRotationRef = StaticDraw::getShader("simpleRotation");
+
+	// load vaos
+	baseVao = StaticDraw::VAOSimple;
+
+	if (!StaticDraw::hasShader("frogRotation"))
+	{
+		// magic numbers: 2 is XY, 2 is UV, 2 is rotation center XY, 2 is aspect ratio and rotation angle
+		StaticDraw::CreateVAO({2,2,2,2},"frogRotation");
+	}
+	frogRotationVaoRef = StaticDraw::getVAO("frogRotation").ref;
+	frogRotationVaoSize = StaticDraw::getVAO("frogRotation").floatCount;
 
 	// load iamges
 	if (!StaticDraw::imageFileRefs.contains("frog"))
@@ -408,18 +420,50 @@ void FrogHop::render(float time, bool updateDisplay)
 
 
 	// use rotation shader
+	// old way of doing things
+	/*
 	glUseProgram(shaderRotationRef); // use correct shader for rotation
-	// rotationn shader has 3 variables that are required. There is a rotation angle. There is a rotation center that is revolved around. There is an aspect ratio based on screen dimensions.
-	// - 1 is obvious because it is required for rotation(radians).
-	// - There is a center of rotation. Possibly, if you rework and implement your own solutions, you should consider moving draw location to shader to simplify draw stack.
-	// - The aspect ratio is needed to prevent distortions as it rotates. OpenGL uses -1.0f,1.0f regardless of dimensions. Widening the screen/drawport causes a distortion because 1x1 doesn't match 4x3/etc.
 	glUniform1f(glGetUniformLocation(shaderRotationRef, "u_rotation"), frogAngleDisplay);
 	glUniform2f(glGetUniformLocation(shaderRotationRef, "rotation_center"), 0, frogGraphicY);
 	glUniform1f(glGetUniformLocation(shaderRotationRef, "aspect_ratio"), StaticDraw::aspectRatio);
 
 	StaticDraw::spriteImage(frogImage, 0, frogGraphicY, xScale, yScale, 0, frame, 1, 2); // draw 1 object using a regular StaticDraw methods. Rotation is handled by shader and not StaticDraw.
+	*/
+	// convoluted but I am using a util function to get a wrong sized vector and copying values to save effort
+	float rotationCenterX = 0;
+	float rotationCenterY = frogGraphicY;
+	float rotationAngle = frogAngleDisplay;
+	float aspectRatio = StaticDraw::aspectRatio;
 
-	glUseProgram(shaderSimpleRef); // reset to default shader when done
+	float xMinf = rotationCenterX - xScale;
+	float xMaxf = rotationCenterX + xScale;
+	float yMinf = rotationCenterY + yScale; // uses + instead of - to fix upside down
+	float yMaxf = rotationCenterY - yScale; // uses - instead of + to fix upside down
+	float uMinf = 0;
+	float uMaxf = 1;
+	float vMinf = (0.0f+frame)/2;
+	float vMaxf = (1.0f+frame)/2;
+
+
+	glUseProgram(shaderRotationRef);
+
+	StaticDraw::multiDraw
+	(
+		frogImage,
+		{
+			xMinf, yMinf, uMinf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
+			xMinf, yMaxf, uMinf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom right
+			xMaxf, yMaxf, uMaxf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
+
+			xMinf, yMinf, uMinf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
+			xMaxf, yMinf, uMaxf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top left
+			xMaxf, yMaxf, uMaxf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
+		},
+		frogRotationVaoRef,
+		frogRotationVaoSize
+	);
+
+	StaticDraw::useShader(shaderSimpleRef);  // reset to default shader when done with rotated sprites
 
 	// draw spikes
 	std::vector<float> v;
