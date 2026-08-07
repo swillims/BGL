@@ -437,8 +437,8 @@ void FrogHop::render(float time, bool updateDisplay)
 
 	float xMinf = rotationCenterX - xScale;
 	float xMaxf = rotationCenterX + xScale;
-	float yMinf = rotationCenterY + yScale; // uses + instead of - to fix upside down
-	float yMaxf = rotationCenterY - yScale; // uses - instead of + to fix upside down
+	float yMinf = rotationCenterY - yScale;
+	float yMaxf = rotationCenterY + yScale;
 	float uMinf = 0;
 	float uMaxf = 1;
 	float vMinf = (0.0f+frame)/2;
@@ -447,17 +447,24 @@ void FrogHop::render(float time, bool updateDisplay)
 
 	glUseProgram(shaderRotationRef);
 
+	// multi draw uses a texture reference, a list of vertices, an optional VAO ref, and an optional Vao float count.
+	// - this example uses a different VAO and different vao float count, because it has more than 4 floats per vertice
+	// - this example uses multiDraw because I don't have a simple draw method set up for handling different VAO sizes
 	StaticDraw::multiDraw
 	(
 		frogImage,
-		{
-			xMinf, yMinf, uMinf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
-			xMinf, yMaxf, uMinf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom right
-			xMaxf, yMaxf, uMaxf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
 
-			xMinf, yMinf, uMinf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
-			xMaxf, yMinf, uMaxf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top left
-			xMaxf, yMaxf, uMaxf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
+		// variable names in vertices are self describing.
+		// - U and V refer to X Y but for texture mapping
+		// -- I have vMin and vMax flipped because the sprite is flipped.
+		{
+			xMinf, yMinf, uMinf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
+			xMinf, yMaxf, uMinf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom right
+			xMaxf, yMaxf, uMaxf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
+
+			xMinf, yMinf, uMinf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // bottom left
+			xMaxf, yMinf, uMaxf, vMaxf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top left
+			xMaxf, yMaxf, uMaxf, vMinf, rotationCenterX, rotationCenterY, frogAngleDisplay, aspectRatio, // top right
 		},
 		frogRotationVaoRef,
 		frogRotationVaoSize
@@ -538,22 +545,20 @@ void FrogHop::clean()
 {
 	// inherited from scene
 
-	// when doing clean up, don't remove things that are used by other scenes. 
-	// - It is unnessary loading and unloading.
-	// It is valid to use string or int. Both are being used as an example.
-	// It is significantly better to use string.
+	// when doing clean up, don't remove things that are used by other scenes.
 
 	// unload sounds
+	// - In the unload examples I use int and string to show both are valid.
 	StaticAudio::unLoad("hopChirp");
 	StaticAudio::unLoad(frogMusic);
 
-	// Unloading textures is the same as unloading sounds. Both string and int are valid.
-	// It is better to use int. The example also using both string and int as example.
-
 	// unload textures
+	// - In the unload examples I use int and string to show both are valid.
 	StaticDraw::unLoadImage("frog");
 	StaticDraw::unLoadImage(spike);
 	StaticDraw::unLoadImage("frogBlock");
+
+	StaticDraw::deleteVAO(frogRotationVaoRef);
 
 	// set all keys to not be tracked
 	// NOTE: mouse clicks are handled seperately from key clicks
