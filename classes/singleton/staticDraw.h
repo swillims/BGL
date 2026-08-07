@@ -572,5 +572,22 @@ struct StaticDraw
         glClearColor(r, g, b, a);
         glClear(GL_COLOR_BUFFER_BIT);
     }
-    //*/
+
+    static void set3DEnabled(const bool enable = true, const GLenum depth = GL_LESS )
+    {
+        if (enable)
+        {
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(depth);
+        }
+        else
+        {
+            glDisable(GL_DEPTH_TEST);
+        }
+    }
+    static void clear3D(glm::vec3 color)
+    {
+        glClearColor(color.r, color.g, color.b, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 };

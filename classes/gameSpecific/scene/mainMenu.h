@@ -8,7 +8,7 @@
 // scenes
 #include "frogHop.h"
 #include "soundOptions.h"
-
+#include "walker3D.h"
 /*
     This scene was written before the uiHelper util class and StaticInput were made.
     - If you want a better tutorial for how to make uiElements, the options menus are better examples:
@@ -275,7 +275,7 @@ struct MainMenu : Scene {
             so->previous = this;
             DataHolder::SceneQueue(so, false);
         }
-        //else if(x==2){ DataHolder::changeSceneTwo(new mainMenu()); }
+        else if(x==2){ DataHolder::SceneQueue(new Walker3D()); }
         else if (x == 3) { DataHolder::SceneQueue(new FrogHop()); }
     }
 
