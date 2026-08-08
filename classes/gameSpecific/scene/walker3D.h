@@ -3,6 +3,22 @@
 
 struct Walker3D : Scene
 {
+    //images
+    unsigned int tile;
+
+    //vao
+    unsigned int baseVao;
+    unsigned int tileVaoRef;
+    unsigned int tileVaoCount;
+
+    //shader
+    unsigned int shaderSimpleRef;
+    unsigned int shader3DSimple;
+
+    //controls
+
+    // vertice storing
+    std::vector<float> batch;
 
     // scene methods
     void onLoad();

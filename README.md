@@ -25,7 +25,7 @@ Scenes contain and process game information. The engine relies on polymorphism, 
 
 "handle(float time = 0)" runs every game step and is intended for game logic.
 
-"render(float time = 0, bool updateDisplay = true)" runs every frame and is intended for rendering.
+"render(float time = 0, bool updateDisplay = true)" runs every frame and is intended for rendering. Calling super initiates a render. Super should be called at the end of the method.
 
 "aspectChange()" should be called whenever the screen size changes. It is also good practice to manually call it once in "onLoad()". Lazy UI/text generation implementation calls aspectChange to remove distortions.
 
@@ -109,6 +109,13 @@ StaticDraw handles graphics functionality. It provides simplified wrappers for s
 "multiDraw(int imageRef, const std::vector<float>& vertices, GLuint vao = VAOSimple, unsigned floatCount = 4)" is used to draw images from batches. It has optional parameters to change the VAO and number floats used by the VAO. 
 
 "clear(t)" clears the screen with a specified color.
+
+##### StaticDraw3D
+StaticDraw also has 3d methods. The intended functionality for this engine is for relatively simple games but 3d is an option.
+
+"set3DEnabled(bool enable = true, GLenum depth = GL_LESS )" enables and disables 3d functionality. "enable" sets it to true or false and depth determines type of rendering depth.
+
+"clear3D(glm::vec3 color = {0,0,0})" resets the depth buffer and clears the image. This method is extremely important for 3d because it will not render if the depth buffer is not reset. It has an optional color parameter that chooses clear color.
 
 #### StaticAudio
 StaticAudio handles audio functionality. It provides wrappers around miniaudio for loading sounds, playing sounds, looping sounds, and controlling volume.

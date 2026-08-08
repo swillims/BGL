@@ -585,7 +585,7 @@ struct StaticDraw
             glDisable(GL_DEPTH_TEST);
         }
     }
-    static void clear3D(glm::vec3 color)
+    static void clear3D(const glm::vec3 color = {0,0,0})
     {
         glClearColor(color.r, color.g, color.b, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

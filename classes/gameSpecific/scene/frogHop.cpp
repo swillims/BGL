@@ -45,7 +45,7 @@ void FrogHop::onLoad()
 	// load vaos
 	baseVao = StaticDraw::VAOSimple;
 
-	if (!StaticDraw::hasShader("frogRotation"))
+	if (!StaticDraw::hasVAO("frogRotation"))
 	{
 		// magic numbers: 2 is XY, 2 is UV, 2 is rotation center XY, 2 is aspect ratio and rotation angle
 		StaticDraw::CreateVAO({2,2,2,2},"frogRotation");
@@ -207,6 +207,8 @@ void FrogHop::pause()
 // process input is part of scene class
 void FrogHop::processInput(GLFWwindow* window, float time) // control inputs
 {
+	StaticInput::Tick();
+
 	if (StaticInput::KeyHeld(rotateC)){frogAngle += time * frogRotationSpeed;}
 	if (StaticInput::KeyHeld(rotateCC)){frogAngle -= time * frogRotationSpeed;}
 	if (StaticInput::KeyClick(hopButton)){jump();}
@@ -221,8 +223,6 @@ void FrogHop::handle(float time)
 	Handle should handle game logic and physics and render should handle graphics.
 	The engine is minimalistic and most logic is contained to the scene.
 	*/
-
-	StaticInput::Tick();
 
 	processInput(window, time);
 
@@ -516,7 +516,7 @@ void FrogHop::render(float time, bool updateDisplay)
 	StaticWrite::AppendText(1, "Score: " + scoreStr, .5f, .9f, xScale * .8, yScale * .8);
 	writer->drawChannel(1, glm::vec3(1.0f, 1.0f, 1.0f));
 
-	// call super
+	// call super to render
 	Scene::render(time, updateDisplay);
 }
 
@@ -534,7 +534,7 @@ void FrogHop::aspectChange()
 	std::string e = StaticInput::IntToString(rotateCC);
 	std::string w = StaticInput::IntToString(hopButton);
 	std::string esc = StaticInput::IntToString(pauseButton);
-	// The number 0 is arbituary. It is ok to use whatever number as long as it is a valid int and it is deliberate.
+	// The number 0 is arbitrary. It is ok to use whatever number as long as it is a valid int and it is deliberate.
 	StaticWrite::AppendText(0, "Controls:", -.95f, .9f, xScale * .8, yScale * .8); // add text to channel 0
 	StaticWrite::AppendText(0, q + " or " + e + ": Rotate Frog", -.9f, .8f, xScale * .8, yScale * .8); // add text to channel 0
 	StaticWrite::AppendText(0, w + ": Jump", -.9f, .7f, xScale * .8, yScale * .8); // add text to channel 0
