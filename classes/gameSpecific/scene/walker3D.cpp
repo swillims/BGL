@@ -17,7 +17,6 @@ void Walker3D::onLoad()
     if (!StaticDraw::hasShader("simple3d"))
     {
         StaticDraw::compileShader("assets/shaders/simple3d.vs", "assets/shaders/simple.fs", "simple3d");
-        std::cout << "aaa\n";
     }
     shader3DSimple = StaticDraw::getShader("simple3d");
 
@@ -27,7 +26,6 @@ void Walker3D::onLoad()
     if (!StaticDraw::hasVAO("3dSimple"))
     {
         StaticDraw::CreateVAO({3, 2}, "3dSimple");
-        std::cout << "bbb\n";
     }
     tileVaoRef = StaticDraw::getVAO("3dSimple").ref;
     tileVaoCount = StaticDraw::getVAO("3dSimple").floatCount;
@@ -38,15 +36,16 @@ void Walker3D::onLoad()
     }
     tile = StaticDraw::imageFileRefs["tile"];
 
+    if (!StaticDraw::imageFileRefs.contains("greenTile"))
+    {
+        StaticDraw::loadImage("assets/gameSpecific/png/walk3d/green.png", "greenTile");
+    }
+    greenTile = StaticDraw::imageFileRefs["greenTile"];
+
     // load sounds
     StaticAudio::updateSounds();
 
     // load inputs
-
-
-
-
-
 
     // set physics framerate to 60
     DataHolder::SetPhysicsCap(60);
@@ -74,13 +73,26 @@ void Walker3D::render(float time, bool updateDisplay)
     (
         tile,
         {
-            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,
+            -0.5f, -0.5f, 1.0f,  0.0f, 0.0f,
             0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-            0.5f,  0.5f, 1.0f,  1.0f, 1.0f
+            0.5f,  0.5f, 0.0f,  1.0f, 1.0f
         },
         tileVaoRef,
         tileVaoCount
     );
+
+    StaticDraw::multiDraw
+    (
+        greenTile,
+        {
+            0.5f, -0.5f, 1.0f,  0.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
+            -0.5f,  0.5f, 0.0f,  1.0f, 1.0f
+        },
+        tileVaoRef,
+        tileVaoCount
+    );
+
 
 
     // call super to render
