@@ -30,6 +30,16 @@ struct StaticDraw
 
     inline static std::vector<VAOInfo> VAOs;
 
+    struct UBOInfo
+    {
+        GLuint ref;
+        GLuint binding;
+
+        UBOInfo(GLuint ref, GLuint binding) : ref(ref), binding(binding) {};
+    };
+
+    inline static std::vector<UBOInfo> UBOs;
+
     // x and y
     inline static int w, h;
     inline static float aspectRatio;
@@ -297,6 +307,104 @@ struct StaticDraw
         }
         return false;
     }
+
+    // random comment included for ctrl+f search createUBO
+    template<typename T>
+    static UBOInfo createSharedShaderVariable(const T& data, int binding = -1)
+    {
+        if (binding == -1)
+        {
+            // this is really bad but fix later. It does not account for deletions or etc
+            binding = UBOs.size();
+        }
+
+        GLuint ubo;
+
+        glGenBuffers(1, &ubo);
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+
+        glBufferData(
+            GL_UNIFORM_BUFFER,
+            sizeof(T),
+            &data,
+            GL_DYNAMIC_DRAW
+        );
+
+        glBindBufferBase(
+            GL_UNIFORM_BUFFER,
+            binding,
+            ubo
+        );
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        UBOs.emplace_back(ubo, binding);
+
+        return UBOs.back();
+    }
+    template<typename T>
+    static UBOInfo createSharedShaderVariable(const T& data, int shaderRef, const std::string& varName, int binding = -1)
+    {
+        const GLuint blockIndex = glGetUniformBlockIndex(shaderRef, varName.c_str());
+
+        if (blockIndex == GL_INVALID_INDEX)
+        {
+            std::cout<<"invalid shader var call\n";
+            return {0,0};
+        }
+
+        if (binding == -1)
+        {
+            binding = UBOs.size();
+        }
+
+        glUniformBlockBinding(shaderRef, blockIndex, binding);
+
+        GLuint ubo;
+
+        glGenBuffers(1, &ubo);
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+
+        glBufferData(
+            GL_UNIFORM_BUFFER,
+            sizeof(T),
+            &data,
+            GL_DYNAMIC_DRAW
+        );
+
+        glBindBufferBase(
+            GL_UNIFORM_BUFFER,
+            binding,
+            ubo
+        );
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        UBOs.emplace_back(ubo, binding);
+
+        return UBOs.back();
+    }
+    template<typename T>
+    static void updateSharedShaderVariable(GLuint ref, const T& data)
+    {
+        glBindBuffer(GL_UNIFORM_BUFFER, ref);
+
+        glBufferSubData(
+            GL_UNIFORM_BUFFER,
+            0,
+            sizeof(T),
+            &data
+        );
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    }
+    template<typename T>
+    static void updateSharedShaderVariable(UBOInfo& ubo, const T& data)
+    {
+        updateSharedShaderVariable(ubo.ref, data);
+    }
+
+
 
     // This one is a debug method. I recommend deleting it if you modify my engine and make a custom engine.
     static void printShaderUniforms(GLuint programID) {

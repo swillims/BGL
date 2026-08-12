@@ -20,6 +20,18 @@ void Walker3D::onLoad()
     }
     shader3DSimple = StaticDraw::getShader("simple3d");
 
+    if (!StaticDraw::hasShader("projection3d"))
+    {
+        StaticDraw::compileShader("assets/shaders/projectionview3d.vs", "assets/shaders/simple.fs", "projection3d");
+    }
+    shader3DProjection = StaticDraw::getShader("projection3d");
+
+    // create ubo
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    viewUboRef = StaticDraw::createSharedShaderVariable(view, shader3DProjection, "view").ref;
+    projectionUboRef = StaticDraw::createSharedShaderVariable(projection, shader3DProjection, "projection").ref;
+
     // load vaos
     baseVao = StaticDraw::VAOSimple;
 
@@ -30,6 +42,7 @@ void Walker3D::onLoad()
     tileVaoRef = StaticDraw::getVAO("3dSimple").ref;
     tileVaoCount = StaticDraw::getVAO("3dSimple").floatCount;
 
+    // load textures
     if (!StaticDraw::imageFileRefs.contains("tile"))
     {
         StaticDraw::loadImage("assets/gameSpecific/png/frogHop/block.png", "tile");
@@ -53,10 +66,21 @@ void Walker3D::onLoad()
     aspectChange();
 }
 
+float x = 0;
+
 void Walker3D::handle(float time)
 {
     processInput(window, time);
 
+    x += time;
+
+    StaticDraw::updateSharedShaderVariable(projectionUboRef, glm::mat4
+        (
+            1.0f,x,0.0f,0.0f,
+            0.0f,1.0f,0.0f,0.0f,
+            0.0f,0.0f,1.0f,0.0f,
+            0.0f,0.0f,0.0f,1.0f)
+            );
 }
 
 void Walker3D::render(float time, bool updateDisplay)
@@ -66,8 +90,8 @@ void Walker3D::render(float time, bool updateDisplay)
     StaticDraw::clear3D();
     batch.clear();
 
-    StaticDraw::useShader(shader3DSimple);
-
+    //StaticDraw::useShader(shader3DSimple);
+    StaticDraw::useShader(shader3DProjection);
 
     StaticDraw::multiDraw
     (

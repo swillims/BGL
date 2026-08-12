@@ -15,6 +15,11 @@ struct Walker3D : Scene
     //shader
     unsigned int shaderSimpleRef;
     unsigned int shader3DSimple;
+    unsigned int shader3DProjection;
+
+    //ubo
+    unsigned int projectionUboRef;
+    unsigned int viewUboRef;
 
     //controls
 
