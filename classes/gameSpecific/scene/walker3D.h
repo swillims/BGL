@@ -1,5 +1,6 @@
 #pragma once
 #include "scene/scene.h"
+#include <glm/glm.hpp>
 
 struct Walker3D : Scene
 {
@@ -24,6 +25,9 @@ struct Walker3D : Scene
     //controls
 
     // vertice storing
+    glm::mat4 viewMat4;
+    glm::mat4 projectionMat4;
+    std::vector<float> floor;
     std::vector<float> batch;
 
     // scene methods

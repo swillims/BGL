@@ -4,6 +4,11 @@
 #include "singleton/staticInput.h"
 #include "singleton/staticSound.h"
 
+#include "glm/ext/matrix_transform.hpp"
+
+#include "3dHelper.h"
+#include "glm/ext/matrix_clip_space.hpp"
+
 void Walker3D::onLoad()
 {
     Scene::onLoad();
@@ -26,11 +31,11 @@ void Walker3D::onLoad()
     }
     shader3DProjection = StaticDraw::getShader("projection3d");
 
-    // create ubo
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-    viewUboRef = StaticDraw::createSharedShaderVariable(view, shader3DProjection, "view").ref;
-    projectionUboRef = StaticDraw::createSharedShaderVariable(projection, shader3DProjection, "projection").ref;
+    // create ubo and default mat4 values
+    viewMat4 = glm::mat4(1.0f);
+    projectionMat4 = glm::mat4(1.0f);
+    viewUboRef = StaticDraw::createSharedShaderVariable(viewMat4, shader3DProjection, "view").ref;
+    projectionUboRef = StaticDraw::createSharedShaderVariable(projectionMat4, shader3DProjection, "projection").ref;
 
     // load vaos
     baseVao = StaticDraw::VAOSimple;
@@ -63,6 +68,13 @@ void Walker3D::onLoad()
     // set physics framerate to 60
     DataHolder::SetPhysicsCap(60);
 
+    // set mat4 defaults
+    viewMat4 = glm::mat4(1.0f);
+    projectionMat4 = glm::mat4(1.0f);
+
+    // generate ground
+    floor = generateFlatGrid5Vao(-5,5,-5,5,paramX,paramZ);
+
     aspectChange();
 }
 
@@ -73,14 +85,21 @@ void Walker3D::handle(float time)
     processInput(window, time);
 
     x += time;
+    //viewMat4 = glm::translate(viewMat4, glm::vec3(0.0f, 0.0f, 0.0f));
+    //projectionMat4 = glm::translate(projectionMat4, glm::vec3(0.0f, 0.0f, 0.0f));
 
-    StaticDraw::updateSharedShaderVariable(projectionUboRef, glm::mat4
-        (
-            1.0f,x,0.0f,0.0f,
-            0.0f,1.0f,0.0f,0.0f,
-            0.0f,0.0f,1.0f,0.0f,
-            0.0f,0.0f,0.0f,1.0f)
-            );
+
+    // Camera
+    viewMat4 = glm::lookAt(
+        glm::vec3(0.0f, 1.0f, 5.0f),  // camera position
+        glm::vec3(0.0f, 0.0f, 0.0f),  // what camera looks at
+        glm::vec3(0.0f, 1.0f, 0.0f)   // which direction is "up"
+    );
+
+    //StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
+    StaticDraw::updateSharedShaderVariable(viewUboRef, viewMat4);
+
+    aspectChange();
 }
 
 void Walker3D::render(float time, bool updateDisplay)
@@ -117,6 +136,13 @@ void Walker3D::render(float time, bool updateDisplay)
         tileVaoCount
     );
 
+    StaticDraw::multiDraw
+    (
+        greenTile,
+        floor,
+        tileVaoRef,
+        tileVaoCount
+    );
 
 
     // call super to render
@@ -131,7 +157,13 @@ void Walker3D::processInput(GLFWwindow *window, float time)
 
 void Walker3D::aspectChange()
 {
-
+    projectionMat4 = glm::perspective(
+        glm::radians(45.0f),
+        StaticDraw::aspectRatio,
+        0.1f,
+        100.0f
+    );
+    StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
 }
 
 void Walker3D::clean()
