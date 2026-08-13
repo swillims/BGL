@@ -58,7 +58,7 @@ void DataHolder::handleScene(float time)
     }
     if (frameCap < 0.0001) // if you want more than 10000 frames per second on your engine, change this number
     {
-        currentScene->render(frameCap);
+        currentScene->render(time);
     }
     else if (frameTick < 0)
     {
