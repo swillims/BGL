@@ -136,6 +136,27 @@ static int mainmainmain()
         }
     }
 
+    settingsFileName = "metadata/keybind3dsettings";
+    if (util::fileExists(settingsFileName))
+    {
+        // read file and split by line
+        std::cout << "keybind settings file exists\n";
+        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+
+        // handle each line
+        for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
+        {
+            util::removeComments(line, "#");
+            util::removeComments(line, "//");
+            std::vector<std::string> data = util::split(line, ":");
+            if (data.size() > 1)
+            {
+                util::sanitizeString(data[1], {" "});
+                StaticInput::AssignAlias(data[0], data[1]);
+            }
+        }
+    }
+
     // sound settings
     StaticAudio::createTag("music");
     StaticAudio::createTag("soundEffect");
