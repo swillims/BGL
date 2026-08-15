@@ -3,9 +3,15 @@
 #include "walkerKeyOptions.h"
 #include "buttonInput.h"
 
+/*
+ * -> IMPORTANT <-
+ * The options menus were written while I was still learning and are below standard quality.
+ * Do not learn from these.
+ * For better examples of how to write UI, go csv writer - https://github.com/swillims/csv-writer
+ */
+
 void KeyOptions::buttonPress(int x)
 {
-    //std::cout<<x<<"\n";
     if (x == uiExit)
     {
         DataHolder::SceneQueue(previous, true);

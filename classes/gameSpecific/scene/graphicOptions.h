@@ -8,6 +8,14 @@
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
 
+
+/*
+ * -> IMPORTANT <-
+ * The options menus were written while I was still learning and are below standard quality.
+ * Do not learn from these.
+ * For better examples of how to write UI, go csv writer - https://github.com/swillims/csv-writer
+ */
+
 struct GraphicsOptions : Scene
 {
 private:
