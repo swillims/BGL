@@ -2,6 +2,14 @@
 #include "scene/scene.h"
 #include <glm/glm.hpp>
 
+struct Player
+{
+    glm::vec3 position{glm::vec3(0.0f, 1.0f, 0.0f)};
+    glm::vec3 direction{glm::vec3(0.0f, 0.0f, 0.0f)};
+    float camYaw{};
+    float camPitch{};
+};
+
 struct Walker3D : Scene
 {
     //images
@@ -22,13 +30,16 @@ struct Walker3D : Scene
     unsigned int projectionUboRef;
     unsigned int viewUboRef;
 
-    //controls
+    // controls
 
     // vertice storing
     glm::mat4 viewMat4;
     glm::mat4 projectionMat4;
     std::vector<float> floor;
     std::vector<float> batch;
+
+    // game logic
+    Player player;
 
     // scene methods
     void onLoad();

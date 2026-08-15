@@ -4,7 +4,7 @@
 #include "singleton/staticInput.h"
 
 #include "graphicOptions.h"
-#include "keyOptions.h"
+#include "walkerKeyOptions.h"
 
 struct SoundOptions : Scene
 {
@@ -370,7 +370,7 @@ public:
         }
         else if ( x == uiKeySettings)
         {
-            KeyOptions* keys = new KeyOptions();
+            WalkerKeyOptions* keys = new WalkerKeyOptions();
             keys->previous = previous;
             DataHolder::SceneQueue(keys, true);
         }

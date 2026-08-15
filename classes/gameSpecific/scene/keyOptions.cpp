@@ -1,6 +1,6 @@
 #include "keyOptions.h"
 #include "graphicOptions.h"
-#include "soundOptions.h"
+#include "walkerKeyOptions.h"
 #include "buttonInput.h"
 
 void KeyOptions::buttonPress(int x)
@@ -42,9 +42,8 @@ void KeyOptions::buttonPress(int x)
     }
     else if (x==uiSoundSettings)
     {
-        SoundOptions* sound = new SoundOptions();
-        sound->previous = previous;
-        DataHolder::SceneQueue(sound, true);
+        WalkerKeyOptions* options = new WalkerKeyOptions();
+        options->previous = previous;
+        DataHolder::SceneQueue(options, true);
     }
 }
-

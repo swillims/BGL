@@ -7,7 +7,8 @@
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
 
-struct KeyOptions : Scene
+// code may be wrong due to copy pasting from other scene ¯\_(ツ)_/¯
+struct WalkerKeyOptions : Scene
 {
 private:
     enum uiKeys
@@ -17,6 +18,9 @@ private:
         uiQ,
         uiW,
         uiE,
+        uiA,
+        uiS,
+        uiD,
         uiEsc,
 
         uiResetKeys,
@@ -54,6 +58,12 @@ public:
     std::string wValue;
     std::string eTitle;
     std::string eValue;
+    std::string aTitle;
+    std::string aValue;
+    std::string sTitle;
+    std::string sValue;
+    std::string dTitle;
+    std::string dValue;
     std::string escTitle;
     std::string escValue;
 
@@ -64,7 +74,7 @@ public:
     Scene* previous;
 
     // -1, -1 is bottom left cornor for draw start and -1 to 1 scale has width and height of 2
-    KeyOptions() : ui(1.0) {}
+    WalkerKeyOptions() : ui(1.0) {}
 
     void onLoad() override
     {
@@ -100,21 +110,31 @@ public:
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
 
-        keyTitle = "Frog Hop Key Bindings";
+        keyTitle = "Walker 3D Key Bindings";
 
-        qTitle = "<-Rotate";
-        wTitle = "Hop";
-        eTitle = "Rotate->";
-        escTitle = "Menu";
+        qTitle = "3dLRotate";
+        wTitle = "3dUp";
+        eTitle = "3dRRotate";
+        aTitle = "3dLeft";
+        sTitle = "3dDown";
+        dTitle = "3dRight";
+
+        escTitle = "3dMenu ";
 
         if (!StaticInput::HasAlias<std::string>(qTitle)){StaticInput::AssignAlias(qTitle,'Q');}
         if (!StaticInput::HasAlias<std::string>(wTitle)){StaticInput::AssignAlias(wTitle,'W');}
         if (!StaticInput::HasAlias<std::string>(eTitle)){StaticInput::AssignAlias(eTitle,'E');}
+        if (!StaticInput::HasAlias<std::string>(aTitle)){StaticInput::AssignAlias(aTitle,'A');}
+        if (!StaticInput::HasAlias<std::string>(sTitle)){StaticInput::AssignAlias(sTitle,'S');}
+        if (!StaticInput::HasAlias<std::string>(dTitle)){StaticInput::AssignAlias(dTitle,'D');}
         if (!StaticInput::HasAlias<std::string>(escTitle)){StaticInput::AssignAlias(escTitle,"ESCAPE");}
 
         qValue = StaticInput::GetStringAlias(qTitle);
         wValue = StaticInput::GetStringAlias(wTitle);
         eValue = StaticInput::GetStringAlias(eTitle);
+        aValue = StaticInput::GetStringAlias(aTitle);
+        sValue = StaticInput::GetStringAlias(sTitle);
+        dValue = StaticInput::GetStringAlias(dTitle);
         escValue = StaticInput::GetStringAlias(escTitle);
 
         exitText = "Exit Settings";
@@ -131,44 +151,81 @@ public:
                 .appendType<UIStack>().appendType<UIXRatio>(2)
                         .appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
                     .back()
-            .back()
+                .back()
             .appendType<UITextOneLine>(-111, keyTitle,.25).back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, qTitle,.25).back()
+                .appendType<UITextOneLine>(-111, qTitle,.15).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
-                        .appendType<UITextOneLine>(-111, qValue,.15)
-            .back().back().back().back()
+                        .appendType<UITextOneLine>(-111, qValue,.15).back()
+                        .back()
+                    .back()
+                .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, eTitle,.25).back()
-                .appendType<UIXRatio>(1)
-                    .appendType<UIStack>()
-                        .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
-                        .appendType<UITextOneLine>(-111, eValue,.15);
-
-        ui[0].appendType<UIXHolder>()
-            .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, wTitle,.25).back()
+                .appendType<UITextOneLine>(-111, wTitle,.15).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
                         .appendType<UITextOneLine>(-111, wValue,.15).back()
-            .back().back().back()
-            .appendType<UIEmpty>();
-
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, eTitle,.15).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
+                        .appendType<UITextOneLine>(-111, eValue,.15).back()
+                        .back()
+                    .back()
+                .back()
+        ;
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, escTitle,.25).back()
+                .appendType<UITextOneLine>(-111, aTitle,.15).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiA).back()
+                        .appendType<UITextOneLine>(-111, aValue,.15).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, sTitle,.15).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiS).back()
+                        .appendType<UITextOneLine>(-111, sValue,.15).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, dTitle,.15).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiD).back()
+                        .appendType<UITextOneLine>(-111, dValue,.15).back()
+                        .back()
+                    .back()
+                .back()
+        ;
+        ui[0].appendType<UIXHolder>()
+            .appendType<UIEmpty>().back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, escTitle,.15).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
                         .appendType<UITextOneLine>(-111, escValue,.15).back()
-                .back().back().back()
-                .appendType<UIEmpty>();
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIEmpty>()
+        ;
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
@@ -236,7 +293,7 @@ public:
     {
         StaticAudio::playSoundEffectMulti(bwoo);
 
-        std::string settingsFileName = "metadata/keybindsettings";
+        std::string settingsFileName = "metadata/keybind3dsettings";
         std::ostringstream write;
 
         write << qTitle << ":" << qValue << "\n";

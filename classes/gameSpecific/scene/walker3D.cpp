@@ -73,7 +73,7 @@ void Walker3D::onLoad()
     projectionMat4 = glm::mat4(1.0f);
 
     // generate ground
-    floor = generateFlatGrid5Vao(-5,5,-5,5,paramX,paramZ);
+    floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
 
     aspectChange();
 }
@@ -85,19 +85,6 @@ void Walker3D::handle(float time)
     processInput(window, time);
 
     x += time;
-    //viewMat4 = glm::translate(viewMat4, glm::vec3(0.0f, 0.0f, 0.0f));
-    //projectionMat4 = glm::translate(projectionMat4, glm::vec3(0.0f, 0.0f, 0.0f));
-
-
-    // Camera
-    viewMat4 = glm::lookAt(
-        glm::vec3(0.0f, 1.0f, 5.0f),  // camera position
-        glm::vec3(0.0f, 0.0f, 0.0f),  // what camera looks at
-        glm::vec3(0.0f, 1.0f, 0.0f)   // which direction is "up"
-    );
-
-    //StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
-    StaticDraw::updateSharedShaderVariable(viewUboRef, viewMat4);
 
     aspectChange();
 }
@@ -108,6 +95,23 @@ void Walker3D::render(float time, bool updateDisplay)
     // - clear3D also resets a depth buffer and the depth buffer needs to be set to draw in 3D
     StaticDraw::clear3D();
     batch.clear();
+
+    // Camera Things
+    player.camYaw += time;
+
+    // when I looked it up, it said to include yaw. I want to try it without and update later.
+    player.direction.x = cos(player.camYaw);// * cos(player.camPitch);
+    player.direction.y = sin(player.camPitch);
+    player.direction.z = sin(player.camYaw);// * cos(player.camPitch);
+
+    viewMat4 = glm::lookAt(
+        player.position,
+        player.position + player.direction,
+        glm::vec3(0.0f, 1.0f, 0.0f)   // up
+    );
+
+    StaticDraw::updateSharedShaderVariable(viewUboRef, viewMat4);
+
 
     //StaticDraw::useShader(shader3DSimple);
     StaticDraw::useShader(shader3DProjection);
