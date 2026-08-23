@@ -97,12 +97,24 @@ void Walker3D::onLoad()
     // set physics framerate to 60
     DataHolder::SetPhysicsCap(60);
 
-    // set mat4 defaults
-    viewMat4 = glm::mat4(1.0f);
-    projectionMat4 = glm::mat4(1.0f);
+    if (!alreadyLoaded)
+    {
+        // set mat4 defaults
+        viewMat4 = glm::mat4(1.0f);
+        projectionMat4 = glm::mat4(1.0f);
 
-    // generate ground
-    floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
+        // generate ground
+        floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
+
+        // ui is completely unnessary here but I have a tool, so I should use it in a tutorial
+        ui.appendType<UIYSplits>(std::vector<float>({.1f,.1f,.1f}))
+            .appendType<UITextOneLine>(uiTextChannel, menuString, .6f, XLEFT).back()
+            .appendType<UITextOneLine>(uiTextChannel, rotateString, .6f, XLEFT).back()
+            .appendType<UITextOneLine>(uiTextChannel, playerWalkString, .6f, XLEFT).back()
+        ;
+
+        alreadyLoaded = true;
+    }
 
     menuEsc = false;
     aspectChange();
@@ -124,7 +136,6 @@ void Walker3D::render(float time, bool updateDisplay)
     // clearing before a draw is correct
     // - clear3D also resets a depth buffer and the depth buffer needs to be set to draw in 3D
     StaticDraw::clear3D();
-    batch.clear();
 
     // Camera Things
     //player.camYaw += time;
@@ -177,7 +188,8 @@ void Walker3D::render(float time, bool updateDisplay)
         tileVaoCount
     );
 
-
+    StaticWrite::StartWrite();
+    StaticWrite::DrawChannel(uiTextChannel, glm::vec3(1.0f, 1.0f, 1.0f));
     // call super to render
     Scene::render(time, updateDisplay);
 }
@@ -234,6 +246,11 @@ void Walker3D::aspectChange()
         100.0f
     );
     StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
+
+    uiBatch.clear();
+    StaticWrite::SetUpChannel(uiTextChannel);
+    ui.adjustNodeDefault();
+    ui.renderVerts(uiBatch);
 }
 
 void Walker3D::clean()

@@ -2,6 +2,7 @@
 #include "scene/scene.h"
 #include <glm/glm.hpp>
 #include <string>
+#include "uiHelper.h"
 
 struct Player
 {
@@ -56,15 +57,18 @@ struct Walker3D : Scene
     glm::mat4 viewMat4;
     glm::mat4 projectionMat4;
     std::vector<float> floor;
-    std::vector<float> batch;
+    std::vector<float> uiBatch;
 
     // game logic
+    bool alreadyLoaded = false;
     Player player;
 
-    // ui strings
+    // ui
+    UIBase ui;
     std::string menuString;
     std::string playerWalkString;
     std::string rotateString;
+    unsigned int uiTextChannel = 0;
 
     // scene methods
     void onLoad();
