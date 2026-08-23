@@ -681,7 +681,7 @@ struct StaticDraw
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    static void set3DEnabled(const bool enable = true, const GLenum depth = GL_LESS )
+    static void set3DEnabled(const bool enable = true, const GLenum depth = GL_LEQUAL )
     {
         if (enable)
         {

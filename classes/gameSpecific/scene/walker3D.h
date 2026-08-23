@@ -1,6 +1,7 @@
 #pragma once
 #include "scene/scene.h"
 #include <glm/glm.hpp>
+#include <string>
 
 struct Player
 {
@@ -8,6 +9,10 @@ struct Player
     glm::vec3 direction{glm::vec3(0.0f, 0.0f, 0.0f)};
     float camYaw{};
     float camPitch{};
+    float moveSpeed = 2.5f;
+    float rotateSpeed = 1.0f;
+    float playerVX = 0.0f;
+    float playerVZ = 0.0f;
 };
 
 struct Walker3D : Scene
@@ -31,6 +36,21 @@ struct Walker3D : Scene
     unsigned int viewUboRef;
 
     // controls
+    unsigned int qKey;
+    unsigned int wKey;
+    unsigned int eKey;
+    unsigned int aKey;
+    unsigned int sKey;
+    unsigned int dKey;
+    unsigned int escKey;
+
+    bool rotateQ;
+    bool walkW;
+    bool rotateE;
+    bool walkA;
+    bool walkS;
+    bool walkD;
+    bool menuEsc;
 
     // vertice storing
     glm::mat4 viewMat4;
@@ -40,6 +60,11 @@ struct Walker3D : Scene
 
     // game logic
     Player player;
+
+    // ui strings
+    std::string menuString;
+    std::string playerWalkString;
+    std::string rotateString;
 
     // scene methods
     void onLoad();

@@ -109,7 +109,6 @@ void FrogHop::onLoad()
 	pauseButton = StaticInput::GetAlias(keyOptions.escTitle);
 
 	// not tracking unused keys is a mild optimization.
-	// - It would be a bigger optimization if glfw was instead of a wrapper class but this is a tutorial.
 	StaticInput::KeyTrackSetAll(false);
 
 	// track keys we need

@@ -5,9 +5,12 @@
 #include "singleton/staticSound.h"
 
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 
 #include "3dHelper.h"
-#include "glm/ext/matrix_clip_space.hpp"
+
+#include "walkerKeyOptions.h"
+#include "pauseMenu.h"
 
 void Walker3D::onLoad()
 {
@@ -64,6 +67,32 @@ void Walker3D::onLoad()
     StaticAudio::updateSounds();
 
     // load inputs
+    // - creating temp keyOptions page to pull values from
+    WalkerKeyOptions keyOptions;
+    keyOptions.previous = this; // not setting previous makes avoiding crashes easier
+    keyOptions.onLoad();
+    qKey = StaticInput::GetAlias(keyOptions.qTitle);
+    wKey = StaticInput::GetAlias(keyOptions.wTitle);
+    eKey = StaticInput::GetAlias(keyOptions.eTitle);
+    aKey = StaticInput::GetAlias(keyOptions.aTitle);
+    sKey = StaticInput::GetAlias(keyOptions.sTitle);
+    dKey = StaticInput::GetAlias(keyOptions.dTitle);
+    escKey = StaticInput::GetAlias(keyOptions.escTitle);
+
+    StaticInput::KeyTrackSetAll(false); // not tracking unused keys is a mild optimization.
+    StaticInput::KeyTrack(qKey);
+    StaticInput::KeyTrack(wKey);
+    StaticInput::KeyTrack(eKey);
+    StaticInput::KeyTrack(aKey);
+    StaticInput::KeyTrack(sKey);
+    StaticInput::KeyTrack(dKey);
+    StaticInput::KeyTrack(escKey);
+
+    // set strings
+    menuString = "Pause: " + StaticInput::IntToString(escKey);
+    playerWalkString = "Move: " + StaticInput::IntToString(wKey) + " " + StaticInput::IntToString(aKey) + " " +
+        StaticInput::IntToString(sKey) + " " + StaticInput::IntToString(dKey);
+    rotateString = "Rotate: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey);
 
     // set physics framerate to 60
     DataHolder::SetPhysicsCap(60);
@@ -75,18 +104,19 @@ void Walker3D::onLoad()
     // generate ground
     floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
 
+    menuEsc = false;
     aspectChange();
 }
-
-float x = 0;
 
 void Walker3D::handle(float time)
 {
     processInput(window, time);
 
-    x += time;
+    if (menuEsc){return;} // stop handle if a return is called
 
-    aspectChange();
+    player.position += glm::vec3(player.playerVX, 0.0f, player.playerVZ);
+
+    //x += time;
 }
 
 void Walker3D::render(float time, bool updateDisplay)
@@ -97,12 +127,11 @@ void Walker3D::render(float time, bool updateDisplay)
     batch.clear();
 
     // Camera Things
-    player.camYaw += time;
+    //player.camYaw += time;
 
-    // when I looked it up, it said to include yaw. I want to try it without and update later.
-    player.direction.x = cos(player.camYaw);// * cos(player.camPitch);
-    player.direction.y = sin(player.camPitch);
-    player.direction.z = sin(player.camYaw);// * cos(player.camPitch);
+    player.direction.x = std::sin(player.camYaw);
+    player.direction.y = std::sin(player.camPitch);
+    player.direction.z = std::cos(player.camYaw);
 
     viewMat4 = glm::lookAt(
         player.position,
@@ -156,7 +185,44 @@ void Walker3D::render(float time, bool updateDisplay)
 void Walker3D::processInput(GLFWwindow *window, float time)
 {
     StaticInput::Tick();
+    rotateQ = StaticInput::KeyHeld(qKey);
+    rotateE = StaticInput::KeyHeld(eKey);
+    walkW = StaticInput::KeyHeld(wKey);
+    walkA = StaticInput::KeyHeld(aKey);
+    walkS = StaticInput::KeyHeld(sKey);
+    walkD = StaticInput::KeyHeld(dKey);
 
+    if (StaticInput::KeyClick(escKey))
+    {
+        PauseMenu* pm = new PauseMenu(this);
+        DataHolder::SceneQueue(pm, false);
+        menuEsc = true;
+        return;
+    }
+
+    // the tutorial is technical over practical. For a real game, normalize coordinates.
+    float delta = time * player.moveSpeed;
+    float controlX = 0.0f;
+    float controlZ = 0.0f;
+    controlX -= walkA;
+    controlX += walkD;
+    controlZ += walkW;
+    controlZ -= walkS;
+
+    float rotatedX = -(controlX * std::cos(player.camYaw)) + (controlZ * std::sin(player.camYaw));
+    float rotatedZ = (controlX * std::sin(player.camYaw)) + (controlZ * std::cos(player.camYaw));
+
+    glm::vec3 normalized(rotatedX, 0.0f, rotatedZ);
+
+    player.playerVX = normalized.x * delta;
+    player.playerVZ = normalized.z * delta;
+
+    float controlCam = 0.0f;
+    // The math people decided that positive is counterclockwise and negative is clockwise. This looks wrong but is right. Don't be mad at me, be mad at the math people.
+    controlCam += rotateQ;
+    controlCam -= rotateE;
+    controlCam *= time * player.rotateSpeed;
+    player.camYaw += controlCam;
 }
 
 void Walker3D::aspectChange()
