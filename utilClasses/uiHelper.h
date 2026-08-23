@@ -129,6 +129,7 @@ struct UIElement
         for (int i = 0; i < count; i++)
         {
             nodes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+            nodes.back()->previousNode = this;
         }
         return nodes;
     }
@@ -344,8 +345,9 @@ struct UIXSplits : UIContainer
 {
     std::vector<float> splits;
 
-    UIXSplits(std::vector<float> splits, int key = -1)
+    UIXSplits(std::vector<float> splits, const int key = -1)
         : UIContainer(key), splits(splits) {}
+
 
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2) override
     {
@@ -367,7 +369,7 @@ struct UIYSplits : UIContainer
 {
     std::vector<float> splits;
 
-    UIYSplits(std::vector<float> splits, int key = -1)
+    UIYSplits(std::vector<float> splits, const int key = -1)
         : UIContainer(key), splits(splits) {}
 
     void adjustNode(float xMin2, float yMin2, float xSize2, float ySize2)
@@ -474,7 +476,7 @@ struct UITextOneLine : UIElement
                     textVerts[i] += shiftAmount;
                 }
             }
-            if (yAlign == YCENTER || YTOP)
+            if (yAlign == YCENTER || yAlign == YTOP)
             {
                 float yyMax = textVerts[1];
                 for (int i = 5; i < textVerts.size(); i += 4)
@@ -482,7 +484,7 @@ struct UITextOneLine : UIElement
                     if (yyMax < textVerts[i]) { yyMax = textVerts[i]; }
                 }
                 float shiftAmount = ySize + yMin - yyMax;
-                if (yAlign == XCENTER)
+                if (yAlign == YCENTER)
                 {
                     shiftAmount /= 2;
                 }
