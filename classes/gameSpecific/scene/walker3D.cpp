@@ -190,6 +190,7 @@ void Walker3D::render(float time, bool updateDisplay)
 
     StaticWrite::StartWrite();
     StaticWrite::DrawChannel(uiTextChannel, glm::vec3(1.0f, 1.0f, 1.0f));
+
     // call super to render
     Scene::render(time, updateDisplay);
 }
@@ -239,6 +240,7 @@ void Walker3D::processInput(GLFWwindow *window, float time)
 
 void Walker3D::aspectChange()
 {
+    StaticDraw::updateView();
     projectionMat4 = glm::perspective(
         glm::radians(45.0f),
         StaticDraw::aspectRatio,
