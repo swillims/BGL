@@ -192,7 +192,7 @@ struct MainMenu : Scene {
             float h = b * (i*2-a) + b/2;
             if(i==0){ StaticWrite::AppendText(i, "Exit", -.5, h, fontXScale, fontYScale); }
             else if(i == 1){ StaticWrite::AppendText(i, "Options", -.5, h, fontXScale, fontYScale); }
-            else if(i == 2){ StaticWrite::AppendText(i, "...", -.5, h, fontXScale, fontYScale); }
+            else if(i == 2){ StaticWrite::AppendText(i, "Walk 3D", -.5, h, fontXScale, fontYScale); }
             else if(i == 3){ StaticWrite::AppendText(i, "Frog Hop", -.5, h, fontXScale, fontYScale); }
         }
     }
