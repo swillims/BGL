@@ -32,6 +32,9 @@ void FrogHop::onLoad()
 
 	// extremely important to call super at start of onLoad to declare window
 	Scene::onLoad();
+
+	// this is a 2d game. Be specific with everything to avoid random bugs.
+	StaticDraw::set3DEnabled(false);
 	
 	// load shaders
 	shaderSimpleRef = StaticDraw::getShader("simple");
@@ -443,8 +446,7 @@ void FrogHop::render(float time, bool updateDisplay)
 	float vMinf = (0.0f+frame)/2;
 	float vMaxf = (1.0f+frame)/2;
 
-
-	glUseProgram(shaderRotationRef);
+	StaticDraw::useShader(shaderRotationRef);
 
 	// multi draw uses a texture reference, a list of vertices, an optional VAO ref, and an optional Vao float count.
 	// - this example uses a different VAO and different vao float count, because it has more than 4 floats per vertice
@@ -560,7 +562,7 @@ void FrogHop::clean()
 	StaticDraw::deleteVAO(frogRotationVaoRef);
 
 	// set all keys to not be tracked
-	// NOTE: mouse clicks are handled seperately from key clicks
+	// NOTE: mouse clicks are handled separately from key clicks
 	StaticInput::KeyTrackSetAll(false);
 };
 // */

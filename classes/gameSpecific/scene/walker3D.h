@@ -26,11 +26,14 @@ struct Walker3D : Scene
     unsigned int baseVao;
     unsigned int tileVaoRef;
     unsigned int tileVaoCount;
+    unsigned int threeDTwoDRef;
+    unsigned int threeDTwoDCount;
 
     //shader
     unsigned int shaderSimpleRef;
     unsigned int shader3DSimple;
     unsigned int shader3DProjection;
+    unsigned int shader3d2d;
 
     //ubo
     unsigned int projectionUboRef;

@@ -34,11 +34,29 @@ void Walker3D::onLoad()
     }
     shader3DProjection = StaticDraw::getShader("projection3d");
 
+    if (!StaticDraw::hasShader("3d2d"))
+    {
+        StaticDraw::compileShader("assets/shaders/3d2d.vs", "assets/shaders/simple.fs", "3d2d");
+    }
+    shader3d2d = StaticDraw::getShader("3d2d");
+
     // create ubo and default mat4 values
     viewMat4 = glm::mat4(1.0f);
     projectionMat4 = glm::mat4(1.0f);
-    viewUboRef = StaticDraw::createSharedShaderVariable(viewMat4, shader3DProjection, "view").ref;
-    projectionUboRef = StaticDraw::createSharedShaderVariable(projectionMat4, shader3DProjection, "projection").ref;
+    if (!StaticDraw::hasSharedShaderVariable("view"))
+    {
+        StaticDraw::createSharedShaderVariable(viewMat4, "view").ref;
+    }
+    viewUboRef = StaticDraw::getSharedShaderVariable("view").ref;
+    if (!StaticDraw::hasSharedShaderVariable("projection"))
+    {
+        StaticDraw::createSharedShaderVariable(projectionMat4, "projection").ref;
+    }
+    projectionUboRef = StaticDraw::getSharedShaderVariable("projection").ref;
+    StaticDraw::bindSharedShaderVariable(shader3DProjection, "view");
+    StaticDraw::bindSharedShaderVariable(shader3DProjection, "projection");
+    StaticDraw::bindSharedShaderVariable(shader3d2d, "view");
+    StaticDraw::bindSharedShaderVariable(shader3d2d, "projection");
 
     // load vaos
     baseVao = StaticDraw::VAOSimple;
@@ -49,6 +67,13 @@ void Walker3D::onLoad()
     }
     tileVaoRef = StaticDraw::getVAO("3dSimple").ref;
     tileVaoCount = StaticDraw::getVAO("3dSimple").floatCount;
+
+    if (!StaticDraw::hasVAO("3d2d"))
+    {
+        StaticDraw::CreateVAO({3, 2, 1}, "3d2d");
+    }
+    threeDTwoDRef = StaticDraw::getVAO("3d2d").ref;
+    threeDTwoDCount = StaticDraw::getVAO("3d2d").floatCount;
 
     // load textures
     if (!StaticDraw::imageFileRefs.contains("tile"))
@@ -187,6 +212,24 @@ void Walker3D::render(float time, bool updateDisplay)
         tileVaoRef,
         tileVaoCount
     );
+
+    StaticDraw::useShader(shader3d2d);
+    StaticDraw::multiDraw
+    (
+        tile,
+        {
+            0.0f, 2.0f, 5.0f, 0.0f, 0.0f, -1.0f,
+            0.0f, 2.0f, 5.0f, 1.0f, 0.0f,  1.0f,
+            0.0f, 4.0f, 5.0f, 1.0f, 1.0f,  1.0f,
+
+            0.0f, 2.0f, 5.0f, 0.0f, 0.0f, -1.0f,
+            0.0f, 4.0f, 5.0f, 1.0f, 1.0f,  1.0f,
+            0.0f, 4.0f, 5.0f, 0.0f, 1.0f, -1.0f,
+        },
+        threeDTwoDRef,
+        threeDTwoDCount
+    );
+
 
     StaticWrite::StartWrite();
     StaticWrite::DrawChannel(uiTextChannel, glm::vec3(1.0f, 1.0f, 1.0f));

@@ -32,10 +32,11 @@ struct StaticDraw
 
     struct UBOInfo
     {
+        std::string name;
         GLuint ref;
         GLuint binding;
 
-        UBOInfo(GLuint ref, GLuint binding) : ref(ref), binding(binding) {};
+        UBOInfo(const std::string& name, GLuint ref, GLuint binding) : name(name), ref(ref), binding(binding) {};
     };
 
     inline static std::vector<UBOInfo> UBOs;
@@ -99,8 +100,6 @@ struct StaticDraw
 
         cleanIndices();
     }
-
-    
 
     static unsigned int compileShader(const char* vertexSource, const char* fragmentSource, std::string shaderName = "")
     {
@@ -308,41 +307,7 @@ struct StaticDraw
         return false;
     }
 
-    // random comment included for ctrl+f search createUBO
-    template<typename T>
-    static UBOInfo createSharedShaderVariable(const T& data, int binding = -1)
-    {
-        if (binding == -1)
-        {
-            // this is really bad but fix later. It does not account for deletions or etc
-            binding = UBOs.size();
-        }
-
-        GLuint ubo;
-
-        glGenBuffers(1, &ubo);
-        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-
-        glBufferData(
-            GL_UNIFORM_BUFFER,
-            sizeof(T),
-            &data,
-            GL_DYNAMIC_DRAW
-        );
-
-        glBindBufferBase(
-            GL_UNIFORM_BUFFER,
-            binding,
-            ubo
-        );
-
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        UBOs.emplace_back(ubo, binding);
-
-        return UBOs.back();
-    }
-    template<typename T>
+    /*template<typename T>
     static UBOInfo createSharedShaderVariable(const T& data, int shaderRef, const std::string& varName, int binding = -1)
     {
         const GLuint blockIndex = glGetUniformBlockIndex(shaderRef, varName.c_str());
@@ -350,7 +315,7 @@ struct StaticDraw
         if (blockIndex == GL_INVALID_INDEX)
         {
             std::cout<<"invalid shader var call\n";
-            return {0,0};
+            return {"",0,0};
         }
 
         if (binding == -1)
@@ -380,10 +345,67 @@ struct StaticDraw
 
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-        UBOs.emplace_back(ubo, binding);
+        UBOs.emplace_back(varName, ubo, binding);
+
+        return UBOs.back();
+    }*/
+    template<typename T>
+    static UBOInfo createSharedShaderVariable(const T& data, const std::string& name, int binding = -1)
+    {
+        if (binding == -1){binding = UBOs.size();}
+
+        GLuint ubo;
+
+        glGenBuffers(1, &ubo);
+        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+
+        glBufferData(
+            GL_UNIFORM_BUFFER,
+            sizeof(T),
+            &data,
+            GL_DYNAMIC_DRAW
+        );
+
+        glBindBufferBase(
+            GL_UNIFORM_BUFFER,
+            binding,
+            ubo
+        );
+
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        UBOs.emplace_back(name, ubo, binding);
 
         return UBOs.back();
     }
+
+    static void bindSharedShaderVariable(int shaderRef, const std::string& varName, GLuint binding=-1)
+    {
+        GLuint blockIndex = glGetUniformBlockIndex(shaderRef, varName.c_str());
+        if (blockIndex == GL_INVALID_INDEX)
+        {
+            std::cout << "shader bind is for invalid shader index ;-;\n";
+            return;
+        }
+        if (binding == -1)
+        {
+            // this will fail silently which is fine
+            binding = getSharedShaderVariable(varName).binding;
+        }
+        glUniformBlockBinding(shaderRef, blockIndex, binding);
+    }
+
+    static bool hasSharedShaderVariable(const std::string& ref)
+    {
+        for (const UBOInfo& ubo : UBOs){if (ubo.name == ref){return true;}}
+        return false;
+    }
+    static UBOInfo getSharedShaderVariable(const std::string& ref)
+    {
+        for (const UBOInfo& ubo : UBOs){if (ubo.name == ref){return ubo;}}
+        return {"",-0,0};
+    }
+
     template<typename T>
     static void updateSharedShaderVariable(GLuint ref, const T& data)
     {
