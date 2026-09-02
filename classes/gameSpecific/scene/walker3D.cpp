@@ -12,12 +12,21 @@
 #include "walkerKeyOptions.h"
 #include "pauseMenu.h"
 
+/*
+ * This engine is 2d first.
+ * This 3d section is proof of concept.
+ * If it works it works.
+ * The math is weird and convoluted. I(the author) had to look up everything.
+ * If you have the math skills to do this, awesome.
+ * For normal people, it is better to use a professional engine or stick with 2d.
+ * Math is hard.
+*/
+
+
 void Walker3D::onLoad()
 {
     Scene::onLoad();
     StaticDraw::set3DEnabled();
-
-    // have two of a few things to validate loads
 
     // load shaders
     shaderSimpleRef = StaticDraw::getShader("simple");
@@ -152,8 +161,6 @@ void Walker3D::handle(float time)
     if (menuEsc){return;} // stop handle if a return is called
 
     player.position += glm::vec3(player.playerVX, 0.0f, player.playerVZ);
-
-    //x += time;
 }
 
 void Walker3D::render(float time, bool updateDisplay)
@@ -163,55 +170,33 @@ void Walker3D::render(float time, bool updateDisplay)
     StaticDraw::clear3D();
 
     // Camera Things
-    //player.camYaw += time;
-
+    // - idk what any of this camera stuff is. I looked up how to do it. I'm learning while I make this.
     player.direction.x = std::sin(player.camYaw);
     player.direction.y = std::sin(player.camPitch);
     player.direction.z = std::cos(player.camYaw);
 
-    viewMat4 = glm::lookAt(
-        player.position,
-        player.position + player.direction,
-        glm::vec3(0.0f, 1.0f, 0.0f)   // up
+    glm::vec3 forward = glm::normalize(player.direction);
+    glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
+    glm::vec3 up = glm::cross(forward, right);
+
+    viewMat4 = glm::mat4(1.0f);
+
+    viewMat4[0] = glm::vec4(right, 0.0f);
+    viewMat4[1] = glm::vec4(up, 0.0f);
+    viewMat4[2] = glm::vec4(-forward, 0.0f);
+
+    viewMat4[3] = glm::vec4(
+        -glm::dot(right, player.position),
+        -glm::dot(up, player.position),
+         glm::dot(forward, player.position),
+        1.0f
     );
 
     StaticDraw::updateSharedShaderVariable(viewUboRef, viewMat4);
 
-
-    //StaticDraw::useShader(shader3DSimple);
     StaticDraw::useShader(shader3DProjection);
 
-    StaticDraw::multiDraw
-    (
-        tile,
-        {
-            -0.5f, -0.5f, 1.0f,  0.0f, 0.0f,
-            0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-            0.5f,  0.5f, 0.0f,  1.0f, 1.0f
-        },
-        tileVaoRef,
-        tileVaoCount
-    );
-
-    StaticDraw::multiDraw
-    (
-        greenTile,
-        {
-            0.5f, -0.5f, 1.0f,  0.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f, 0.0f,  1.0f, 1.0f
-        },
-        tileVaoRef,
-        tileVaoCount
-    );
-
-    StaticDraw::multiDraw
-    (
-        greenTile,
-        floor,
-        tileVaoRef,
-        tileVaoCount
-    );
+    StaticDraw::multiDraw(greenTile, floor, tileVaoRef, tileVaoCount);
 
     StaticDraw::useShader(shader3d2d);
     StaticDraw::multiDraw
@@ -230,6 +215,15 @@ void Walker3D::render(float time, bool updateDisplay)
         threeDTwoDCount
     );
 
+    hoveredImage = getHoveredImage();
+    if (hoveredImage!=-1)
+    {
+
+    }
+    else
+    {
+        getTile();
+    }
 
     StaticWrite::StartWrite();
     StaticWrite::DrawChannel(uiTextChannel, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -256,7 +250,6 @@ void Walker3D::processInput(GLFWwindow *window, float time)
         return;
     }
 
-    // the tutorial is technical over practical. For a real game, normalize coordinates.
     float delta = time * player.moveSpeed;
     float controlX = 0.0f;
     float controlZ = 0.0f;
@@ -265,8 +258,8 @@ void Walker3D::processInput(GLFWwindow *window, float time)
     controlZ += walkW;
     controlZ -= walkS;
 
-    float rotatedX = -(controlX * std::cos(player.camYaw)) + (controlZ * std::sin(player.camYaw));
-    float rotatedZ = (controlX * std::sin(player.camYaw)) + (controlZ * std::cos(player.camYaw));
+    float rotatedX = (controlX * std::cos(player.camYaw)) + (controlZ * std::sin(player.camYaw));
+    float rotatedZ = -(controlX * std::sin(player.camYaw)) + (controlZ * std::cos(player.camYaw));
 
     glm::vec3 normalized(rotatedX, 0.0f, rotatedZ);
 
@@ -274,9 +267,8 @@ void Walker3D::processInput(GLFWwindow *window, float time)
     player.playerVZ = normalized.z * delta;
 
     float controlCam = 0.0f;
-    // The math people decided that positive is counterclockwise and negative is clockwise. This looks wrong but is right. Don't be mad at me, be mad at the math people.
-    controlCam += rotateQ;
-    controlCam -= rotateE;
+    controlCam -= rotateQ;
+    controlCam += rotateE;
     controlCam *= time * player.rotateSpeed;
     player.camYaw += controlCam;
 }
@@ -292,13 +284,61 @@ void Walker3D::aspectChange()
     );
     StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
 
-    uiBatch.clear();
-    StaticWrite::SetUpChannel(uiTextChannel);
-    ui.adjustNodeDefault();
-    ui.renderVerts(uiBatch);
+    updateUI();
 }
 
 void Walker3D::clean()
 {
 
+}
+
+int Walker3D::getHoveredImage()
+{
+    return -1;
+}
+
+int Walker3D::getTile()
+{
+    // I don't know how to do a raycast so I looked it up
+    double mouseX;
+    double mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    // Mouse -> NDC
+    float x = (2.0f * mouseX) / StaticDraw::w - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / StaticDraw::h;
+
+    // NDC -> world ray
+    glm::vec4 nearPoint = glm::inverse(projectionMat4) * glm::vec4(x, y, -1.0f, 1.0f);
+    glm::vec4 farPoint  = glm::inverse(projectionMat4) * glm::vec4(x, y,  1.0f, 1.0f);
+
+    nearPoint /= nearPoint.w;
+    farPoint  /= farPoint.w;
+
+    nearPoint = glm::inverse(viewMat4) * nearPoint;
+    farPoint  = glm::inverse(viewMat4) * farPoint;
+
+    glm::vec3 rayOrigin = glm::vec3(nearPoint);
+    glm::vec3 rayDirection = glm::normalize(glm::vec3(farPoint - nearPoint));
+
+    // Ray -> Y = 0
+    float distance = -rayOrigin.y / rayDirection.y;
+
+    glm::vec3 hit = rayOrigin + rayDirection * distance;
+
+    // The 2D tile coordinate
+    int tileX = static_cast<int>(std::floor(hit.x));
+    int tileZ = static_cast<int>(std::floor(hit.z));
+
+    std::cout << tileX << " " << tileZ << "\n";
+
+    return -1;
+}
+
+void Walker3D::updateUI()
+{
+    uiBatch.clear();
+    StaticWrite::SetUpChannel(uiTextChannel);
+    ui.adjustNodeDefault();
+    ui.renderVerts(uiBatch);
 }

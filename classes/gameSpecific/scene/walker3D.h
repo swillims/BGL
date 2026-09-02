@@ -66,12 +66,17 @@ struct Walker3D : Scene
     bool alreadyLoaded = false;
     Player player;
 
+    // hover logic
+    unsigned int hoveredImage;
+    unsigned int hoveredTileX;
+    unsigned int hoveredTileY;
+
     // ui
     UIBase ui;
     std::string menuString;
     std::string playerWalkString;
     std::string rotateString;
-    unsigned int uiTextChannel = 0;
+    unsigned int uiTextChannel = 1;
 
     // scene methods
     void onLoad();
@@ -82,4 +87,7 @@ struct Walker3D : Scene
     void clean();
 
     // Walker3D methods
+    int getHoveredImage();
+    int getTile();
+    void updateUI();
 };
