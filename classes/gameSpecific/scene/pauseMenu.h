@@ -28,7 +28,7 @@ public:
     std::vector<float> batch;
 
     // text channel for writing
-    unsigned int writeChannel;
+    unsigned int writeChannel = -1;
 
     // strings
     std::string returnStr;

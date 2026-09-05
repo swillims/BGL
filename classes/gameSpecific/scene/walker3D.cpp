@@ -22,7 +22,6 @@
  * Math is hard. I don't know it.
 */
 
-
 void Walker3D::onLoad()
 {
     Scene::onLoad();
