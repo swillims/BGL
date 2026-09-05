@@ -19,7 +19,7 @@
  * The math is weird and convoluted. I(the author) had to look up everything.
  * If you have the math skills to do this, awesome.
  * For normal people, it is better to use a professional engine or stick with 2d.
- * Math is hard.
+ * Math is hard. I don't know it.
 */
 
 
@@ -127,6 +127,7 @@ void Walker3D::onLoad()
     playerWalkString = "Move: " + StaticInput::IntToString(wKey) + " " + StaticInput::IntToString(aKey) + " " +
         StaticInput::IntToString(sKey) + " " + StaticInput::IntToString(dKey);
     rotateString = "Rotate: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey);
+    hoverString = "Null";
 
     // set physics framerate to 60
     DataHolder::SetPhysicsCap(60);
@@ -141,14 +142,23 @@ void Walker3D::onLoad()
         floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
 
         // ui is completely unnessary here but I have a tool, so I should use it in a tutorial
-        ui.appendType<UIYSplits>(std::vector<float>({.1f,.1f,.1f}))
+        ui.appendType<UIYSplits>(std::vector<float>({.1f,.1f,.1f,.1f}))
             .appendType<UITextOneLine>(uiTextChannel, menuString, .6f, XLEFT).back()
             .appendType<UITextOneLine>(uiTextChannel, rotateString, .6f, XLEFT).back()
             .appendType<UITextOneLine>(uiTextChannel, playerWalkString, .6f, XLEFT).back()
+            .appendType<UITextOneLine>(uiTextChannel, hoverString, .6f, XLEFT).back()
         ;
 
         alreadyLoaded = true;
     }
+
+    // set up random floating things
+    images.clear();
+    images.emplace_back(TwoDThreeDImg(0,0,0,1,1));
+    images.emplace_back(TwoDThreeDImg(2,2,0,1,1));
+    images.emplace_back(TwoDThreeDImg(0,2,2,1,1));
+    images.emplace_back(TwoDThreeDImg(1,1,1,1,1));
+    images.emplace_back(TwoDThreeDImg(-2,1,1,1,1));
 
     menuEsc = false;
     aspectChange();
@@ -199,18 +209,16 @@ void Walker3D::render(float time, bool updateDisplay)
     StaticDraw::multiDraw(greenTile, floor, tileVaoRef, tileVaoCount);
 
     StaticDraw::useShader(shader3d2d);
+    imageBatch.clear();
+    for (TwoDThreeDImg& t: images)
+    {
+        t.updateVertices(viewMat4,projectionMat4);
+        imageBatch.insert(imageBatch.end(), t.vertices.begin(), t.vertices.end());
+    }
     StaticDraw::multiDraw
     (
         tile,
-        {
-            0.0f, 2.0f, 5.0f, 0.0f, 0.0f, -1.0f,
-            0.0f, 2.0f, 5.0f, 1.0f, 0.0f,  1.0f,
-            0.0f, 4.0f, 5.0f, 1.0f, 1.0f,  1.0f,
-
-            0.0f, 2.0f, 5.0f, 0.0f, 0.0f, -1.0f,
-            0.0f, 4.0f, 5.0f, 1.0f, 1.0f,  1.0f,
-            0.0f, 4.0f, 5.0f, 0.0f, 1.0f, -1.0f,
-        },
+        imageBatch,
         threeDTwoDRef,
         threeDTwoDCount
     );
@@ -218,12 +226,14 @@ void Walker3D::render(float time, bool updateDisplay)
     hoveredImage = getHoveredImage();
     if (hoveredImage!=-1)
     {
-
+        hoverString = "Hovered Image: " + std::to_string(hoveredImage);
     }
     else
     {
         getTile();
     }
+
+    updateUI();
 
     StaticWrite::StartWrite();
     StaticWrite::DrawChannel(uiTextChannel, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -294,12 +304,29 @@ void Walker3D::clean()
 
 int Walker3D::getHoveredImage()
 {
-    return -1;
+    // I don't know how to do this, so I looked it up.
+    int closest = -1;
+    float mouseX;
+    float mouseY;
+    StaticInput::GetMouseF(mouseX, mouseY);
+    float closestDepth = std::numeric_limits<float>::max();
+    for (int i = 0; i < images.size(); ++i)
+    {
+        const auto& image = images[i];
+        if (mouseX < image.xMin || mouseX > image.xMax || mouseY < image.yMin || mouseY > image.yMax){continue;}
+        float depth = glm::dot(glm::vec3(image.x, image.y, image.z) - player.position,player.direction);
+        if (depth < closestDepth)
+        {
+            closestDepth = depth;
+            closest = i;
+        }
+    }
+    return closest;
 }
 
 int Walker3D::getTile()
 {
-    // I don't know how to do a raycast so I looked it up
+    // I don't know how to do a raycast so I looked it up. I don't know what any of this is.
     double mouseX;
     double mouseY;
     glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -329,9 +356,7 @@ int Walker3D::getTile()
     // The 2D tile coordinate
     int tileX = static_cast<int>(std::floor(hit.x));
     int tileZ = static_cast<int>(std::floor(hit.z));
-
-    std::cout << tileX << " " << tileZ << "\n";
-
+    hoverString = "Hovered Tile: " + std::to_string(tileX) + " " + std::to_string(tileZ);
     return -1;
 }
 
