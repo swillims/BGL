@@ -96,6 +96,20 @@ void Walker3D::onLoad()
     }
     greenTile = StaticDraw::imageFileRefs["greenTile"];
 
+    if (!StaticDraw::imageFileRefs.contains("multiTile"))
+    {
+        StaticDraw::crateLayerImage(32,32, "multiTile");
+    }
+    multiTile = StaticDraw::imageFileRefs["multiTile"];
+    StaticDraw::MultiImage* m = StaticDraw::getLayerImage(multiTile);
+
+    std::cout << m->layers << std::endl;
+    if (!m->hasLayer("Grass"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/green.png", "greenTile");
+    }
+    std::cout << m->layers << std::endl;
+
     // load sounds
     StaticAudio::updateSounds();
 

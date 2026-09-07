@@ -107,6 +107,7 @@ struct Walker3D : Scene
     //images
     unsigned int tile;
     unsigned int greenTile;
+    unsigned int multiTile;
 
     //vao
     unsigned int baseVao;

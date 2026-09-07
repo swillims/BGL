@@ -27,7 +27,6 @@ struct StaticDraw
 
         VAOInfo(std::string name, GLuint ref, int floatCount) : name(name), ref(ref), floatCount(floatCount){}
     };
-
     inline static std::vector<VAOInfo> VAOs;
 
     struct UBOInfo
@@ -38,8 +37,26 @@ struct StaticDraw
 
         UBOInfo(const std::string& name, GLuint ref, GLuint binding) : name(name), ref(ref), binding(binding) {};
     };
-
     inline static std::vector<UBOInfo> UBOs;
+
+    // OpenGL does not allow a 0 layer texture so there will be a default empty layer set to 0.
+    struct MultiImage
+    {
+        std::string name;
+        GLuint ref;
+        GLsizei width;
+        GLsizei height;
+        GLsizei layers = 1;
+        util::BiMap<unsigned int, std::string> layerRefs;
+
+        MultiImage(const std::string& name, GLuint ref, GLsizei width, GLsizei height) : name(name), ref(ref), width(width), height(height) {};
+
+        bool hasLayer(unsigned int ref){return layerRefs.contains(ref);}
+        bool hasLayer(std::string name){return layerRefs.contains(name);}
+
+        GLuint addLayer(std::string fileName, std::string imageName = "", bool flip = false);
+    };
+    inline static std::vector<MultiImage> multiImages;
 
     // x and y
     inline static int w, h;
@@ -307,48 +324,6 @@ struct StaticDraw
         return false;
     }
 
-    /*template<typename T>
-    static UBOInfo createSharedShaderVariable(const T& data, int shaderRef, const std::string& varName, int binding = -1)
-    {
-        const GLuint blockIndex = glGetUniformBlockIndex(shaderRef, varName.c_str());
-
-        if (blockIndex == GL_INVALID_INDEX)
-        {
-            std::cout<<"invalid shader var call\n";
-            return {"",0,0};
-        }
-
-        if (binding == -1)
-        {
-            binding = UBOs.size();
-        }
-
-        glUniformBlockBinding(shaderRef, blockIndex, binding);
-
-        GLuint ubo;
-
-        glGenBuffers(1, &ubo);
-        glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-
-        glBufferData(
-            GL_UNIFORM_BUFFER,
-            sizeof(T),
-            &data,
-            GL_DYNAMIC_DRAW
-        );
-
-        glBindBufferBase(
-            GL_UNIFORM_BUFFER,
-            binding,
-            ubo
-        );
-
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        UBOs.emplace_back(varName, ubo, binding);
-
-        return UBOs.back();
-    }*/
     template<typename T>
     static UBOInfo createSharedShaderVariable(const T& data, const std::string& name, int binding = -1)
     {
@@ -426,8 +401,6 @@ struct StaticDraw
         updateSharedShaderVariable(ubo.ref, data);
     }
 
-
-
     // This one is a debug method. I recommend deleting it if you modify my engine and make a custom engine.
     static void printShaderUniforms(GLuint programID) {
         GLint uniformCount;
@@ -465,10 +438,26 @@ struct StaticDraw
 
     static void loadImage(std::string fileName, std::string imageName = "", bool flip = false);
 
+    static void crateLayerImage(GLsizei width, GLsizei height, std::string imageName = "");
+
+    static void loadLayerImage(int multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);
+    static void loadLayerImage(const std::string& multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);
+
+    static MultiImage* getLayerImage(unsigned int ref)
+    {
+        for (MultiImage& image : multiImages)
+        {
+            if (image.ref == ref){return &image;}
+        }
+        std::cout<<"failed to find multiImage. Return 0 from list. Expect errors/undefined behavior\n";
+        return &multiImages[0];
+    }
+
     static void unLoadImage(const std::string& ref);
 
     static void unLoadImage(unsigned int ref);
 
+    // I don't know if I use this or if it works.
     static void loadFolder(const std::string& folderPath)
     {
         for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(folderPath))
