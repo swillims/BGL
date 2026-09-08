@@ -88,7 +88,7 @@ void StaticDraw::loadImage(std::string fileName, std::string imageName, bool fli
     }
 }
 
-void StaticDraw::crateLayerImage(GLsizei width, GLsizei height, std::string imageName)
+void StaticDraw::crateLayerImage(GLsizei width, GLsizei height, std::string imageName, unsigned int depth)
 {
     unsigned int texture;
     glGenTextures(1, &texture);
@@ -101,11 +101,11 @@ void StaticDraw::crateLayerImage(GLsizei width, GLsizei height, std::string imag
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage3D(GL_TEXTURE_2D_ARRAY,0, GL_RGBA, width, height, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY,0, GL_RGBA, width, height, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
     imageFileRefs.insert(texture, imageName);
 
-    multiImages.emplace_back(imageName, texture, width, height);
+    multiImages.emplace_back(imageName, texture, width, height, depth);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
@@ -136,7 +136,7 @@ void StaticDraw::loadLayerImage(const std::string &multiImageRef, const std::str
     std::cout << "load layer failed due to file to find texture\n";
 }
 
-GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageName, bool flip)
+GLuint StaticDraw::MultiImage::addLayer(const std::string& fileName, std::string imageName, bool flip)
 {
     stbi_set_flip_vertically_on_load(flip);
 
@@ -154,21 +154,42 @@ GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageN
 
     if (imageWidth < width || imageHeight < height)
     {
-        std::cout << "Failed to load layer image because dimensions larger than allocated \n";
-
+        std::cout << "Failed to load layer image because dimensions larger than allocated\n";
         stbi_image_free(data);
         return 0;
     }
 
     GLuint layer = layers;
 
-    std::vector<unsigned char> oldData;
+    if (layers < capacity)
+    {
+        glBindTexture(GL_TEXTURE_2D_ARRAY, ref);
 
-    oldData.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(layers) * 4);
+        glTexSubImage3D( GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+        if (imageName.empty()){imageName = util::cleanFileName(fileName);}
+        else {imageName = util::cleanFileName(imageName);}
+
+        layerRefs.insert(layer, imageName);
+
+        layers++;
+
+        stbi_image_free(data);
+
+        return layer;
+    }
+
+    GLsizei newCapacity = capacity * 2;
+
+    std::cout << "Caution: At capacity and new layer added so resizing. Resizing Layer Image from " << capacity << " to " << newCapacity << " layers\n";
+
+    // Read the currently allocated texture into CPU memory.
+    std::vector<unsigned char> oldData(static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(layers) * 4);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, ref);
 
-    // Read the existing texture array into CPU memory.
     if (layers > 0)
     {
         glGetTexImage(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, GL_UNSIGNED_BYTE, oldData.data());
@@ -181,14 +202,21 @@ GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageN
     glBindTexture(GL_TEXTURE_2D_ARRAY, newRef);
 
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage3D(GL_TEXTURE_2D_ARRAY,0,GL_RGBA, width, height, layers + 1,0, GL_RGBA, GL_UNSIGNED_BYTE, oldData.empty() ? nullptr : oldData.data());
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, newCapacity, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-    // Upload the new layer.
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    if (layers > 0)
+    {
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, layers, GL_RGBA, GL_UNSIGNED_BYTE, oldData.data());
+    }
+
+    glTexSubImage3D( GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
@@ -198,8 +226,7 @@ GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageN
     imageFileRefs.insert(newRef, name);
 
     ref = newRef;
-
-    stbi_image_free(data);
+    capacity = newCapacity;
 
     if (imageName.empty()){imageName = util::cleanFileName(fileName);}
     else {imageName = util::cleanFileName(imageName);}
@@ -207,6 +234,8 @@ GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageN
     layerRefs.insert(layer, imageName);
 
     layers++;
+
+    stbi_image_free(data);
 
     return layer;
 }

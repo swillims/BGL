@@ -42,20 +42,24 @@ struct StaticDraw
     // OpenGL does not allow a 0 layer texture so there will be a default empty layer set to 0.
     struct MultiImage
     {
+        // definition vars
         std::string name;
         GLuint ref;
         GLsizei width;
         GLsizei height;
+
+        // layer vars
         GLsizei layers = 1;
-        GLsizei capacity = 1; // a different version used capacity. I will switch back to it when I make something more complex.
+        unsigned int capacity;
         util::BiMap<unsigned int, std::string> layerRefs;
 
-        MultiImage(const std::string& name, GLuint ref, GLsizei width, GLsizei height) : name(name), ref(ref), width(width), height(height) {};
+        // constructor
+        MultiImage(const std::string& name, GLuint ref, GLsizei width, GLsizei height, unsigned int capacity=1) : name(name), ref(ref), width(width), height(height), capacity(capacity) {};
 
         bool hasLayer(unsigned int ref){return layerRefs.contains(ref);}
         bool hasLayer(std::string name){return layerRefs.contains(name);}
 
-        GLuint addLayer(std::string fileName, std::string imageName = "", bool flip = false);
+        GLuint addLayer(const std::string& fileName, std::string imageName = "", bool flip = true);
     };
     inline static std::vector<MultiImage> multiImages;
 
@@ -439,7 +443,7 @@ struct StaticDraw
 
     static void loadImage(std::string fileName, std::string imageName = "", bool flip = false);
 
-    static void crateLayerImage(GLsizei width, GLsizei height, std::string imageName = "");
+    static void crateLayerImage(GLsizei width, GLsizei height, std::string imageName = "", unsigned int depth = 1);
 
     static void loadLayerImage(int multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);
     static void loadLayerImage(const std::string& multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);

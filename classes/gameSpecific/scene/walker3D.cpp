@@ -98,36 +98,37 @@ void Walker3D::onLoad()
 
     if (!StaticDraw::imageFileRefs.contains("multiTile"))
     {
-        StaticDraw::crateLayerImage(32,32, "multiTile");
+        StaticDraw::crateLayerImage(32,32, "multiTile",1);
     }
     StaticDraw::MultiImage* m = StaticDraw::getLayerImage(StaticDraw::imageFileRefs["multiTile"]);
     if (!m->hasLayer("1"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/13232.png", "1", true);
+        // the loader is aligned differently than the drawer so set optional varaible "flip" to true
+        m->addLayer("assets/gameSpecific/png/walk3d/13232.png", "1",  true);
     }
     if (!m->hasLayer("2"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/23232.png", "2", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/23232.png", "2");
     }
     if (!m->hasLayer("3"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/33232.png", "3", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/33232.png", "3");
     }
     if (!m->hasLayer("4"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/43232.png", "4", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/43232.png", "4");
     }
     if (!m->hasLayer("5"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/53232.png", "5", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/53232.png", "5");
     }
     if (!m->hasLayer("6"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/63232.png", "6", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/63232.png", "6");
     }
     if (!m->hasLayer("7"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/73232.png", "7", true);
+        m->addLayer("assets/gameSpecific/png/walk3d/73232.png", "7");
     }
     multiTile = StaticDraw::imageFileRefs["multiTile"];
 
