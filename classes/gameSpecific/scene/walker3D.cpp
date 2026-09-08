@@ -44,7 +44,7 @@ void Walker3D::onLoad()
 
     if (!StaticDraw::hasShader("3d2d"))
     {
-        StaticDraw::compileShader("assets/shaders/3d2d.vs", "assets/shaders/simple.fs", "3d2d");
+        StaticDraw::compileShader("assets/shaders/3d2dLayer.vs", "assets/shaders/simpleLayer.fs", "3d2d");
     }
     shader3d2d = StaticDraw::getShader("3d2d");
 
@@ -78,7 +78,7 @@ void Walker3D::onLoad()
 
     if (!StaticDraw::hasVAO("3d2d"))
     {
-        StaticDraw::CreateVAO({3, 2, 1}, "3d2d");
+        StaticDraw::CreateVAO({3, 2, 1, 1}, "3d2d");
     }
     threeDTwoDRef = StaticDraw::getVAO("3d2d").ref;
     threeDTwoDCount = StaticDraw::getVAO("3d2d").floatCount;
@@ -100,15 +100,36 @@ void Walker3D::onLoad()
     {
         StaticDraw::crateLayerImage(32,32, "multiTile");
     }
-    multiTile = StaticDraw::imageFileRefs["multiTile"];
-    StaticDraw::MultiImage* m = StaticDraw::getLayerImage(multiTile);
-
-    std::cout << m->layers << std::endl;
-    if (!m->hasLayer("Grass"))
+    StaticDraw::MultiImage* m = StaticDraw::getLayerImage(StaticDraw::imageFileRefs["multiTile"]);
+    if (!m->hasLayer("1"))
     {
-        m->addLayer("assets/gameSpecific/png/walk3d/green.png", "greenTile");
+        m->addLayer("assets/gameSpecific/png/walk3d/13232.png", "1", true);
     }
-    std::cout << m->layers << std::endl;
+    if (!m->hasLayer("2"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/23232.png", "2", true);
+    }
+    if (!m->hasLayer("3"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/33232.png", "3", true);
+    }
+    if (!m->hasLayer("4"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/43232.png", "4", true);
+    }
+    if (!m->hasLayer("5"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/53232.png", "5", true);
+    }
+    if (!m->hasLayer("6"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/63232.png", "6", true);
+    }
+    if (!m->hasLayer("7"))
+    {
+        m->addLayer("assets/gameSpecific/png/walk3d/73232.png", "7", true);
+    }
+    multiTile = StaticDraw::imageFileRefs["multiTile"];
 
     // load sounds
     StaticAudio::updateSounds();
@@ -167,11 +188,11 @@ void Walker3D::onLoad()
 
     // set up random floating things
     images.clear();
-    images.emplace_back(TwoDThreeDImg(0,0,0,1,1));
-    images.emplace_back(TwoDThreeDImg(2,2,0,1,1));
-    images.emplace_back(TwoDThreeDImg(0,2,2,1,1));
-    images.emplace_back(TwoDThreeDImg(1,1,1,1,1));
-    images.emplace_back(TwoDThreeDImg(-2,1,1,1,1));
+    images.emplace_back(TwoDThreeDImg(0,0,0,1,1,1));
+    images.emplace_back(TwoDThreeDImg(2,2,0,1,1,2));
+    images.emplace_back(TwoDThreeDImg(0,2,2,1,1,3));
+    images.emplace_back(TwoDThreeDImg(1,1,1,1,1,4));
+    images.emplace_back(TwoDThreeDImg(-2,1,1,1,1,5));
 
     menuEsc = false;
     aspectChange();
@@ -228,9 +249,9 @@ void Walker3D::render(float time, bool updateDisplay)
         t.updateVertices(viewMat4,projectionMat4);
         imageBatch.insert(imageBatch.end(), t.vertices.begin(), t.vertices.end());
     }
-    StaticDraw::multiDraw
+    StaticDraw::multiDrawLayer
     (
-        tile,
+        multiTile,
         imageBatch,
         threeDTwoDRef,
         threeDTwoDCount
@@ -239,7 +260,7 @@ void Walker3D::render(float time, bool updateDisplay)
     hoveredImage = getHoveredImage();
     if (hoveredImage!=-1)
     {
-        hoverString = "Hovered Image: " + std::to_string(hoveredImage);
+        hoverString = "Hovered Image: " + std::to_string(hoveredImage + 1);
     }
     else
     {

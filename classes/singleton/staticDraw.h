@@ -47,6 +47,7 @@ struct StaticDraw
         GLsizei width;
         GLsizei height;
         GLsizei layers = 1;
+        GLsizei capacity = 1; // a different version used capacity. I will switch back to it when I make something more complex.
         util::BiMap<unsigned int, std::string> layerRefs;
 
         MultiImage(const std::string& name, GLuint ref, GLsizei width, GLsizei height) : name(name), ref(ref), width(width), height(height) {};
@@ -669,6 +670,24 @@ struct StaticDraw
         );
 
         glBindTexture(GL_TEXTURE_2D, imageRef);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size() / floatCount);
+        glBindVertexArray(0);
+    }
+
+    static void multiDrawLayer(int imageRef, const std::vector<float>& vertices, GLuint vao = VAOSimple, unsigned floatCount = 4)
+    {
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            vertices.size() * sizeof(float),
+            vertices.data(),
+            GL_STATIC_DRAW
+        );
+
+        glBindTexture(GL_TEXTURE_2D_ARRAY, imageRef);
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size() / floatCount);
         glBindVertexArray(0);

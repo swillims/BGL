@@ -112,7 +112,7 @@ void StaticDraw::crateLayerImage(GLsizei width, GLsizei height, std::string imag
 
 void StaticDraw::loadLayerImage(int multiImageRef, const std::string &fileName, const std::string &imageName, bool flip)
 {
-    for (MultiImage m : multiImages)
+    for (MultiImage& m : multiImages)
     {
         if (m.ref==multiImageRef)
         {
@@ -125,7 +125,7 @@ void StaticDraw::loadLayerImage(int multiImageRef, const std::string &fileName, 
 
 void StaticDraw::loadLayerImage(const std::string &multiImageRef, const std::string &fileName, const std::string &imageName, bool flip)
 {
-    for (MultiImage m : multiImages)
+    for (MultiImage& m : multiImages)
     {
         if (m.name==multiImageRef)
         {
@@ -138,9 +138,7 @@ void StaticDraw::loadLayerImage(const std::string &multiImageRef, const std::str
 
 GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageName, bool flip)
 {
-
-    if (flip){stbi_set_flip_vertically_on_load(true);}
-    else {stbi_set_flip_vertically_on_load(false);}
+    stbi_set_flip_vertically_on_load(flip);
 
     int imageWidth;
     int imageHeight;
@@ -150,33 +148,65 @@ GLuint StaticDraw::MultiImage::addLayer(std::string fileName, std::string imageN
 
     if (!data)
     {
-        std::cout << "Failed to load layer image ;-; \n";
+        std::cout << "Failed to load layer image\n";
         return 0;
     }
 
-    if (imageWidth > width || imageHeight > height)
+    if (imageWidth < width || imageHeight < height)
     {
-        std::cout<< "Failed to load layer image: dimensions do not match texture array\n";
+        std::cout << "Failed to load layer image because dimensions larger than allocated \n";
+
         stbi_image_free(data);
         return 0;
     }
 
     GLuint layer = layers;
 
+    std::vector<unsigned char> oldData;
+
+    oldData.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(layers) * 4);
+
     glBindTexture(GL_TEXTURE_2D_ARRAY, ref);
 
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, width, height,1,GL_RGBA,GL_UNSIGNED_BYTE,data);
+    // Read the existing texture array into CPU memory.
+    if (layers > 0)
+    {
+        glGetTexImage(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, GL_UNSIGNED_BYTE, oldData.data());
+    }
+
+    GLuint oldRef = ref;
+    GLuint newRef;
+
+    glGenTextures(1, &newRef);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, newRef);
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage3D(GL_TEXTURE_2D_ARRAY,0,GL_RGBA, width, height, layers + 1,0, GL_RGBA, GL_UNSIGNED_BYTE, oldData.empty() ? nullptr : oldData.data());
+
+    // Upload the new layer.
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+    glDeleteTextures(1, &oldRef);
+
+    imageFileRefs.erase(oldRef);
+    imageFileRefs.insert(newRef, name);
+
+    ref = newRef;
+
     stbi_image_free(data);
 
     if (imageName.empty()){imageName = util::cleanFileName(fileName);}
-    else{imageName = util::cleanFileName(imageName);}
+    else {imageName = util::cleanFileName(imageName);}
 
     layerRefs.insert(layer, imageName);
+
     layers++;
-
-    layerRefs.insert(layer, imageName);
 
     return layer;
 }

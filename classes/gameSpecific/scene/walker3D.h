@@ -27,6 +27,7 @@ struct TwoDThreeDImg
     // screen coordinates
     float xMin, xMax;
     float yMin, yMax;
+    float layer = 2.0f;
 
     // I don't think I use vertices. I'm not deleting it because I might change the render technique.
     // - I need to calculate vertices CPU side for figuring out ray trace/mouse hover thing and I have two bad options relating to it
@@ -35,7 +36,7 @@ struct TwoDThreeDImg
     // -- I can switch to using manual vertice calls which disable clipping but be higher performance.
     std::vector<float> vertices;
 
-    TwoDThreeDImg(float x, float y, float z, float deltaX, float height) : x(x), y(y), z(z), deltaX(deltaX/2), height(height) {}
+    TwoDThreeDImg(float x, float y, float z, float deltaX, float height, float layer) : x(x), y(y), z(z), deltaX(deltaX/2), height(height), layer(layer) {}
 
     void updatePosition(float newX, float newY, float newZ)
     {
@@ -91,13 +92,13 @@ struct TwoDThreeDImg
         vertices =
         {
             // x, y, z, u, v, delta
-            x, y, z, 0.0f, 0.0f, -deltaX,
-            x, y, z, 1.0f, 0.0f, deltaX,
-            x, yh, z, 1.0f, 1.0f, deltaX,
+            x, y, z, 0.0f, 0.0f, -deltaX, layer,
+            x, y, z, 1.0f, 0.0f, deltaX, layer,
+            x, yh, z, 1.0f, 1.0f, deltaX, layer,
 
-            x, y, z, 0.0f, 0.0f, -deltaX,
-            x, yh, z, 1.0f, 1.0f, deltaX,
-            x, yh, z, 0.0f, 1.0f, -deltaX,
+            x, y, z, 0.0f, 0.0f, -deltaX, layer,
+            x, yh, z, 1.0f, 1.0f, deltaX, layer,
+            x, yh, z, 0.0f, 1.0f, -deltaX, layer
         };
     }
 };
