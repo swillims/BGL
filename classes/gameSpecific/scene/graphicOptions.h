@@ -111,7 +111,7 @@ public:
 
         if (!StaticDraw::imageFileRefs.contains("optionsUi.png"))
         {
-            StaticDraw::loadImage("assets/core/optionsUi.png");
+            StaticDraw::loadImage("assets/core/optionsUi.png", "optionsUi.png", false);
         }
         uITex = StaticDraw::imageFileRefs["optionsUi.png"];
 

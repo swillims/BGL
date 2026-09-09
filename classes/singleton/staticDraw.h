@@ -441,12 +441,12 @@ struct StaticDraw
 
     static int getImageRef(std::string stringRef) { return imageFileRefs[stringRef]; }
 
-    static void loadImage(std::string fileName, std::string imageName = "", bool flip = false);
+    static void loadImage(std::string fileName, std::string imageName = "", bool flip = true);
 
     static void crateLayerImage(GLsizei width, GLsizei height, std::string imageName = "", unsigned int depth = 1);
 
-    static void loadLayerImage(int multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);
-    static void loadLayerImage(const std::string& multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = false);
+    static void loadLayerImage(int multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = true);
+    static void loadLayerImage(const std::string& multiImageRef, const std::string& fileName, const std::string& imageName = "", bool flip = true);
 
     static MultiImage* getLayerImage(unsigned int ref)
     {

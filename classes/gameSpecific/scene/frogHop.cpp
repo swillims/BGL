@@ -59,7 +59,7 @@ void FrogHop::onLoad()
 	// load iamges
 	if (!StaticDraw::imageFileRefs.contains("frog"))
 	{
-		StaticDraw::loadImage("assets/gameSpecific/png/frogHop/frogsprite1x2.png", "frog");
+		StaticDraw::loadImage("assets/gameSpecific/png/frogHop/frogsprite1x2.png", "frog", false);
 	}
 	frogImage = StaticDraw::imageFileRefs["frog"];
 	if (!StaticDraw::imageFileRefs.contains("frogBlock"))
