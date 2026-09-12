@@ -16,10 +16,8 @@
  * This engine is 2d first.
  * This 3d section is proof of concept.
  * If it works it works.
- * The math is weird and convoluted. I(the author) had to look up everything.
- * If you have the math skills to do this, awesome.
- * For normal people, it is better to use a professional engine or stick with 2d.
- * Math is hard. I don't know it.
+ * 3d math is hard.
+ * I recommend giving up and either using the 2d functionality or using a normal game engine.
 */
 
 void Walker3D::onLoad()
@@ -404,6 +402,12 @@ int Walker3D::getTile()
     // The 2D tile coordinate
     int tileX = static_cast<int>(std::floor(hit.x));
     int tileZ = static_cast<int>(std::floor(hit.z));
+
+    if (rayDirection.y >= 0.0f)
+    {
+        hoverString = "Sky";
+        return -1;
+    }
     hoverString = "Hovered Tile: " + std::to_string(tileX) + " " + std::to_string(tileZ);
     return -1;
 }
