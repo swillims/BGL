@@ -22,12 +22,16 @@ private:
     {
         uiExit,
 
-        uiQ,
         uiW,
-        uiE,
         uiA,
         uiS,
         uiD,
+
+        uiQ,
+        uiE,
+        uiR,
+        uiF,
+
         uiEsc,
 
         uiResetKeys,
@@ -59,21 +63,31 @@ public:
     // uiTextSources
     std::string keyTitle;
 
-    std::string qTitle;
-    std::string qValue;
+    // move strings
     std::string wTitle;
     std::string wValue;
-    std::string eTitle;
-    std::string eValue;
     std::string aTitle;
     std::string aValue;
     std::string sTitle;
     std::string sValue;
     std::string dTitle;
     std::string dValue;
+
+    // rotate strings
+    std::string qTitle;
+    std::string qValue;
+    std::string eTitle;
+    std::string eValue;
+    std::string rTitle;
+    std::string rValue;
+    std::string fTitle;
+    std::string fValue;
+
+    // menu
     std::string escTitle;
     std::string escValue;
 
+    // other
     std::string exitText;
     std::string saveText;
 
@@ -119,30 +133,40 @@ public:
 
         keyTitle = "Walker 3D Key Bindings";
 
-        qTitle = "3dLRotate";
         wTitle = "3dUp";
-        eTitle = "3dRRotate";
         aTitle = "3dLeft";
         sTitle = "3dDown";
         dTitle = "3dRight";
 
+        qTitle = "3dLookLeft";
+        eTitle = "3dLookRight";
+        rTitle = "3dLookUp";
+        fTitle = "3dLookDown";
+
         escTitle = "3dMenu ";
 
-        if (!StaticInput::HasAlias<std::string>(qTitle)){StaticInput::AssignAlias(qTitle,'Q');}
         if (!StaticInput::HasAlias<std::string>(wTitle)){StaticInput::AssignAlias(wTitle,'W');}
-        if (!StaticInput::HasAlias<std::string>(eTitle)){StaticInput::AssignAlias(eTitle,'E');}
         if (!StaticInput::HasAlias<std::string>(aTitle)){StaticInput::AssignAlias(aTitle,'A');}
         if (!StaticInput::HasAlias<std::string>(sTitle)){StaticInput::AssignAlias(sTitle,'S');}
         if (!StaticInput::HasAlias<std::string>(dTitle)){StaticInput::AssignAlias(dTitle,'D');}
+
+        if (!StaticInput::HasAlias<std::string>(qTitle)){StaticInput::AssignAlias(qTitle,'Q');}
+        if (!StaticInput::HasAlias<std::string>(eTitle)){StaticInput::AssignAlias(eTitle,'E');}
+        if (!StaticInput::HasAlias<std::string>(rTitle)){StaticInput::AssignAlias(rTitle,'R');}
+        if (!StaticInput::HasAlias<std::string>(fTitle)){StaticInput::AssignAlias(fTitle,'F');}
+
         if (!StaticInput::HasAlias<std::string>(escTitle)){StaticInput::AssignAlias(escTitle,"ESCAPE");}
 
-        qValue = StaticInput::GetStringAlias(qTitle);
         wValue = StaticInput::GetStringAlias(wTitle);
-        eValue = StaticInput::GetStringAlias(eTitle);
         aValue = StaticInput::GetStringAlias(aTitle);
         sValue = StaticInput::GetStringAlias(sTitle);
         dValue = StaticInput::GetStringAlias(dTitle);
         escValue = StaticInput::GetStringAlias(escTitle);
+
+        qValue = StaticInput::GetStringAlias(qTitle);
+        eValue = StaticInput::GetStringAlias(eTitle);
+        rValue = StaticInput::GetStringAlias(rTitle);
+        fValue = StaticInput::GetStringAlias(fTitle);
 
         exitText = "Exit Settings";
         saveText = "Save Key Bindings";
@@ -151,6 +175,10 @@ public:
         // - because it navigates back to itself without deleting, it has to either clear the nodes or not add new nodes if they already exist
         // -- deleting the old nodes is better for readability than a massive if statement
         ui.nodes.clear();
+
+        // font size added to reduce cost to change in future
+        float elemFontSize = .11f;
+        float buttonFontSize = .2f;
 
         ui.appendType<UIYHolder>();
         ui[0].appendType<UIBuffer>(.1)
@@ -164,58 +192,76 @@ public:
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, qTitle,.15).back()
+                .appendType<UITextOneLine>(-111, qTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
-                        .appendType<UITextOneLine>(-111, qValue,.15).back()
+                        .appendType<UITextOneLine>(-111, qValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, wTitle,.15).back()
-                .appendType<UIXRatio>(1)
-                    .appendType<UIStack>()
-                        .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
-                        .appendType<UITextOneLine>(-111, wValue,.15).back()
-                        .back()
-                    .back()
-                .back()
-            .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, eTitle,.15).back()
+                .appendType<UITextOneLine>(-111, eTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
-                        .appendType<UITextOneLine>(-111, eValue,.15).back()
+                        .appendType<UITextOneLine>(-111, eValue, buttonFontSize).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, rTitle, elemFontSize).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiR).back()
+                        .appendType<UITextOneLine>(-111, rValue, buttonFontSize).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, fTitle, elemFontSize).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiF).back()
+                        .appendType<UITextOneLine>(-111, fValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
         ;
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, aTitle,.15).back()
+                .appendType<UITextOneLine>(-111, wTitle, elemFontSize).back()
+                .appendType<UIXRatio>(1)
+                    .appendType<UIStack>()
+                        .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
+                        .appendType<UITextOneLine>(-111, wValue, buttonFontSize).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIXHolder>()
+                .appendType<UITextOneLine>(-111, aTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiA).back()
-                        .appendType<UITextOneLine>(-111, aValue,.15).back()
+                        .appendType<UITextOneLine>(-111, aValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, sTitle,.15).back()
+                .appendType<UITextOneLine>(-111, sTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiS).back()
-                        .appendType<UITextOneLine>(-111, sValue,.15).back()
+                        .appendType<UITextOneLine>(-111, sValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, dTitle,.15).back()
+                .appendType<UITextOneLine>(-111, dTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiD).back()
-                        .appendType<UITextOneLine>(-111, dValue,.15).back()
+                        .appendType<UITextOneLine>(-111, dValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
@@ -223,11 +269,11 @@ public:
         ui[0].appendType<UIXHolder>()
             .appendType<UIEmpty>().back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, escTitle,.15).back()
+                .appendType<UITextOneLine>(-111, escTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
-                        .appendType<UITextOneLine>(-111, escValue,.15).back()
+                        .appendType<UITextOneLine>(-111, escValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
@@ -296,25 +342,5 @@ public:
 
     void buttonPress(int x);
 
-    void saveSetting()
-    {
-        StaticAudio::playSoundEffectMulti(bwoo);
-
-        std::string settingsFileName = "metadata/keybind3dsettings";
-        std::ostringstream write;
-
-        write << qTitle << ":" << qValue << "\n";
-        write << eTitle << ":" << eValue << "\n";
-        write << wTitle << ":" << wValue << "\n";
-        write << escTitle << ":" << escValue;
-
-        if(util::writeFile(settingsFileName, write.str()))
-        {
-            std::cout << "keybind settings saved\n";
-        }
-        else
-        {
-            std::cout << "fail to write keybind settings\n";
-        }
-    }
+    void saveSetting();
 };

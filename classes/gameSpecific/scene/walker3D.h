@@ -128,12 +128,16 @@ struct Walker3D : Scene
     unsigned int viewUboRef;
 
     // controls
-    unsigned int qKey;
     unsigned int wKey;
-    unsigned int eKey;
     unsigned int aKey;
     unsigned int sKey;
     unsigned int dKey;
+
+    unsigned int qKey;
+    unsigned int eKey;
+    unsigned int rKey;
+    unsigned int fKey;
+
     unsigned int escKey;
 
     bool rotateQ;

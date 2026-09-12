@@ -140,28 +140,38 @@ void Walker3D::onLoad()
     WalkerKeyOptions keyOptions;
     keyOptions.previous = this; // not setting previous makes avoiding crashes easier
     keyOptions.onLoad();
-    qKey = StaticInput::GetAlias(keyOptions.qTitle);
+
     wKey = StaticInput::GetAlias(keyOptions.wTitle);
-    eKey = StaticInput::GetAlias(keyOptions.eTitle);
     aKey = StaticInput::GetAlias(keyOptions.aTitle);
     sKey = StaticInput::GetAlias(keyOptions.sTitle);
     dKey = StaticInput::GetAlias(keyOptions.dTitle);
+
+    qKey = StaticInput::GetAlias(keyOptions.qTitle);
+    eKey = StaticInput::GetAlias(keyOptions.eTitle);
+    rKey = StaticInput::GetAlias(keyOptions.rTitle);
+    fKey = StaticInput::GetAlias(keyOptions.fTitle);
+
     escKey = StaticInput::GetAlias(keyOptions.escTitle);
 
     StaticInput::KeyTrackSetAll(false); // not tracking unused keys is a mild optimization.
-    StaticInput::KeyTrack(qKey);
     StaticInput::KeyTrack(wKey);
-    StaticInput::KeyTrack(eKey);
     StaticInput::KeyTrack(aKey);
     StaticInput::KeyTrack(sKey);
     StaticInput::KeyTrack(dKey);
+    StaticInput::KeyTrack(qKey);
+    StaticInput::KeyTrack(eKey);
+    StaticInput::KeyTrack(rKey);
+    StaticInput::KeyTrack(fKey);
     StaticInput::KeyTrack(escKey);
 
     // set strings
     menuString = "Pause: " + StaticInput::IntToString(escKey);
+    rotateString = "Rotate Camera: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey) + " " +
+        StaticInput::IntToString(rKey) + " " + StaticInput::IntToString(fKey);
+
     playerWalkString = "Move: " + StaticInput::IntToString(wKey) + " " + StaticInput::IntToString(aKey) + " " +
         StaticInput::IntToString(sKey) + " " + StaticInput::IntToString(dKey);
-    rotateString = "Rotate: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey);
+
     hoverString = "Null";
 
     // set physics framerate to 60

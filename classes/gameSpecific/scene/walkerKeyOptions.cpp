@@ -21,21 +21,12 @@ void WalkerKeyOptions::buttonPress(int x)
     {
         saveSetting();
     }
-    else if (x == uiQ)
-    {
-        ButtonInput* scene = new ButtonInput(qTitle, this);
-        DataHolder::SceneQueue(scene, false);
-    }
     else if (x == uiW)
     {
         ButtonInput* scene = new ButtonInput(wTitle, this);
         DataHolder::SceneQueue(scene, false);
     }
-    else if (x == uiE)
-    {
-        ButtonInput* scene = new ButtonInput(eTitle, this);
-        DataHolder::SceneQueue(scene, false);
-    }
+
     else if (x == uiA)
     {
         ButtonInput* scene = new ButtonInput(aTitle, this);
@@ -49,6 +40,26 @@ void WalkerKeyOptions::buttonPress(int x)
     else if (x == uiD)
     {
         ButtonInput* scene = new ButtonInput(dTitle, this);
+        DataHolder::SceneQueue(scene, false);
+    }
+    else if (x == uiQ)
+    {
+        ButtonInput* scene = new ButtonInput(qTitle, this);
+        DataHolder::SceneQueue(scene, false);
+    }
+    else if (x == uiE)
+    {
+        ButtonInput* scene = new ButtonInput(eTitle, this);
+        DataHolder::SceneQueue(scene, false);
+    }
+    else if (x == uiR)
+    {
+        ButtonInput* scene = new ButtonInput(rTitle, this);
+        DataHolder::SceneQueue(scene, false);
+    }
+    else if (x == uiF)
+    {
+        ButtonInput* scene = new ButtonInput(fTitle, this);
         DataHolder::SceneQueue(scene, false);
     }
     else if (x == uiEsc)
@@ -67,5 +78,34 @@ void WalkerKeyOptions::buttonPress(int x)
         SoundOptions* sound = new SoundOptions();
         sound->previous = previous;
         DataHolder::SceneQueue(sound, true);
+    }
+}
+
+void WalkerKeyOptions::saveSetting()
+{
+    {
+        StaticAudio::playSoundEffectMulti(bwoo);
+
+        std::string settingsFileName = "metadata/keybind3dsettings";
+        std::ostringstream write;
+
+        write << qTitle << ":" << qValue << "\n";
+        write << eTitle << ":" << eValue << "\n";
+        write << rTitle << ":" << rValue << "\n";
+        write << fTitle << ":" << fValue << "\n";
+        write << wTitle << ":" << wValue << "\n";
+        write << aTitle << ":" << aValue << "\n";
+        write << sTitle << ":" << sValue << "\n";
+        write << dTitle << ":" << dValue << "\n";
+        write << escTitle << ":" << escValue;
+
+        if(util::writeFile(settingsFileName, write.str()))
+        {
+            std::cout << "keybind settings saved\n";
+        }
+        else
+        {
+            std::cout << "fail to write keybind settings\n";
+        }
     }
 }
