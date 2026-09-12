@@ -47,7 +47,18 @@ struct TwoDThreeDImg
 
     void updateVertices(const glm::mat4& view, const glm::mat4&projection)
     {
-        glm::vec3 right = glm::vec3(view[0]);
+        //glm::vec3 right = glm::vec3(view[0]);
+
+        glm::vec3 right
+        (
+            view[0][0],
+            view[1][0],
+            view[2][0]
+        );
+
+        right.y = 0.0f;
+        right = glm::normalize(right);
+
 
         glm::vec3 position(x, y, z);
 

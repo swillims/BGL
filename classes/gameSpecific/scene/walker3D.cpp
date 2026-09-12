@@ -352,18 +352,18 @@ void Walker3D::clean()
 
 int Walker3D::getHoveredImage()
 {
-    // I don't know how to do this, so I looked it up.
+    // this looks backwards because it uses old names before projection was z flipped
     int closest = -1;
     float mouseX;
     float mouseY;
     StaticInput::GetMouseF(mouseX, mouseY);
-    float closestDepth = std::numeric_limits<float>::max();
+    float closestDepth = -std::numeric_limits<float>::max();
     for (int i = 0; i < images.size(); ++i)
     {
         const auto& image = images[i];
         if (mouseX < image.xMin || mouseX > image.xMax || mouseY < image.yMin || mouseY > image.yMax){continue;}
         float depth = glm::dot(glm::vec3(image.x, image.y, image.z) - player.position,player.direction);
-        if (depth < closestDepth)
+        if (depth > closestDepth)
         {
             closestDepth = depth;
             closest = i;
