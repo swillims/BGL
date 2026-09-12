@@ -715,16 +715,24 @@ struct StaticDraw
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    static void set3DEnabled(const bool enable = true, const GLenum depth = GL_LEQUAL )
+    static void set3DEnabled(const bool enableDepthTest = true, const GLenum depthFunc = GL_LEQUAL, bool enableCulling = false)
     {
-        if (enable)
+        if (enableDepthTest)
         {
             glEnable(GL_DEPTH_TEST);
-            glDepthFunc(depth);
+            glDepthFunc(depthFunc);
         }
         else
         {
             glDisable(GL_DEPTH_TEST);
+        }
+        if (enableCulling)
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
         }
     }
     static void clear3D(const glm::vec3 color = {0,0,0})

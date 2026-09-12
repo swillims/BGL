@@ -44,7 +44,7 @@ void Walker3D::onLoad()
 
     if (!StaticDraw::hasShader("3d2d"))
     {
-        StaticDraw::compileShader("assets/shaders/3d2dLayer.vs", "assets/shaders/simpleLayer.fs", "3d2d");
+        StaticDraw::compileShader("assets/shaders/3d2dLayer.vs", "assets/shaders/simpleLayerA.fs", "3d2d");
     }
     shader3d2d = StaticDraw::getShader("3d2d");
 
@@ -179,10 +179,6 @@ void Walker3D::onLoad()
 
     if (!alreadyLoaded)
     {
-        // set mat4 defaults
-        viewMat4 = glm::mat4(1.0f);
-        projectionMat4 = glm::mat4(1.0f);
-
         // generate ground
         floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
 
@@ -224,27 +220,16 @@ void Walker3D::render(float time, bool updateDisplay)
     // - clear3D also resets a depth buffer and the depth buffer needs to be set to draw in 3D
     StaticDraw::clear3D();
 
-    // Camera Things
-    // - idk what any of this camera stuff is. I looked up how to do it. I'm learning while I make this.
     player.direction.x = std::sin(player.camYaw);
     player.direction.y = std::sin(player.camPitch);
-    player.direction.z = std::cos(player.camYaw);
+    player.direction.z = -std::cos(player.camYaw);
 
-    glm::vec3 forward = glm::normalize(player.direction);
-    glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
-    glm::vec3 up = glm::cross(forward, right);
+    //player.direction = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    viewMat4 = glm::mat4(1.0f);
-
-    viewMat4[0] = glm::vec4(right, 0.0f);
-    viewMat4[1] = glm::vec4(up, 0.0f);
-    viewMat4[2] = glm::vec4(-forward, 0.0f);
-
-    viewMat4[3] = glm::vec4(
-        -glm::dot(right, player.position),
-        -glm::dot(up, player.position),
-         glm::dot(forward, player.position),
-        1.0f
+    viewMat4 = glm::lookAt(
+        player.position,
+        player.position + player.direction,
+        glm::vec3(0.0f, 1.0f, 0.0f)
     );
 
     StaticDraw::updateSharedShaderVariable(viewUboRef, viewMat4);
@@ -315,8 +300,8 @@ void Walker3D::processInput(GLFWwindow *window, float time)
     controlZ += walkW;
     controlZ -= walkS;
 
-    float rotatedX = (controlX * std::cos(player.camYaw)) + (controlZ * std::sin(player.camYaw));
-    float rotatedZ = -(controlX * std::sin(player.camYaw)) + (controlZ * std::cos(player.camYaw));
+    float rotatedX = (controlX * std::cos(player.camYaw)) - (controlZ * std::sin(player.camYaw));
+    float rotatedZ = (controlX * std::sin(player.camYaw)) + (controlZ * std::cos(player.camYaw));
 
     glm::vec3 normalized(rotatedX, 0.0f, rotatedZ);
 
@@ -325,14 +310,23 @@ void Walker3D::processInput(GLFWwindow *window, float time)
 
     float controlXCam = 0.0f;
     float controlYCam = 0.0f;
-    controlXCam -= rotateQ;
-    controlXCam += rotateE;
+    controlXCam += rotateQ;
+    controlXCam -= rotateE;
     controlXCam *= time * player.rotateSpeed;
-    controlYCam -= rotateF;
-    controlYCam += rotateR;
+    controlYCam += rotateF;
+    controlYCam -= rotateR;
     controlYCam *= time * player.rotateSpeed;
     player.camYaw += controlXCam;
     player.camPitch += controlYCam;
+
+    // avoid bug from going over max size for a float
+    // - it improbably that a person would hold down a rotate key long enough to create a bug but we stop the bug anyway because easy
+    if (player.camYaw > 4){player.camYaw -= 2*glm::pi<float>();}
+    if (player.camYaw < -4){player.camYaw += 2*glm::pi<float>();}
+
+    // limit pitch
+    if (player.camPitch>1){player.camPitch=1;}
+    else if (player.camPitch<-1){player.camPitch=-1;}
 }
 
 void Walker3D::aspectChange()
@@ -344,6 +338,8 @@ void Walker3D::aspectChange()
         0.1f,
         100.0f
     );
+    // I am treating positive z as further away, so I need to reverse projection
+    projectionMat4[2] *= -1.0f;
     StaticDraw::updateSharedShaderVariable(projectionUboRef, projectionMat4);
 
     updateUI();
