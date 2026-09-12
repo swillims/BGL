@@ -140,12 +140,16 @@ struct Walker3D : Scene
 
     unsigned int escKey;
 
-    bool rotateQ;
     bool walkW;
-    bool rotateE;
     bool walkA;
     bool walkS;
     bool walkD;
+
+    bool rotateE;
+    bool rotateQ;
+    bool rotateR;
+    bool rotateF;
+
     bool menuEsc;
 
     // graphic math and vertice storing

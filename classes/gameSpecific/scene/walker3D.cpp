@@ -292,6 +292,8 @@ void Walker3D::processInput(GLFWwindow *window, float time)
     StaticInput::Tick();
     rotateQ = StaticInput::KeyHeld(qKey);
     rotateE = StaticInput::KeyHeld(eKey);
+    rotateF = StaticInput::KeyHeld(fKey);
+    rotateR = StaticInput::KeyHeld(rKey);
     walkW = StaticInput::KeyHeld(wKey);
     walkA = StaticInput::KeyHeld(aKey);
     walkS = StaticInput::KeyHeld(sKey);
@@ -321,11 +323,16 @@ void Walker3D::processInput(GLFWwindow *window, float time)
     player.playerVX = normalized.x * delta;
     player.playerVZ = normalized.z * delta;
 
-    float controlCam = 0.0f;
-    controlCam -= rotateQ;
-    controlCam += rotateE;
-    controlCam *= time * player.rotateSpeed;
-    player.camYaw += controlCam;
+    float controlXCam = 0.0f;
+    float controlYCam = 0.0f;
+    controlXCam -= rotateQ;
+    controlXCam += rotateE;
+    controlXCam *= time * player.rotateSpeed;
+    controlYCam -= rotateF;
+    controlYCam += rotateR;
+    controlYCam *= time * player.rotateSpeed;
+    player.camYaw += controlXCam;
+    player.camPitch += controlYCam;
 }
 
 void Walker3D::aspectChange()
