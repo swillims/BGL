@@ -117,20 +117,16 @@ struct TwoDThreeDImg
 struct Walker3D : Scene
 {
     //images
-    unsigned int tile;
     unsigned int greenTile;
     unsigned int multiTile;
 
     //vao
-    unsigned int baseVao;
     unsigned int tileVaoRef;
     unsigned int tileVaoCount;
     unsigned int threeDTwoDRef;
     unsigned int threeDTwoDCount;
 
     //shader
-    unsigned int shaderSimpleRef;
-    unsigned int shader3DSimple;
     unsigned int shader3DProjection;
     unsigned int shader3d2d;
 
@@ -177,8 +173,6 @@ struct Walker3D : Scene
 
     // hover logic
     unsigned int hoveredImage;
-    unsigned int hoveredTileX;
-    unsigned int hoveredTileY;
 
     // ui
     UIBase ui;

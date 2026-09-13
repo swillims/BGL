@@ -26,14 +26,6 @@ void Walker3D::onLoad()
     StaticDraw::set3DEnabled();
 
     // load shaders
-    shaderSimpleRef = StaticDraw::getShader("simple");
-
-    if (!StaticDraw::hasShader("simple3d"))
-    {
-        StaticDraw::compileShader("assets/shaders/simple3d.vs", "assets/shaders/simple.fs", "simple3d");
-    }
-    shader3DSimple = StaticDraw::getShader("simple3d");
-
     if (!StaticDraw::hasShader("projection3d"))
     {
         StaticDraw::compileShader("assets/shaders/projectionview3d.vs", "assets/shaders/simple.fs", "projection3d");
@@ -65,7 +57,8 @@ void Walker3D::onLoad()
     StaticDraw::bindSharedShaderVariable(shader3d2d, "projection");
 
     // load vaos
-    baseVao = StaticDraw::VAOSimple;
+    //baseVao = StaticDraw::VAOSimple;
+    // - VAOSimple is not part of this scene but I left commented out code for baseVAO for people to reference if they want to use it.
 
     if (!StaticDraw::hasVAO("3dSimple"))
     {
@@ -82,12 +75,6 @@ void Walker3D::onLoad()
     threeDTwoDCount = StaticDraw::getVAO("3d2d").floatCount;
 
     // load textures
-    if (!StaticDraw::imageFileRefs.contains("tile"))
-    {
-        StaticDraw::loadImage("assets/gameSpecific/png/frogHop/block.png", "tile");
-    }
-    tile = StaticDraw::imageFileRefs["tile"];
-
     if (!StaticDraw::imageFileRefs.contains("greenTile"))
     {
         StaticDraw::loadImage("assets/gameSpecific/png/walk3d/green.png", "greenTile");
@@ -131,12 +118,16 @@ void Walker3D::onLoad()
     multiTile = StaticDraw::imageFileRefs["multiTile"];
 
     // load sounds
+
+    // I haven't added any sounds yet.
+    // - I probably won't add sounds because this scene is currently a gameless tech demo for 3d.
+
     StaticAudio::updateSounds();
 
     // load inputs
     // - creating temp keyOptions page to pull values from
     WalkerKeyOptions keyOptions;
-    keyOptions.previous = this; // not setting previous makes avoiding crashes easier
+    keyOptions.previous = this; // setting previous makes avoiding crashes easier
     keyOptions.onLoad();
 
     wKey = StaticInput::GetAlias(keyOptions.wTitle);
@@ -164,11 +155,8 @@ void Walker3D::onLoad()
 
     // set strings
     menuString = "Pause: " + StaticInput::IntToString(escKey);
-    rotateString = "Rotate Camera: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey) + " " +
-        StaticInput::IntToString(rKey) + " " + StaticInput::IntToString(fKey);
-
-    playerWalkString = "Move: " + StaticInput::IntToString(wKey) + " " + StaticInput::IntToString(aKey) + " " +
-        StaticInput::IntToString(sKey) + " " + StaticInput::IntToString(dKey);
+    rotateString = "Rotate Camera: " + StaticInput::IntToString(qKey) + " " + StaticInput::IntToString(eKey) + " " + StaticInput::IntToString(rKey) + " " + StaticInput::IntToString(fKey);
+    playerWalkString = "Move: " + StaticInput::IntToString(wKey) + " " + StaticInput::IntToString(aKey) + " " + StaticInput::IntToString(sKey) + " " + StaticInput::IntToString(dKey);
 
     hoverString = "Null";
 
@@ -198,6 +186,8 @@ void Walker3D::onLoad()
     images.emplace_back(TwoDThreeDImg(0,2,2,1,1,3));
     images.emplace_back(TwoDThreeDImg(1,1,1,1,1,4));
     images.emplace_back(TwoDThreeDImg(-2,1,1,1,1,5));
+    images.emplace_back(TwoDThreeDImg(.5,1.5,1.5,1,1,6));
+    images.emplace_back(TwoDThreeDImg(1,4,10,1,1,7));
 
     menuEsc = false;
     aspectChange();
