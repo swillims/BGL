@@ -24,23 +24,42 @@ void StaticDraw::updateView()
 
 void StaticDraw::unLoadImage(const std::string& ref)
 {
-    std::cout << "unloading: " << ref << "\n";
+    /*std::cout << "unloading: " << ref << "\n";
     if(imageFileRefs.contains(ref))
     {
         unsigned int id = imageFileRefs[ref];
         glDeleteTextures(1, &id);
         imageFileRefs.erase(ref);
+    }*/
+
+    // searching twice is inefficient but it fine because it is not in render or handle.
+    // - moving functionality to int version of method reduces technical debt by not having duplicate functions
+    if(imageFileRefs.contains(ref))
+    {
+        unsigned int id = imageFileRefs[ref];
+        unLoadImage(id);
     }
 }
 
 void StaticDraw::unLoadImage(unsigned int ref)
 {
     std::cout << "unloading: " << ref << "\n";
+
     if (imageFileRefs.contains(ref))
     {
         unsigned int id = ref;
         glDeleteTextures(1, &id);
         imageFileRefs.erase(ref);
+    }
+
+    // remove multiImage
+    for (int i = 0; i < multiImages.size(); ++i)
+    {
+        if (multiImages[i].ref == ref)
+        {
+            multiImages.erase(multiImages.begin() + i);
+            return;
+        }
     }
 }
 
@@ -152,7 +171,7 @@ GLuint StaticDraw::MultiImage::addLayer(const std::string& fileName, std::string
         return 0;
     }
 
-    if (imageWidth < width || imageHeight < height)
+    if (imageWidth > width || imageHeight > height)
     {
         std::cout << "Failed to load layer image because dimensions larger than allocated\n";
         stbi_image_free(data);

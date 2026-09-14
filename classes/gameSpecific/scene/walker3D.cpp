@@ -183,10 +183,10 @@ void Walker3D::onLoad()
     images.clear();
     images.emplace_back(TwoDThreeDImg(0,0,0,1,1,1));
     images.emplace_back(TwoDThreeDImg(2,2,0,1,1,2));
-    images.emplace_back(TwoDThreeDImg(0,2,2,1,1,3));
+    images.emplace_back(TwoDThreeDImg(0,2,5,1,1,3));
     images.emplace_back(TwoDThreeDImg(1,1,1,1,1,4));
     images.emplace_back(TwoDThreeDImg(-2,1,1,1,1,5));
-    images.emplace_back(TwoDThreeDImg(.5,1.5,1.5,1,1,6));
+    images.emplace_back(TwoDThreeDImg(.5,1.5,3,1,1,6));
     images.emplace_back(TwoDThreeDImg(1,4,10,1,1,7));
 
     menuEsc = false;
@@ -195,6 +195,8 @@ void Walker3D::onLoad()
 
 void Walker3D::handle(float time)
 {
+    // A lot of functionality should be moved here, but I'm not going to because it is a cheap tech demo.
+
     processInput(window, time);
 
     if (menuEsc){return;} // stop handle if a return is called
@@ -206,7 +208,8 @@ void Walker3D::render(float time, bool updateDisplay)
 {
     // clearing before a draw is correct
     // - clear3D also resets a depth buffer and the depth buffer needs to be set to draw in 3D
-    StaticDraw::clear3D();
+    //StaticDraw::clear3D();
+    StaticDraw::clear3D({0,0,.5});
 
     player.direction.x = std::sin(player.camYaw);
     player.direction.y = std::sin(player.camPitch);
@@ -335,7 +338,12 @@ void Walker3D::aspectChange()
 
 void Walker3D::clean()
 {
-
+    StaticDraw::unLoadImage(greenTile);
+    StaticDraw::unLoadImage(multiTile);
+    StaticDraw::unLoadShader(shader3DProjection);
+    StaticDraw::unLoadShader(shader3d2d);
+    StaticDraw::unLoadSharedShaderVariable(viewUboRef);
+    StaticDraw::unLoadSharedShaderVariable(projectionUboRef);
 }
 
 int Walker3D::getHoveredImage()

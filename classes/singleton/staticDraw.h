@@ -406,6 +406,33 @@ struct StaticDraw
         updateSharedShaderVariable(ubo.ref, data);
     }
 
+    static void unLoadSharedShaderVariable(const std::string& ref)
+    {
+        for (UBOInfo& ubo : UBOs)
+        {
+            if (ubo.name == ref)
+            {
+                // searching twice is inefficient but it fine because it is not in render or handle.
+                // - moving functionality to int version of method reduces technical debt by not having duplicate functions
+                unLoadSharedShaderVariable(ubo.ref);
+                return;
+            }
+        }
+    }
+    static void unLoadSharedShaderVariable(GLuint ref)
+    {
+        // using for normal for loop instead of : for loop because I need i for removal.
+        for (int i = 0; i < UBOs.size(); ++i)
+        {
+            if (UBOs[i].ref == ref)
+            {
+                glDeleteBuffers(1, &UBOs[i].ref);
+                UBOs.erase(UBOs.begin() + i);
+                return;
+            }
+        }
+    }
+
     // This one is a debug method. I recommend deleting it if you modify my engine and make a custom engine.
     static void printShaderUniforms(GLuint programID) {
         GLint uniformCount;
