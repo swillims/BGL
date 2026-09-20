@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "singleton/staticFile.h"
+
 #ifdef _WIN32
     #include <GLFW/glfw3.h> // windows // comment added to make ignoring in grep easier
     #include <GL/gl.h>
@@ -67,12 +69,12 @@ static int mainmainmain()
 
     // load graphics settings
     settingsFileName = "metadata/graphicsettings";
-    if (util::fileExists(settingsFileName))
+    if (StaticFile::Exists(settingsFileName))
     {
         // read file and split by line
         // - note: util::split handles Windows (\r\n) and Unix (\n) line endings automatically. Look this up if you don't know it.
         std::cout << "graphics settings file exists\n";
-        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+        std::vector<std::string> lines = util::split(StaticFile::Load(settingsFileName),"\n");
 
         // handle each line
         for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
@@ -116,11 +118,11 @@ static int mainmainmain()
 
     // keybind settings
     settingsFileName = "metadata/keybindsettings";
-    if (util::fileExists(settingsFileName))
+    if (StaticFile::Exists(settingsFileName))
     {
         // read file and split by line
         std::cout << "keybind settings file exists\n";
-        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+        std::vector<std::string> lines = util::split(StaticFile::Load(settingsFileName),"\n");
 
         // handle each line
         for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
@@ -137,11 +139,11 @@ static int mainmainmain()
     }
 
     settingsFileName = "metadata/keybind3dsettings";
-    if (util::fileExists(settingsFileName))
+    if (StaticFile::Exists(settingsFileName))
     {
         // read file and split by line
         std::cout << "keybind settings file exists\n";
-        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+        std::vector<std::string> lines = util::split(StaticFile::Load(settingsFileName),"\n");
 
         // handle each line
         for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
@@ -162,10 +164,10 @@ static int mainmainmain()
     StaticAudio::createTag("soundEffect");
 
     settingsFileName = "metadata/soundsettings";
-    if (util::fileExists(settingsFileName))
+    if (StaticFile::Exists(settingsFileName))
     {
         std::cout << "sound settings file exists\n";
-        std::vector<std::string> lines = util::split(util::readFile(settingsFileName),"\n");
+        std::vector<std::string> lines = util::split(StaticFile::Load(settingsFileName),"\n");
 
         // handle each line
         for (std::string& line : lines) // it's ok to not use const here because string is not reused and is not a literal
