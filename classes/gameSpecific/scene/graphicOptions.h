@@ -7,6 +7,7 @@
 #include "singleton/dataHolder.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
+#include "singleton/staticFile.h"
 
 
 /*
@@ -377,7 +378,7 @@ public:
         write << "SCR_HEIGHT:" << StaticDraw::h << "\n";
         write << "FPS_CAP:" << DataHolder::god.frameCapInt;
 
-        if(util::writeFile(settingsFileName, write.str()))
+        if(StaticFile::Write(settingsFileName, write.str()))
         {
             std::cout << "sound settings saved\n";
         }

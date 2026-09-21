@@ -86,10 +86,27 @@ std::string StaticFile::Load(const std::string &path)
 bool StaticFile::Write(const std::string &path, const std::string &data, bool append)
 {
     {
-        std::ofstream file
-        (
-            path, append ? std::ios::app : std::ios::out
-        );
+        std::filesystem::path p(path);
+
+        if (!p.parent_path().empty())
+        {
+            std::error_code error;
+            std::filesystem::create_directories(p.parent_path(), error);
+
+            if (error)
+            {
+                return false;
+            }
+        }
+        std::ofstream file;
+        if (append)
+        {
+            file.open(path, std::ios::out | std::ios::app);
+        }
+        else
+        {
+            file.open(path, std::ios::out | std::ios::trunc);
+        }
 
         if (!file.is_open())
         {
@@ -98,6 +115,11 @@ bool StaticFile::Write(const std::string &path, const std::string &data, bool ap
 
         file << data;
 
+        if (!file.good())
+        {
+            file.close();
+            return false;
+        }
         file.close();
         return true;
     }

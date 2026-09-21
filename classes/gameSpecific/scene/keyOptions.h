@@ -6,6 +6,7 @@
 #include "singleton/dataHolder.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
+#include "singleton/staticFile.h"
 
 /*
  * -> IMPORTANT <-
@@ -251,7 +252,7 @@ public:
         write << wTitle << ":" << wValue << "\n";
         write << escTitle << ":" << escValue;
 
-        if(util::writeFile(settingsFileName, write.str()))
+        if(StaticFile::Write(settingsFileName, write.str()))
         {
             std::cout << "keybind settings saved\n";
         }

@@ -5,6 +5,7 @@
 
 #include "graphicOptions.h"
 #include "walkerKeyOptions.h"
+#include "singleton/staticFile.h"
 
 /*
  * -> IMPORTANT <-
@@ -393,7 +394,7 @@ public:
         write << "SOUND_MUSIC:" << static_cast<int>(musicVollume * 100) << "\n";
         write << "SOUND_EFFECT:" << static_cast<int>(effectVollume * 100);
 
-        if(util::writeFile(settingsFileName, write.str()))
+        if(StaticFile::Write(settingsFileName, write.str()))
         {
             std::cout << "sound settings saved\n";
         }

@@ -2,6 +2,7 @@
 #include "keyOptions.h"
 #include "soundOptions.h"
 #include "buttonInput.h"
+#include "singleton/staticFile.h"
 
 /*
  * -> IMPORTANT <-
@@ -99,7 +100,7 @@ void WalkerKeyOptions::saveSetting()
         write << dTitle << ":" << dValue << "\n";
         write << escTitle << ":" << escValue;
 
-        if(util::writeFile(settingsFileName, write.str()))
+        if(StaticFile::Write(settingsFileName, write.str()))
         {
             std::cout << "keybind settings saved\n";
         }

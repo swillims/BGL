@@ -6,6 +6,7 @@
 #include "singleton/dataHolder.h"
 #include "singleton/staticSound.h"
 #include "singleton/staticDraw.h"
+#include "singleton/staticFile.h"
 
 /*
  * -> IMPORTANT <-
