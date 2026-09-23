@@ -359,7 +359,7 @@ int Walker3D::getHoveredImage()
         const auto& image = images[i];
         if (mouseX < image.xMin || mouseX > image.xMax || mouseY < image.yMin || mouseY > image.yMax){continue;}
         float depth = glm::dot(glm::vec3(image.x, image.y, image.z) - player.position,player.direction);
-        if (depth > closestDepth)
+        if (depth < 0.0f && depth > closestDepth)
         {
             closestDepth = depth;
             closest = i;
