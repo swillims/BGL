@@ -114,6 +114,27 @@ void StaticWrite::destroyChannels()
     channels = std::unordered_map<unsigned int,std::vector<float>>();
 }
 
+void StaticWrite::destroyChannel(unsigned int channel)
+{
+    if (channels.contains(channel))
+    {
+        channels[channel].clear();
+    }
+}
+
+unsigned int StaticWrite::getFreeChannel(bool setUp)
+{
+    unsigned int channel = 0;
+    while (channels.contains(channel))
+    {
+        channel++;
+    }
+    if (!setUp)
+    {
+        setUpChannel(channel);
+    }
+    return channel;
+}
 
 void StaticWrite::setUpChannel(unsigned int channel)
 {

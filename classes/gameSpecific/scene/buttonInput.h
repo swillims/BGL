@@ -10,6 +10,8 @@ struct ButtonInput : Scene
     std::vector<float> batch;
     std::vector<int> ints;
 
+    unsigned int channel;
+
     UIXRatio ui;
 
     ButtonInput(const std::string &aliasTarget, Scene* previous) : aliasTarget(aliasTarget), previous(previous), ui(1.0, true) {}
@@ -18,8 +20,8 @@ struct ButtonInput : Scene
     {
         Scene::onLoad();
         message = "Press a Key";
-
-        ui.appendType<UIBuffer>(.2).appendType<UITextOneLine>(-11111, message, .15);
+        channel = StaticWrite::GetFreeChannel();
+        ui.appendType<UIBuffer>(.2).appendType<UITextOneLine>(channel, message, .15);
 
         StaticInput::KeyTrackSetAll();
         ints = StaticInput::GetTrackedKeys(); // very unnecessary but showing tools
@@ -34,7 +36,7 @@ struct ButtonInput : Scene
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-11111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f));
 
         // call super
         Scene::render(time, updateDisplay);
@@ -68,5 +70,9 @@ struct ButtonInput : Scene
                 return;
             }
         }
+    }
+    void clean()
+    {
+        StaticWrite::DestroyChannel(channel);
     }
 };

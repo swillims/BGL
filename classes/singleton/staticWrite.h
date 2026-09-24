@@ -78,6 +78,10 @@ struct StaticWrite
     void generateAtlas(const std::string& fontPath);
     void destroyChannels();
     static void DestroyChannels() { singleton->destroyChannels(); }
+    void destroyChannel(unsigned int channel);
+    static void DestroyChannel(unsigned int channel) { singleton->destroyChannel(channel); }
+    unsigned int getFreeChannel(bool setUp = true);
+    static unsigned int GetFreeChannel(bool setUp =  true){return singleton->getFreeChannel(setUp);}
     void setUpChannel(unsigned int channel);
     static void SetUpChannel(unsigned int channel) { singleton->setUpChannel(channel); }
     std::vector<float>generateVertices(const std::string& text, float x, float y, float xScale, float yScale)
