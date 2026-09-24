@@ -124,6 +124,11 @@ void Walker3D::onLoad()
 
     StaticAudio::updateSounds();
 
+    // load write channels
+    // - destroying channels is good for onload for non-dependent scenes because it free resources.
+    StaticWrite::DestroyChannels();
+    uiTextChannel = StaticWrite::GetFreeChannel();
+
     // load inputs
     // - creating temp keyOptions page to pull values from
     WalkerKeyOptions keyOptions;
@@ -169,15 +174,18 @@ void Walker3D::onLoad()
         floor = generateFlatGrid5Vao(-20,20,-20,20,paramX,paramZ);
 
         // ui is completely unnessary here but I have a tool, so I should use it in a tutorial
-        ui.appendType<UIYSplits>(std::vector<float>({.1f,.1f,.1f,.1f}))
-            .appendType<UITextOneLine>(uiTextChannel, menuString, .6f, XLEFT).back()
-            .appendType<UITextOneLine>(uiTextChannel, rotateString, .6f, XLEFT).back()
-            .appendType<UITextOneLine>(uiTextChannel, playerWalkString, .6f, XLEFT).back()
-            .appendType<UITextOneLine>(uiTextChannel, hoverString, .6f, XLEFT).back()
-        ;
+
 
         alreadyLoaded = true;
     }
+
+    ui.nodes.clear();
+    ui.appendType<UIYSplits>(std::vector<float>({.1f,.1f,.1f,.1f}))
+        .appendType<UITextOneLine>(uiTextChannel, menuString, .6f, XLEFT).back()
+        .appendType<UITextOneLine>(uiTextChannel, rotateString, .6f, XLEFT).back()
+        .appendType<UITextOneLine>(uiTextChannel, playerWalkString, .6f, XLEFT).back()
+        .appendType<UITextOneLine>(uiTextChannel, hoverString, .6f, XLEFT).back()
+        ;
 
     // set up random floating things
     images.clear();
@@ -344,6 +352,8 @@ void Walker3D::clean()
     StaticDraw::unLoadShader(shader3d2d);
     StaticDraw::unLoadSharedShaderVariable(viewUboRef);
     StaticDraw::unLoadSharedShaderVariable(projectionUboRef);
+
+    StaticWrite::DestroyChannel(uiTextChannel);
 }
 
 int Walker3D::getHoveredImage()

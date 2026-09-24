@@ -180,7 +180,7 @@ struct Walker3D : Scene
     std::string playerWalkString;
     std::string rotateString;
     std::string hoverString;
-    unsigned int uiTextChannel = 1;
+    unsigned int uiTextChannel = -1;
 
     // scene methods
     void onLoad();

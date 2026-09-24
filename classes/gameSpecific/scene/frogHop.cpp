@@ -89,6 +89,8 @@ void FrogHop::onLoad()
 	StaticAudio::updateSounds();
 
 	// set up write channels
+	// - destroying channels is good for onload for non-dependent scenes because it free resources.
+	StaticWrite::DestroyChannels();
 	channel = StaticWrite::GetFreeChannel();
 	channel2 = StaticWrite::GetFreeChannel();
 
