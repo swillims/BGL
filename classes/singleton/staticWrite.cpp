@@ -129,7 +129,7 @@ unsigned int StaticWrite::getFreeChannel(bool setUp)
     {
         channel++;
     }
-    if (!setUp)
+    if (setUp)
     {
         setUpChannel(channel);
     }

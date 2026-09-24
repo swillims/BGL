@@ -88,6 +88,10 @@ void FrogHop::onLoad()
 
 	StaticAudio::updateSounds();
 
+	// set up write channels
+	channel = StaticWrite::GetFreeChannel();
+	channel2 = StaticWrite::GetFreeChannel();
+
 	// Load Controls
 
 	// to get controls working, the class needs key bindings.
@@ -165,6 +169,7 @@ void FrogHop::onLoad()
 		jumpSpeed = 5;
 		scoreScale = 5.0f;
 		score = 0;
+		controlsScale = 0.8f;
 	}
 
 	// set music
@@ -201,7 +206,7 @@ void FrogHop::pause()
 	PauseMenu* menu = new PauseMenu(this);
 	// Set pause menu has a function for setting text channel.
 	// - The text channel needs to be a number not used by this scene or it will draw this scenes text over the manu.
-	menu->setTextChannel(-1111);
+	menu->setTextChannel(StaticWrite::GetFreeChannel());
 	// Change scenes to menu and set clean to false to avoid deleting this scene
 	DataHolder::SceneQueue(menu, false);
 }
@@ -506,16 +511,14 @@ void FrogHop::render(float time, bool updateDisplay)
 	// set needed to use writing shader
 	writer->startWrite();
 
-
 	// First variable in drawChannel is the channel being drawn to
 	// Second variable drawChannel is a color. RGB
-	// - The text of channel 0 is defined in aspectChange()
-	writer->drawChannel(0, glm::vec3(1.0f, 1.0f, 1.0f));
+	writer->drawChannel(channel, glm::vec3(1.0f, 1.0f, 1.0f));
 
-	StaticWrite::SetUpChannel(1);
+	StaticWrite::SetUpChannel(channel2);
 	std::string scoreStr = std::to_string(static_cast<int>(score));
-	StaticWrite::AppendText(1, "Score: " + scoreStr, .5f, .9f, xScale * .8, yScale * .8);
-	writer->drawChannel(1, glm::vec3(1.0f, 1.0f, 1.0f));
+	StaticWrite::AppendText(channel2, "Score: " + scoreStr, .5f, .9f, xScale * .8, yScale * .8);
+	writer->drawChannel(channel2, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// call super to render
 	Scene::render(time, updateDisplay);
@@ -530,16 +533,16 @@ void FrogHop::aspectChange()
 	
 	xScale = yScale / StaticDraw::aspectRatio;
 
-	StaticWrite::SetUpChannel(0); // clears channel 0
+	StaticWrite::SetUpChannel(channel); // clears channel 0
 	std::string q = StaticInput::IntToString(rotateC);
 	std::string e = StaticInput::IntToString(rotateCC);
 	std::string w = StaticInput::IntToString(hopButton);
 	std::string esc = StaticInput::IntToString(pauseButton);
 	// The number 0 is arbitrary. It is ok to use whatever number as long as it is a valid int and it is deliberate.
-	StaticWrite::AppendText(0, "Controls:", -.95f, .9f, xScale * .8, yScale * .8); // add text to channel 0
-	StaticWrite::AppendText(0, q + " or " + e + ": Rotate Frog", -.9f, .8f, xScale * .8, yScale * .8); // add text to channel 0
-	StaticWrite::AppendText(0, w + ": Jump", -.9f, .7f, xScale * .8, yScale * .8); // add text to channel 0
-	StaticWrite::AppendText(0, esc + ": Pause", -.9f, .6f, xScale * .8, yScale * .8);
+	StaticWrite::AppendText(channel, "Controls:", -.95f, .9f, xScale * .8, yScale * .8);
+	StaticWrite::AppendText(channel, q + " or " + e + ": Rotate Frog", -.9f, .8f, xScale * .8, yScale * .8);
+	StaticWrite::AppendText(channel, w + ": Jump", -.9f, .7f, xScale * .8, yScale * .8);
+	StaticWrite::AppendText(channel, esc + ": Pause", -.9f, .6f, xScale * .8, yScale * .8);
 }
 
 void FrogHop::clean()
@@ -560,6 +563,9 @@ void FrogHop::clean()
 	StaticDraw::unLoadImage("frogBlock");
 
 	StaticDraw::deleteVAO(frogRotationVaoRef);
+
+	StaticWrite::DestroyChannel(channel);
+	StaticWrite::DestroyChannel(channel2);
 
 	// set all keys to not be tracked
 	// NOTE: mouse clicks are handled separately from key clicks

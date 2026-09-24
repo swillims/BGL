@@ -87,8 +87,10 @@ struct FrogHop : Scene
 	bool wHeld;
 	float jumpSpeed;
 
-	// meta variables
-	// - I'm not going to save score because this is just a demo and the option menus show how to save things
+	// ui variables
+	unsigned int channel;
+	unsigned int channel2;
+	float controlsScale;
 	float score;
 	float scoreScale;
 
