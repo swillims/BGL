@@ -69,6 +69,8 @@ public:
     float effectVollumeLeft;
     float effectVollumeWidth;
 
+    unsigned int channel;
+
     // settingsVariables
     float masterVollume;
     float musicVollume;
@@ -114,6 +116,9 @@ public:
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
 
         StaticAudio::updateSounds();
+
+        // writer
+        channel = StaticWrite::GetFreeChannel();
 
         // declared on StaticDraw Init
         shaderSimpleRef = StaticDraw::getShader("simple");
@@ -168,14 +173,14 @@ public:
                         .appendType<TexUVNode>(0, .25, 0, .5,uiKeySettings).back()
                     .back()
                 .back()
-                .appendType<UITextOneLine>(-111, soundTitle,.35).back()
+                .appendType<UITextOneLine>(channel, soundTitle,.35).back()
                 .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiGraphicSettings).back()
             ;
 
         i++;
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
-                .appendType<UITextOneLine>(-111, masterTitle, .2, XRIGHT);
+                .appendType<UITextOneLine>(channel, masterTitle, .2, XRIGHT);
 
         // bar
         std::vector<std::unique_ptr<UIElement>>& ct =
@@ -188,7 +193,7 @@ public:
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
         ui[0][i].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, masterValue, .2, XLEFT)
+            .appendType<UITextOneLine>(channel, masterValue, .2, XLEFT)
             .back().back()[1]
             .appendType<UIXShifter>(masterVollumeLeft, masterVollumeWidth)
             .appendType<UIXRatio> (1.0)
@@ -197,7 +202,7 @@ public:
         i++;
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, musicTitle, .2, XRIGHT);
+            .appendType<UITextOneLine>(channel, musicTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct2 =
             ui[0][i].appendType<UIStack>().setKey(uiMusicVollume)
             .appendType<UIXHolder>()
@@ -208,7 +213,7 @@ public:
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
         ui[0][i].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, musicValue, .2, XLEFT)
+            .appendType<UITextOneLine>(channel, musicValue, .2, XLEFT)
             .back().back()[1]
             .appendType<UIXShifter>(musicVollumeLeft, musicVollumeWidth)
             .appendType<UIXRatio>(1.0)
@@ -217,7 +222,7 @@ public:
         i++;
         ui[0].appendType<UIXSplits>(std::vector<float>{ .25f, .6f, .15f }, -1)
             .appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, soundEffectTitle, .2, XRIGHT);
+            .appendType<UITextOneLine>(channel, soundEffectTitle, .2, XRIGHT);
         std::vector<std::unique_ptr<UIElement>>& ct3 =
             ui[0][i].appendType<UIStack>().setKey(3) // key
             .appendType<UIXHolder>()
@@ -228,7 +233,7 @@ public:
             node.appendType<TexUVNode>(.25, .75, 0, .5);
         }
         ui[0][i].appendType<UIBuffer>(.1)
-            .appendType<UITextOneLine>(-111, soundEffectValue, .2, XLEFT)
+            .appendType<UITextOneLine>(channel, soundEffectValue, .2, XLEFT)
             .back().back()[1]
             .appendType<UIXShifter>(effectVollumeLeft, effectVollumeWidth)
             .appendType<UIXRatio>(1.0)
@@ -237,9 +242,9 @@ public:
         i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
-            .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
+            .appendType<UITextOneLine>(channel, exitText, .2, XCENTER).back().back().back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
-            .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
+            .appendType<UITextOneLine>(channel, saveText, .2, XCENTER);
 
         aspectChange();
     }
@@ -260,7 +265,7 @@ public:
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f));
 
         Scene::render(time, updateDisplay);
     };
@@ -276,7 +281,7 @@ public:
     {
         StaticDraw::updateView(); // need for proper aspect ratio update
         batch.clear();
-        StaticWrite::SetUpChannel(-111);
+        StaticWrite::SetUpChannel(channel);
 
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
@@ -303,6 +308,11 @@ public:
                 else{buttonPress(buttonHover);}
             }
         }
+    }
+
+    void clean()
+    {
+        StaticWrite::DestroyChannel(channel);
     }
 
     void buttonPress(int x)

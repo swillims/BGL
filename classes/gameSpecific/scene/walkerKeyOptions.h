@@ -55,6 +55,7 @@ public:
     // ui vars
     unsigned int buttonHover; // button being hovered
     double mouseCordX, mouseCordY; // mouse cords that need to be normalized
+    unsigned int channel;
 
     std::vector<float> batch;
 
@@ -188,81 +189,81 @@ public:
                         .appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
                     .back()
                 .back()
-            .appendType<UITextOneLine>(-111, keyTitle,.25).back()
+            .appendType<UITextOneLine>(channel, keyTitle,.25).back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, qTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, qTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
-                        .appendType<UITextOneLine>(-111, qValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, qValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, eTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, eTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
-                        .appendType<UITextOneLine>(-111, eValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, eValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, rTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, rTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiR).back()
-                        .appendType<UITextOneLine>(-111, rValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, rValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, fTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, fTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiF).back()
-                        .appendType<UITextOneLine>(-111, fValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, fValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
         ;
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, wTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, wTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
-                        .appendType<UITextOneLine>(-111, wValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, wValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, aTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, aTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiA).back()
-                        .appendType<UITextOneLine>(-111, aValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, aValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, sTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, sTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiS).back()
-                        .appendType<UITextOneLine>(-111, sValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, sValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, dTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, dTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiD).back()
-                        .appendType<UITextOneLine>(-111, dValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, dValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
@@ -270,11 +271,11 @@ public:
         ui[0].appendType<UIXHolder>()
             .appendType<UIEmpty>().back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, escTitle, elemFontSize).back()
+                .appendType<UITextOneLine>(channel, escTitle, elemFontSize).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
-                        .appendType<UITextOneLine>(-111, escValue, buttonFontSize).back()
+                        .appendType<UITextOneLine>(channel, escValue, buttonFontSize).back()
                         .back()
                     .back()
                 .back()
@@ -283,9 +284,9 @@ public:
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
-            .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
+            .appendType<UITextOneLine>(channel, exitText, .2, XCENTER).back().back().back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
-            .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
+            .appendType<UITextOneLine>(channel, saveText, .2, XCENTER);
 
         aspectChange();
     }
@@ -306,7 +307,7 @@ public:
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f));
 
         Scene::render(time, updateDisplay);
     };
@@ -322,8 +323,8 @@ public:
         StaticDraw::updateView();
 
         batch.clear();
-        // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
-        StaticWrite::SetUpChannel(-111);
+        // channel channel used to avoid conflict. Underflow makes it an absurdly large number
+        StaticWrite::SetUpChannel(channel);
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
 
@@ -339,6 +340,11 @@ public:
 
             buttonPress(buttonHover);
         }
+    }
+
+    void clean()
+    {
+        StaticWrite::DestroyChannel(channel);
     }
 
     void buttonPress(int x);

@@ -122,6 +122,11 @@ void PauseMenu::processInput()
     }
 }
 
+void PauseMenu::clean()
+{
+    StaticWrite::DestroyChannel(writeChannel);
+}
+
 void PauseMenu::buttonPress(int x)
 {
     if (x==uiReturnToGame)
@@ -149,6 +154,7 @@ void PauseMenu::buttonPress(int x)
 
 void PauseMenu::setTextChannel(int x)
 {
+    StaticWrite::SetUpChannel(writeChannel);
     writeChannel=x;
     ui.nodes.clear(); // clear nodes
     onLoad(); // reload the scene but with different text channel set in nodes

@@ -51,6 +51,7 @@ public:
     void handle(float time) override;
     void aspectChange() override;
     void processInput();
+    void clean();
     void buttonPress(int x);
     void setTextChannel(int x);
 };
