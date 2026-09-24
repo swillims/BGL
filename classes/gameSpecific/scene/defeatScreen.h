@@ -5,6 +5,8 @@
 
 /*
     This scene was made before uiHelper and StaticInput. I recommend refactoring if you make your own game.
+
+    This is beyond inexcusably ugly and uses archaic code. It needs a refactor.
 */
 
 struct DefeatScreen : Scene
@@ -39,6 +41,7 @@ struct DefeatScreen : Scene
 
     // window vars
     int winWidth, winHeight;
+    unsigned int channel;
 
     // ref used to backtrack to previous scene
     Scene* previous;
@@ -113,7 +116,7 @@ struct DefeatScreen : Scene
 
         // render draw channels
         StaticWrite::StartWrite(); // needed to start writing
-        StaticWrite::DrawChannel(-11, glm::vec3(0.0f, 0.0f, 0.0f)); // channels are set in aspectChange()
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f)); // channels are set in aspectChange()
 
         // make hovered button white
         if (buttonHover != -1 || buttonStart != -1)
@@ -166,13 +169,13 @@ struct DefeatScreen : Scene
             textYShift /= 2;
         }
 
-        StaticWrite::SetUpChannel(-11);
+        StaticWrite::SetUpChannel(channel);
         for (int i = 0; i < a; i++)
         {
             
             float h = yCords[i * 2];
-            if (i == 0) { StaticWrite::AppendText(-11, "Exit", -.5, h + textYShift, fontXScale, fontYScale); }
-            else if (i == 1) { StaticWrite::AppendText(-11, "Retry", -.5, h + textYShift, fontXScale, fontYScale); }
+            if (i == 0) { StaticWrite::AppendText(channel, "Exit", -.5, h + textYShift, fontXScale, fontYScale); }
+            else if (i == 1) { StaticWrite::AppendText(channel, "Retry", -.5, h + textYShift, fontXScale, fontYScale); }
         }
 
         if (yCords.size() >= 2)

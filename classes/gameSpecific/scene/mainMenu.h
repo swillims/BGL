@@ -31,7 +31,7 @@ struct MainMenu : Scene
     UIBase ui;
     std::vector<float> uiBatch;
 
-    unsigned int uiTextChannel = 0;
+    unsigned int uiTextChannel;
 
     // click handling
     int buttonHover = -1;
@@ -85,7 +85,9 @@ struct MainMenu : Scene
 
         // set up writer
         writer = StaticWrite::singleton;
+        // is good practice to have main menu destroy all other channel on load to remove unused resources
         writer->destroyChannels();
+        uiTextChannel = writer->getFreeChannel();
 
         // set up UI
         ui.nodes.clear();
@@ -250,5 +252,6 @@ struct MainMenu : Scene
     void clean() override
     {
         StaticAudio::stopSound(backgroundMusic);
+        StaticWrite::DestroyChannel(uiTextChannel);
     }
 };

@@ -98,6 +98,7 @@ public:
     // uiVariables
     int screenX;
     int screenY;
+    unsigned int channel;
 
     // scene for backtracking and render
     Scene* previous;
@@ -136,6 +137,9 @@ public:
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
+
+        // text channel
+        channel = StaticWrite::GetFreeChannel();
 
         screenX = StaticDraw::w;
         screenY = StaticDraw::h;
@@ -188,100 +192,94 @@ public:
                     .appendType<TexUVNode>(0, .25, 0, .5,uiSoundSettings).back()
                 .back()
             .back()
-            .appendType<UITextOneLine>(-111, soundTitle,.35).back()
+            .appendType<UITextOneLine>(channel, soundTitle,.35).back()
 
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiKeySettings);
 
         i++;
         ui[0].appendType<UIXHolder>()
-            .appendType<UITextOneLine>(-111, xTitle,.35).back()
+            .appendType<UITextOneLine>(channel, xTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX1).back().back()
-                    .appendType<UITextOneLine>(-111, strx4,.35).back()
+                    .appendType<UITextOneLine>(channel, strx4,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX2).back().back()
-                    .appendType<UITextOneLine>(-111, strx3,.35).back()
+                    .appendType<UITextOneLine>(channel, strx3,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX3).back().back()
-                    .appendType<UITextOneLine>(-111, strx2,.35).back()
+                    .appendType<UITextOneLine>(channel, strx2,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiX4).back().back()
-                    .appendType<UITextOneLine>(-111, strx1,.35).back()
+                    .appendType<UITextOneLine>(channel, strx1,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiX4d).back().back()
                 .back();
 
         i++;
         ui[0].appendType<UIXHolder>()
-            .appendType<UITextOneLine>(-111, yTitle,.35).back()
+            .appendType<UITextOneLine>(channel, yTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY1).back().back()
-                    .appendType<UITextOneLine>(-111, stry4,.35).back()
+                    .appendType<UITextOneLine>(channel, stry4,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY2).back().back()
-                    .appendType<UITextOneLine>(-111, stry3,.35).back()
+                    .appendType<UITextOneLine>(channel, stry3,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY3).back().back()
-                    .appendType<UITextOneLine>(-111, stry2,.35).back()
+                    .appendType<UITextOneLine>(channel, stry2,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiY4).back().back()
-                    .appendType<UITextOneLine>(-111, stry1,.35).back()
+                    .appendType<UITextOneLine>(channel, stry1,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiY4d).back().back()
                 .back();
-                // The .back()s at the end of a chain do nothing. They are stylistically left in to look better.
-
         i++;
         ui[0].appendType<UIXHolder>()
-            .appendType<UITextOneLine>(-111, fpsTitle,.35).back()
+            .appendType<UITextOneLine>(channel, fpsTitle,.35).back()
             .appendType<UIXHolder>()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS1).back().back()
-                    .appendType<UITextOneLine>(-111, strfps4,.35).back()
+                    .appendType<UITextOneLine>(channel, strfps4,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS1d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS2).back().back()
-                    .appendType<UITextOneLine>(-111, strfps3,.35).back()
+                    .appendType<UITextOneLine>(channel, strfps3,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS2d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS3).back().back()
-                    .appendType<UITextOneLine>(-111, strfps2,.35).back()
+                    .appendType<UITextOneLine>(channel, strfps2,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS3d).back().back()
                 .back()
                 .appendType<UIYHolder>()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(.75, 1, 0, .5,uiFPS4).back().back()
-                    .appendType<UITextOneLine>(-111, strfps1,.35).back()
+                    .appendType<UITextOneLine>(channel, strfps1,.35).back()
                     .appendType<UIXRatio>(1).appendType<TexUVNode>(0, .25, 0, .5,uiFPS4d).back().back()
                 .back();
-
         i++;
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2)
                     .appendType<TexUVNode>(0,1,.5,1,uiExit).back()
-                    .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back()
+                    .appendType<UITextOneLine>(channel, exitText, .2, XCENTER).back()
                 .back()
             .back()
             .appendType<UIStack>()
                 .appendType<UIXRatio>(2)
                     .appendType<TexUVNode>(0,1,.5,1,uiSave).back()
-                    .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
-
-        // an earlier comment said that .back()s at the ends are stylistic. Look at how ugly ^^^ this ^^^ without them
-
+                    .appendType<UITextOneLine>(channel, saveText, .2, XCENTER);
         aspectChange();
     }
     void render(float time = 0, bool updateDisplay = true) override
@@ -301,7 +299,7 @@ public:
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f));
 
         Scene::render(time, updateDisplay);
     };
@@ -346,8 +344,7 @@ public:
         strfps4 = std::to_string(fps / 1000 % 10);
 
         batch.clear();
-        // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
-        StaticWrite::SetUpChannel(-111);
+        StaticWrite::SetUpChannel(channel);
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
 
@@ -363,6 +360,11 @@ public:
 
             buttonPress(buttonHover);
         }
+    }
+
+    void clean()
+    {
+        StaticWrite::DestroyChannel(channel);
     }
 
     void buttonPress(int x);

@@ -68,6 +68,8 @@ public:
     std::string exitText;
     std::string saveText;
 
+    unsigned int channel;
+
     // scene for backtracking and render
     Scene* previous;
 
@@ -102,6 +104,9 @@ public:
             StaticAudio::load("assets/core/menuBloo.wav", "menuBloo.wav", { "soundEffect" });
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
+
+        // load text channels
+        channel = StaticWrite::GetFreeChannel();
 
         int fps = DataHolder::god.frameCapInt;
 
@@ -140,49 +145,55 @@ public:
                         .appendType<TexUVNode>(0, .25, 0, .5,uiGraphicsSettings).back()
                     .back()
             .back()
-            .appendType<UITextOneLine>(-111, keyTitle,.25).back()
+            .appendType<UITextOneLine>(channel, keyTitle,.25).back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(.75, 1, 0, .5,uiSoundSettings);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, qTitle,.25).back()
+                .appendType<UITextOneLine>(channel, qTitle,.25).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiQ).back()
-                        .appendType<UITextOneLine>(-111, qValue,.15)
-            .back().back().back().back()
+                        .appendType<UITextOneLine>(channel, qValue,.15).back()
+                        .back()
+                    .back()
+                .back()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, eTitle,.25).back()
+                .appendType<UITextOneLine>(channel, eTitle,.25).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiE).back()
-                        .appendType<UITextOneLine>(-111, eValue,.15);
+                        .appendType<UITextOneLine>(channel, eValue,.15);
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, wTitle,.25).back()
+                .appendType<UITextOneLine>(channel, wTitle,.25).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiW).back()
-                        .appendType<UITextOneLine>(-111, wValue,.15).back()
-            .back().back().back()
+                        .appendType<UITextOneLine>(channel, wValue,.15).back()
+                        .back()
+                    .back()
+                .back()
             .appendType<UIEmpty>();
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIXHolder>()
-                .appendType<UITextOneLine>(-111, escTitle,.25).back()
+                .appendType<UITextOneLine>(channel, escTitle,.25).back()
                 .appendType<UIXRatio>(1)
                     .appendType<UIStack>()
                         .appendType<TexUVNode>(0, 1, .5, 1,uiEsc).back()
-                        .appendType<UITextOneLine>(-111, escValue,.15).back()
-                .back().back().back()
-                .appendType<UIEmpty>();
+                        .appendType<UITextOneLine>(channel, escValue,.15).back()
+                        .back()
+                    .back()
+                .back()
+            .appendType<UIEmpty>();
 
         ui[0].appendType<UIXHolder>()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiExit).back()
-            .appendType<UITextOneLine>(-111, exitText, .2, XCENTER).back().back().back()
+            .appendType<UITextOneLine>(channel, exitText, .2, XCENTER).back().back().back()
             .appendType<UIStack>().appendType<UIXRatio>(2).appendType<TexUVNode>(0,1,.5,1,uiSave).back()
-            .appendType<UITextOneLine>(-111, saveText, .2, XCENTER);
+            .appendType<UITextOneLine>(channel, saveText, .2, XCENTER);
 
         aspectChange();
     }
@@ -203,7 +214,7 @@ public:
 
         // write text
         StaticWrite::StartWrite();
-        StaticWrite::DrawChannel(-111, glm::vec3(0.0f, 0.0f, 0.0f));
+        StaticWrite::DrawChannel(channel, glm::vec3(0.0f, 0.0f, 0.0f));
 
         Scene::render(time, updateDisplay);
     };
@@ -219,8 +230,7 @@ public:
         StaticDraw::updateView();
 
         batch.clear();
-        // channel -111 used to avoid conflict. Underflow makes it an absurdly large number
-        StaticWrite::SetUpChannel(-111);
+        StaticWrite::SetUpChannel(channel);
         ui.adjustNodeDefault();
         ui.renderVerts(batch);
 
@@ -236,6 +246,11 @@ public:
 
             buttonPress(buttonHover);
         }
+    }
+
+    void clean()
+    {
+        StaticWrite::DestroyChannel(channel);
     }
 
     void buttonPress(int x);
