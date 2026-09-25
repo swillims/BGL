@@ -128,6 +128,9 @@ public:
         }
         bwoo = StaticAudio::soundStringRefs["menuBloo.wav"];
 
+        // set up channels
+        channel = StaticWrite::GetFreeChannel(channel);
+
         int fps = DataHolder::god.frameCapInt;
 
         // declared on StaticDraw Init
